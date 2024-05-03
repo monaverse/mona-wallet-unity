@@ -1,0 +1,26 @@
+{
+    "name": "com.monaverse.api",
+    "displayName": "Monaverse Wallet SDK API",
+    "description": "Directly access the public API of the Mona Wallet SDK",
+    "version": "0.1.0",
+    "unity": "2022.3",
+    "unityRelease": "17f1",
+    "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.2.1",
+        "com.unity.textmeshpro": "3.0.6",
+        "com.unity.modules.ui": "1.0.0",
+        "com.unity.modules.imgui": "1.0.0",
+        "com.unity.ugui": "1.0.0"
+    },
+    "keywords": [
+        "Mona",
+        "Monaverse",
+        "Wallet",
+        "SDK",
+        "API"
+    ],
+    "author": {
+        "name": "Mona Gallery, Inc.",
+        "url": "https://www.monaverse.com"
+    }
+}
