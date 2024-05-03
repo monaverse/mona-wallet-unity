@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using Monaverse.Api.Extensions;
-using Monaverse.Api.Modules.Auth.Requests;
 using Monaverse.Api.Modules.Auth.Responses;
 using Monaverse.Api.MonaHttpClient;
 using Monaverse.Api.MonaHttpClient.Extensions;
@@ -21,26 +20,26 @@ namespace Monaverse.Api.Modules.Auth
             _monaHttpClient = monaHttpClient;
         }
         
-        public async Task<PostNonceResponse> PostNonce(PostNonceRequest request)
+        public async Task<PostNonceResponse> PostNonce(string walletAddress)
         {
             var monaHttpRequest = new MonaHttpRequest(
                     url: _monaApiOptions.GetUrlWithPath(Constants.Endpoints.PostNonce),
                     method: RequestMethod.Post)
-                .WithBody(new { walletAddress = request.WalletAddress });
+                .WithBody(new { walletAddress = walletAddress });
 
             var response = await _monaHttpClient.SendAsync(monaHttpRequest);
             return response.ConvertTo<PostNonceResponse>();
         }
         
-        public async Task<AuthorizeResponse> Authorize(AuthorizeRequest request)
+        public async Task<AuthorizeResponse> Authorize(string signature, string siweMessage)
         {
             var monaHttpRequest = new MonaHttpRequest(
                     url: _monaApiOptions.GetUrlWithPath(Constants.Endpoints.PostAuthorize),
                     method: RequestMethod.Post)
                 .WithBody(new
                 {
-                    signature = request.Signature,
-                    message = request.Message
+                    signature = signature,
+                    message = siweMessage
                 });
 
             var response = await _monaHttpClient.SendAsync(monaHttpRequest);
