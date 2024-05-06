@@ -1,4 +1,3 @@
-using Monaverse.Api.Logging;
 using Monaverse.Api.Modules.Auth;
 using Monaverse.Api.Modules.Collectibles;
 using Monaverse.Api.MonaHttpClient;
@@ -14,11 +13,9 @@ namespace Monaverse.Api
         
         public bool IsAuthenticated => !string.IsNullOrEmpty(_monaHttpClient.AccessToken);
 
-        public MonaApiClientImpl(IMonaApiOptions monaApiOptions)
+        public MonaApiClientImpl(IMonaApiOptions monaApiOptions, IMonaHttpClient monaHttpClient)
         {
-            //Configure API client
-            var monaApiLogger = new UnityMonaApiLogger(monaApiOptions.LogLevel);
-            _monaHttpClient = new DefaultHttpClient(monaApiLogger);
+            _monaHttpClient = monaHttpClient;
             
             //Configure API modules
             Auth = new AuthApiModule(monaApiOptions, _monaHttpClient);

@@ -1,0 +1,7 @@
+namespace Monaverse.Api.Tests.Editor
+{
+    public static class SampleDataHelper
+    {
+        public const string GetWalletCollectiblesResponse = "{\"data\":[{\"id\":\"bgsDpasdriLhk\",\"type\":\"Avatar\",\"checked\":false,\"minted\":false,\"nsfw\":false,\"promoted\":false,\"__v\":11,\"activeVersion\":0,\"artist\":\"John Doe\",\"description\":\"Test\",\"creator\":\"0xe42c4fe879955cEa16380e9dAf9E7b6B48126E93\",\"slug\":\"grifter-squid-goerli\",\"views\":0,\"accessibility\":{\"accessLevel\":\"Public\",\"accessibleAt\":null,\"accessibleUntil\":null},\"_updated_at\":\"2024-05-03T18:36:56.258Z\",\"_created_at\":\"2024-05-03T18:32:35.784Z\",\"_deleted_at\":null,\"collectionId\":null,\"hidden\":false,\"image\":\"bafasdak2ulwymssqfsaeadls65nt7xxftzh3c3npe7snkmhmfqxqoyu\",\"lastSaleEventId\":null,\"lastSalePrice\":null,\"owner\":\"0xe42c4fe879955cEa16380e9dAf9E7b6B48126E93\",\"owners\":[{\"address\":\"0xe42c4fe879955cEa16380e9dAf9E7b6B48126E93\",\"amount\":1}],\"parentId\":null,\"price\":null,\"properties\":[],\"subCollectionId\":null,\"title\":\"Grifter Squaddie Goerli\",\"nft\":{\"contract\":null,\"ipfsUrl\":\"bafybeig3tvmgazsdfgadfgsdfm7qrtq2undmaxpsy7xnc7m6flzlgffy\",\"network\":null,\"tokenHash\":null,\"tokenId\":null,\"tokenUri\":null,\"transactionId\":null,\"tokenStandard\":null,\"amount\":null},\"creatorId\":null,\"documentId\":null,\"versions\":[{\"asset\":\"https://cdn-staging.mona.gallery/sdfe5433-suet-d9ik-rrgl-fsdfrww.vrm\"}]}],\"totalCount\":1,\"nextPageKey\":null }";
+    }
+}
