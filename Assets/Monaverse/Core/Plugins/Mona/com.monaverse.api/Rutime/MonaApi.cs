@@ -8,7 +8,7 @@ namespace Monaverse.Api
     public static class MonaApi
     {
         private static IMonaApiClient _apiClient;
-        private static IMonaApiClient ApiClient
+        public static IMonaApiClient ApiClient
         {
             get
             {
