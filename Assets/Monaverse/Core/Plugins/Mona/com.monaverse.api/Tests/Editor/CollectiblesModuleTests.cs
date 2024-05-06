@@ -1,4 +1,5 @@
 using System;
+using Monaverse.Api.Logging;
 using Monaverse.Api.MonaHttpClient;
 using Monaverse.Api.MonaHttpClient.Request;
 using Monaverse.Api.MonaHttpClient.Response;
@@ -35,7 +36,7 @@ namespace Monaverse.Api.Tests.Editor
                     i.SendAsync(It.IsAny<IMonaHttpRequest>()))
                 .ReturnsAsync(mockMonaHttpResponse.Object);
 
-            var monaApiClient = MonaApi.Init(new DefaultApiOptions(), mockMonaHttpClient.Object);
+            var monaApiClient = MonaApi.Init(new DefaultApiOptions(), new UnityMonaApiLogger(ApiLogLevel.Info), mockMonaHttpClient.Object);
             var getWalletCollectiblesResponse = await monaApiClient.Collectibles.GetWalletCollectibles();
 
             Assert.NotNull(getWalletCollectiblesResponse);

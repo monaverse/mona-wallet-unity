@@ -2,6 +2,7 @@ namespace Monaverse.Api
 {
     internal static class Constants
     {
+        public const string MonaDomain = "monaverse.com";
         public const string BaseUrlLocal = "http://localhost:3007";
         public const string BaseUrlDevelopment = "https://api-dev.helios.monaver.se";
         public const string BaseUrlStaging = "https://api-staging.helios.monaver.se";

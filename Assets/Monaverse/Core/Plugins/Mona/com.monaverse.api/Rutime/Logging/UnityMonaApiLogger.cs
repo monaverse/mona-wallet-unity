@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Monaverse.Api.Logging
 {
-    public sealed class UnityMonaApiLogger : IHttpLogger
+    public sealed class UnityMonaApiLogger : IHttpLogger, IMonaApiLogger
     {
         private readonly ApiLogLevel _logLevel;
         private const string LogPrefix = "[MonaverseApi] ";

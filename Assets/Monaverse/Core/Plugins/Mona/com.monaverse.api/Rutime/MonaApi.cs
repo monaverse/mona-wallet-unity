@@ -7,7 +7,16 @@ namespace Monaverse.Api
 {
     public static class MonaApi
     {
-        private static IMonaApiClient ApiClient { get; set; }
+        private static IMonaApiClient _apiClient;
+        private static IMonaApiClient ApiClient
+        {
+            get
+            {
+                if (_apiClient != null) return _apiClient;
+                Debug.LogError("You must call Init before using the API");
+                return null;
+            }
+        }
 
         public static IMonaApiClient Init(string applicationId)
         {
@@ -20,23 +29,17 @@ namespace Monaverse.Api
         public static IMonaApiClient Init(IMonaApiOptions monaApiOptions)
         {
             var monaApiLogger = new UnityMonaApiLogger(monaApiOptions.LogLevel);
-            var monaHttpClient = new DefaultHttpClient(monaApiLogger);
-            ApiClient = new MonaApiClientImpl(monaApiOptions, monaHttpClient);
-            return ApiClient;
+            var monaHttpClient = new UnityAsyncHttpClient(monaApiLogger);
+            _apiClient = new MonaApiClientImpl(monaApiOptions, monaApiLogger, monaHttpClient);
+            return _apiClient;
         }
         
-        public static IMonaApiClient Init(IMonaApiOptions monaApiOptions, IMonaHttpClient monaHttpClient)
+        public static IMonaApiClient Init(IMonaApiOptions monaApiOptions,
+            IMonaApiLogger monaApiLogger,
+            IMonaHttpClient monaHttpClient)
         {
-            ApiClient = new MonaApiClientImpl(monaApiOptions, monaHttpClient);
-            return ApiClient;
-        }
-        
-        public static IMonaApiClient GetApiClient()
-        {
-            if (ApiClient != null) return ApiClient;
-            
-            Debug.LogError("You must call Init before using the API");
-            return null;
+            _apiClient = new MonaApiClientImpl(monaApiOptions, monaApiLogger, monaHttpClient);
+            return _apiClient;
         }
     }
 }
