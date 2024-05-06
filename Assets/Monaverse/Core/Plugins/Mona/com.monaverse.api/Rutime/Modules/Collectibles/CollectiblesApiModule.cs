@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Monaverse.Api.Extensions;
+using Monaverse.Api.Logging;
 using Monaverse.Api.Modules.Collectibles.Responses;
 using Monaverse.Api.MonaHttpClient;
 using Monaverse.Api.MonaHttpClient.Extensions;
@@ -13,7 +14,8 @@ namespace Monaverse.Api.Modules.Collectibles
         private readonly IMonaApiOptions _monaApiOptions;
         private readonly IMonaHttpClient _monaHttpClient;
 
-        public CollectiblesApiModule(IMonaApiOptions monaApiOptions, 
+        public CollectiblesApiModule(IMonaApiOptions monaApiOptions,
+            IMonaApiLogger monaApiLogger,
             IMonaHttpClient monaHttpClient)
         {
             _monaApiOptions = monaApiOptions;

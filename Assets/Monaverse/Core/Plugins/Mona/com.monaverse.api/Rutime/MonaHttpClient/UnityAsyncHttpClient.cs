@@ -5,31 +5,32 @@ using Monaverse.Api.MonaHttpClient.Request;
 using Monaverse.Api.MonaHttpClient.Response;
 using UnityEngine.Networking;
 
-namespace Monaverse.Api.MonaHttpClient.Handlers
+namespace Monaverse.Api.MonaHttpClient
 {
-    public sealed class AsyncWebRequestHandler : IWebRequestHandler
+    public sealed class UnityAsyncHttpClient : IMonaHttpClient
     {
         private readonly IHttpLogger _httpLogger;
+        public string AccessToken { get; set; }
 
-        public AsyncWebRequestHandler(IHttpLogger httpLogger)
+        public UnityAsyncHttpClient(IHttpLogger httpLogger)
         {
             _httpLogger = httpLogger;
         }
 
-        public async Task<IMonaHttpResponse> SendWebRequest(IMonaHttpRequest request)
+        public async Task<IMonaHttpResponse> SendAsync(IMonaHttpRequest request)
         {
             var uwr = new UnityWebRequest
             {
                 method = request.Method.ToString(),
                 url = request.GetFullUrl()
             };
-             
+
             foreach (var kvp in request.Headers)
-                uwr.SetRequestHeader(kvp.Key,kvp.Value) ;
-            
-            if (request.Body != null) 
+                uwr.SetRequestHeader(kvp.Key, kvp.Value);
+
+            if (request.Body != null)
             {
-                uwr.uploadHandler = new UploadHandlerRaw(request.Body) 
+                uwr.uploadHandler = new UploadHandlerRaw(request.Body)
                 {
                     contentType = request.GetContentType(),
                 };
@@ -37,12 +38,12 @@ namespace Monaverse.Api.MonaHttpClient.Handlers
 
             uwr.timeout = request.Timeout;
             uwr.downloadHandler = new DownloadHandlerBuffer();
-    
+
             await uwr.SendWebRequestAsync();
-            
+
             var response = uwr.ToMonaHttpResponse(request);
             _httpLogger.LogResponse(response);
-            
+
             return response;
         }
     }
