@@ -13,7 +13,8 @@
     "overrideReferences": false,
     "precompiledReferences": [
         "nunit.framework.dll",
-        "Newtonsoft.Json.dll"
+        "Newtonsoft.Json.dll",
+        "Moq.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],

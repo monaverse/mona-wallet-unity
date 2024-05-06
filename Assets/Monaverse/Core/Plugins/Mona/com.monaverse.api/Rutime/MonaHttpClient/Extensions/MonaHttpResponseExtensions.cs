@@ -21,7 +21,10 @@ namespace Monaverse.Api.MonaHttpClient.Extensions
                 if (typeof(T) == typeof(string))
                     return (T)Convert.ChangeType(response.GetResponseString(), typeof(T));
                 
-                return JsonConvert.DeserializeObject<T>(response.GetResponseString());
+                return JsonConvert.DeserializeObject<T>(response.GetResponseString(), new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore
+                });
             }
 
             Exception ex = new HttpRequestException($"error processing HTTP request for {response.HttpRequest.Method} {response.Url}: {response.ResponseCode}");

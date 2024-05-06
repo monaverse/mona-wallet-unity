@@ -1,3 +1,5 @@
+using Monaverse.Api.Logging;
+using Monaverse.Api.MonaHttpClient;
 using Monaverse.Api.Options;
 using UnityEngine;
 
@@ -17,7 +19,15 @@ namespace Monaverse.Api
 
         public static IMonaApiClient Init(IMonaApiOptions monaApiOptions)
         {
-            ApiClient = new MonaApiClientImpl(monaApiOptions);
+            var monaApiLogger = new UnityMonaApiLogger(monaApiOptions.LogLevel);
+            var monaHttpClient = new DefaultHttpClient(monaApiLogger);
+            ApiClient = new MonaApiClientImpl(monaApiOptions, monaHttpClient);
+            return ApiClient;
+        }
+        
+        public static IMonaApiClient Init(IMonaApiOptions monaApiOptions, IMonaHttpClient monaHttpClient)
+        {
+            ApiClient = new MonaApiClientImpl(monaApiOptions, monaHttpClient);
             return ApiClient;
         }
         
