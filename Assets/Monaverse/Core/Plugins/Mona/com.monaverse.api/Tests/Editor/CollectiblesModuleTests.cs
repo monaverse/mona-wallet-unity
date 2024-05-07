@@ -43,5 +43,28 @@ namespace Monaverse.Api.Tests.Editor
             Assert.NotNull(getWalletCollectiblesResponse.Data);
             Assert.AreEqual(1, getWalletCollectiblesResponse.TotalCount);
         }
+        
+        [Test]
+        public async void GetCollectibleById()
+        {
+            var mockMonaHttpClient = new Mock<IMonaHttpClient>();
+            const string collectibleId = "bgsDpasdriLhk";
+
+            var mockMonaHttpResponse = new Mock<IMonaHttpResponse>();
+            mockMonaHttpResponse.Setup(i => i.IsSuccess).Returns(true);
+            mockMonaHttpResponse.Setup(i =>
+                    i.GetResponseString(null))
+                .Returns(SampleDataHelper.GetWalletCollectibleByIdResponse);
+
+            mockMonaHttpClient.Setup(i =>
+                    i.SendAsync(It.IsAny<IMonaHttpRequest>()))
+                .ReturnsAsync(mockMonaHttpResponse.Object);
+
+            var monaApiClient = MonaApi.Init(new DefaultApiOptions(), new UnityMonaApiLogger(ApiLogLevel.Info), mockMonaHttpClient.Object);
+            var walletCollectibleById = await monaApiClient.Collectibles.GetWalletCollectibleById(collectibleId);
+
+            Assert.NotNull(walletCollectibleById);
+            Assert.AreEqual(collectibleId, walletCollectibleById.Id);
+        }
     }
 }
