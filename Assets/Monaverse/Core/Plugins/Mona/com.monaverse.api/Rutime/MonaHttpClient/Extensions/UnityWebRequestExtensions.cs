@@ -16,7 +16,7 @@ namespace Monaverse.Api.MonaHttpClient.Extensions
                 .SendWebRequestCoroutine()
                 .RunCoroutine(() => isComplete = true);
 
-            while (!isComplete)
+            while (!isComplete && !unityWebRequest.isDone)
                 await Task.Yield();
 
             return unityWebRequest;

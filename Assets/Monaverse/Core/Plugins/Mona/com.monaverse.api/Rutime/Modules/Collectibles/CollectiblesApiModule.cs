@@ -26,8 +26,7 @@ namespace Monaverse.Api.Modules.Collectibles
         {
             var monaHttpRequest = new MonaHttpRequest(
                 url: _monaApiOptions.GetUrlWithPath(Constants.Endpoints.GetWalletCollectibles),
-                method: RequestMethod.Get
-            ).WithBearerToken(_monaHttpClient.AccessToken);
+                method: RequestMethod.Get);
             
             var response = await _monaHttpClient.SendAsync(monaHttpRequest);
             return response.ConvertTo<GetWalletCollectiblesResponse>();
@@ -37,8 +36,7 @@ namespace Monaverse.Api.Modules.Collectibles
         {
             var monaHttpRequest = new MonaHttpRequest(
                 url: _monaApiOptions.GetUrlWithPath(Constants.Endpoints.GetWalletCollectibleById(id)),
-                method: RequestMethod.Get
-            ).WithBearerToken(_monaHttpClient.AccessToken);
+                method: RequestMethod.Get);
             
             var response = await _monaHttpClient.SendAsync(monaHttpRequest);
             return response.ConvertTo<GetWalletCollectibleResponse>();
