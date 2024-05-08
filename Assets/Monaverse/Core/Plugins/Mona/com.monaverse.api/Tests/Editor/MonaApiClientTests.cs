@@ -9,7 +9,6 @@ namespace Monaverse.Api.Tests.Editor
         public void ClientInstanceTest()
         {
             var client = MonaApi.Init(Guid.NewGuid().ToString());
-            client.Collectibles.GetWalletCollectibles();
             Assert.NotNull(client);
         }
 

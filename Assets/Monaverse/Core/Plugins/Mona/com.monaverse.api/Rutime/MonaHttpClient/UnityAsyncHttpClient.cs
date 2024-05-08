@@ -7,7 +7,7 @@ using UnityEngine.Networking;
 
 namespace Monaverse.Api.MonaHttpClient
 {
-    public sealed class UnityAsyncHttpClient : IMonaHttpClient
+    public class UnityAsyncHttpClient : IMonaHttpClient
     {
         private readonly IHttpLogger _httpLogger;
         public string AccessToken { get; set; }
@@ -17,7 +17,7 @@ namespace Monaverse.Api.MonaHttpClient
             _httpLogger = httpLogger;
         }
 
-        public async Task<IMonaHttpResponse> SendAsync(IMonaHttpRequest request)
+        public virtual async Task<IMonaHttpResponse> SendAsync(IMonaHttpRequest request)
         {
             var uwr = new UnityWebRequest
             {

@@ -44,5 +44,11 @@ public class TestAuthApi : MonoBehaviour
         
         //Authorize the wallet
         var authorize = await monaApiClient.Auth.Authorize(signature, validateWalletAddress.SiweMessage);
-        Debug.Log("Authorize: " + authorize);}
+        if(!authorize)
+            return;
+        
+        Debug.Log("Authorization successful");
+        var collectibles = await monaApiClient.Collectibles.GetWalletCollectibles();       
+        Debug.Log("Collectibles: " + collectibles);
+    }
 }

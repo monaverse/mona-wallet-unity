@@ -7,6 +7,6 @@ namespace Monaverse.Api
     {
         IAuthApiModule Auth { get; }
         ICollectiblesApiModule Collectibles { get; }
-        void SetAccessToken(string accessToken);
+        void ClearSession();
     }
 }
