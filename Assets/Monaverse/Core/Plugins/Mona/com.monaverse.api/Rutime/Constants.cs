@@ -7,6 +7,7 @@ namespace Monaverse.Api
         public const string BaseUrlDevelopment = "https://api-dev.helios.monaver.se";
         public const string BaseUrlStaging = "https://api-staging.helios.monaver.se";
         public const string BaseUrlProduction = "https://api.helios.monaver.se";
+        public const string ApplicationIdHeader = "X-Mona-Application-Id";
         
         public static class Endpoints
         {

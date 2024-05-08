@@ -1,0 +1,8 @@
+{
+    "name": "Monaverse.Api.Tests.Runtime",
+    "references": [
+        "Monaverse.Api"],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}

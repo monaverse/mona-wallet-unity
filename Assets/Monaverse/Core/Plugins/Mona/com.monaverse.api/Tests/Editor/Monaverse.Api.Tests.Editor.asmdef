@@ -2,11 +2,12 @@
     "name": "Monaverse.Api.Tests",
     "rootNamespace": "",
     "references": [      
-        "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner",
         "Monaverse.Api"],
     "includePlatforms": [
         "Editor"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

@@ -12,7 +12,6 @@ namespace Monaverse.Api
         private readonly IMonaHttpClient _monaHttpClient;
         public IAuthApiModule Auth { get; private set; }
         public ICollectiblesApiModule Collectibles { get; private set; }
-        
         public bool IsAuthenticated => !string.IsNullOrEmpty(_monaHttpClient.AccessToken);
 
         public MonaApiClientImpl(IMonaApiOptions monaApiOptions,
@@ -21,13 +20,13 @@ namespace Monaverse.Api
         {
             _monaApiLogger = monaApiLogger;
             _monaHttpClient = monaHttpClient;
-            
+
             //Configure API modules
             Auth = new AuthApiModule(monaApiOptions, monaApiLogger, _monaHttpClient);
             Collectibles = new CollectiblesApiModule(monaApiOptions, monaApiLogger, _monaHttpClient);
         }
 
-        public void SetAccessToken(string accessToken)
-            => _monaHttpClient.AccessToken = accessToken;
+        public void ClearSession()
+            => _monaHttpClient.AccessToken = null;
     }
 }
