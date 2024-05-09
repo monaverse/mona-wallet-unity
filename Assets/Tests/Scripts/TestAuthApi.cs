@@ -6,6 +6,22 @@ using UnityEngine;
 public class TestAuthApi : MonoBehaviour
 {
     [SerializeField] private string _privateKey;
+
+    public async void TestNonce()
+    {
+        if (!Application.isPlaying)
+        {
+            Debug.LogError("Must be in play mode to test");
+            return;
+        }
+        
+        Debug.Log("Posting Nonce...");
+        
+        var monaApiClient = MonaApi.Init("FakeAppId");
+        const string walletAddress = "0xbd6702a0Cc6757ebadb3E402bBEa30aD15015f4d";
+        var nonce = await monaApiClient.Auth.PostNonce(walletAddress);
+        Debug.Log("Nonce: " + nonce);
+    }
     
     [ContextMenu("Test Authorize")]
     public async void TestAuthorize()
