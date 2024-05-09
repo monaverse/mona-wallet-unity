@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Tests/WalletModal/Scene/ModalTestScene.unity
+    guid: 88879cdcdb09b4123881b2d94c272b2b
   m_configObjects: {}
