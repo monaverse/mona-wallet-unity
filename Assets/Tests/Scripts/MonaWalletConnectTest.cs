@@ -82,9 +82,11 @@ public class MonaWalletConnectTest : MonoBehaviour
         var data = new PersonalSign(validateWalletAddressResponse.SiweMessage, address);
         var signature = await WalletConnect.Instance.RequestAsync<PersonalSign, string>(data);
         
+        Debug.Log("[MonaWalletConnectTest] Wallet Connect Signature: " + signature);        
+        
         _resultLabel.text = "Authorizing with Mona...";
         
-        var authorizeResponse = await MonaApi.ApiClient.Auth.Authorize(validateWalletAddressResponse.SiweMessage, signature);
+        var authorizeResponse = await MonaApi.ApiClient.Auth.Authorize(signature, validateWalletAddressResponse.SiweMessage);
         Debug.Log("[MonaWalletConnectTest] Authorize Done!\nResponse: " + authorizeResponse);
 
         if (!authorizeResponse)
