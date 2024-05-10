@@ -4,6 +4,7 @@ using Monaverse.Api.Extensions;
 using Monaverse.Api.Logging;
 using Monaverse.Api.Modules.Auth.Requests;
 using Monaverse.Api.Modules.Auth.Responses;
+using Monaverse.Api.Modules.Common;
 using Monaverse.Api.MonaHttpClient;
 using Monaverse.Api.MonaHttpClient.Extensions;
 using Monaverse.Api.MonaHttpClient.Request;
@@ -25,8 +26,8 @@ namespace Monaverse.Api.Modules.Auth
             _monaApiLogger = monaApiLogger;
             _monaHttpClient = monaHttpClient;
         }
-        
-        public async Task<PostNonceResponse> PostNonce(string walletAddress)
+
+        public async Task<ApiResult<PostNonceResponse>> PostNonce(string walletAddress)
         {
             var monaHttpRequest = new MonaHttpRequest(
                     url: _monaApiOptions.GetUrlWithPath(Constants.Endpoints.PostNonce),
@@ -36,34 +37,32 @@ namespace Monaverse.Api.Modules.Auth
             var response = await _monaHttpClient.SendAsync(monaHttpRequest);
             return response.ConvertTo<PostNonceResponse>();
         }
-        
-        public async Task<ValidateWalletAddressResponse> ValidateWalletAddress(string walletAddress)
+
+        public async Task<ApiResult<ValidateWalletResponse>> ValidateWallet(string walletAddress)
         {
             try
             {
                 var postNonceResponse = await PostNonce(walletAddress);
-                if(postNonceResponse == null)
-                    return new ValidateWalletAddressResponse(ValidateWalletResult.FailedGeneratingNonce);
-            
-                if (!postNonceResponse.IsExistingUser)
-                    return new ValidateWalletAddressResponse(ValidateWalletResult.WalletIsNotRegistered);
+                if (!postNonceResponse.IsSuccess)
+                    return ApiResult<ValidateWalletResponse>.Success(new ValidateWalletResponse(ValidateWalletResult.FailedGeneratingNonce, ErrorMessage: postNonceResponse.Message));
+
+                if (!postNonceResponse.Data.IsExistingUser)
+                    return ApiResult<ValidateWalletResponse>.Success(new ValidateWalletResponse(ValidateWalletResult.WalletIsNotRegistered));
 
                 var siweMessage = SiweMessageBuilder.BuildMessage(domain: Constants.MonaDomain,
                     address: walletAddress,
-                    nonce: postNonceResponse.Nonce);
-            
-                return new ValidateWalletAddressResponse(ValidateWalletResult.WalletIsValid, siweMessage);
+                    nonce: postNonceResponse.Data.Nonce);
+
+                return ApiResult<ValidateWalletResponse>.Success(new ValidateWalletResponse(ValidateWalletResult.WalletIsValid, siweMessage));
             }
             catch (Exception exception)
             {
-                return new ValidateWalletAddressResponse(
-                    Result: ValidateWalletResult.Error,
-                    SiweMessage: null,
-                    ErrorMessage: exception.Message);
+                _monaApiLogger.LogError(exception.Message);
+                return ApiResult<ValidateWalletResponse>.Failed(exception.Message);
             }
         }
-        
-        public async Task<bool> Authorize(string signature, string siweMessage)
+
+        public async Task<ApiResult> Authorize(string signature, string siweMessage)
         {
             try
             {
@@ -78,18 +77,16 @@ namespace Monaverse.Api.Modules.Auth
 
                 var response = await _monaHttpClient.SendAsync(monaHttpRequest);
                 var result = response.ConvertTo<AuthorizeResponse>();
-                
-                _monaHttpClient.AccessToken = result.AccessToken;
-                
-                return true;
+
+                _monaHttpClient.AccessToken = result.Data?.AccessToken;
+
+                return result;
             }
             catch (Exception exception)
             {
                 _monaApiLogger.LogError(exception.Message);
-                
-                return false;
+                return ApiResult.Failed(exception.Message);
             }
-           
         }
     }
 }

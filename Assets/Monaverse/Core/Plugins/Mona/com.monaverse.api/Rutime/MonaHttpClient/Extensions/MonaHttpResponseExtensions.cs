@@ -1,6 +1,6 @@
 using System;
-using System.Net.Http;
 using System.Text;
+using Monaverse.Api.Modules.Common;
 using Monaverse.Api.MonaHttpClient.Response;
 using Newtonsoft.Json;
 
@@ -8,29 +8,26 @@ namespace Monaverse.Api.MonaHttpClient.Extensions
 {
     public static class MonaHttpResponseExtensions
     {
-        public static T ConvertTo<T>(this IMonaHttpResponse response)
+        public static ApiResult<T> ConvertTo<T>(this IMonaHttpResponse response)
         {
-            if (response.IsSuccess)
-            {
-                if (typeof(T) == typeof(IMonaHttpResponse))
-                    return (T)Convert.ChangeType(response, typeof(T));
+            if (!response.IsSuccess) return ApiResult<T>.Failed(response.Error);
+            
+            if (typeof(T) == typeof(IMonaHttpResponse))
+                return ApiResult<T>.Success((T)Convert.ChangeType(response, typeof(T)));
 
-                if (typeof(T) == typeof(MonaHttpResponse))
-                    return (T)Convert.ChangeType(response, typeof(T));
+            if (typeof(T) == typeof(MonaHttpResponse))
+                return ApiResult<T>.Success((T)Convert.ChangeType(response, typeof(T)));
 
-                if (typeof(T) == typeof(string))
-                    return (T)Convert.ChangeType(response.GetResponseString(), typeof(T));
+            if (typeof(T) == typeof(string))
+                return ApiResult<T>.Success((T)Convert.ChangeType(response.GetResponseString(), typeof(T)));
                 
-                return JsonConvert.DeserializeObject<T>(response.GetResponseString(), new JsonSerializerSettings
-                {
-                    NullValueHandling = NullValueHandling.Ignore
-                });
-            }
-
-            Exception ex = new HttpRequestException($"error processing HTTP request for {response.HttpRequest.Method} {response.Url}: {response.ResponseCode}");
-            throw ex;
+            var data = JsonConvert.DeserializeObject<T>(response.GetResponseString(), new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            });
+                
+            return ApiResult<T>.Success(data);
         }
-
 
         public static string ToLog(this IMonaHttpResponse httpResponse)
         {

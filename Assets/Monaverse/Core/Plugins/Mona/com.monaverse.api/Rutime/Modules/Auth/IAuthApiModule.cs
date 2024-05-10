@@ -1,12 +1,13 @@
 using System.Threading.Tasks;
 using Monaverse.Api.Modules.Auth.Responses;
+using Monaverse.Api.Modules.Common;
 
 namespace Monaverse.Api.Modules.Auth
 {
     public interface IAuthApiModule
     {
-        Task<PostNonceResponse> PostNonce(string walletAddress);
-        Task<ValidateWalletAddressResponse> ValidateWalletAddress(string walletAddress);
-        Task<bool> Authorize(string signature, string siweMessage);
+        Task<ApiResult<PostNonceResponse>> PostNonce(string walletAddress);
+        Task<ApiResult<ValidateWalletResponse>> ValidateWallet(string walletAddress);
+        Task<ApiResult> Authorize(string signature, string siweMessage);
     }
 }

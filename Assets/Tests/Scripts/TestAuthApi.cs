@@ -48,19 +48,22 @@ public class TestAuthApi : MonoBehaviour
         var monaApiClient = MonaApi.Init("FakeAppId");
 
         //Validate the wallet address
-        var validateWalletAddress = await monaApiClient.Auth.ValidateWalletAddress(walletAddress);
+        var validateWalletAddress = await monaApiClient.Auth.ValidateWallet(walletAddress);
         Debug.Log("ValidateWalletAddress: " + validateWalletAddress);
         
         if(!validateWalletAddress.IsSuccess)
             return;
         
+        if(!validateWalletAddress.Data.IsValid)
+            return;
+        
         //Sign the message with the local wallet
         var signer = new EthereumMessageSigner();
-        var signature = signer.EncodeUTF8AndSign(validateWalletAddress.SiweMessage, new EthECKey(_privateKey));
+        var signature = signer.EncodeUTF8AndSign(validateWalletAddress.Data.SiweMessage, new EthECKey(_privateKey));
         
         //Authorize the wallet
-        var authorize = await monaApiClient.Auth.Authorize(signature, validateWalletAddress.SiweMessage);
-        if(!authorize)
+        var authorize = await monaApiClient.Auth.Authorize(signature, validateWalletAddress.Data.SiweMessage);
+        if(!authorize.IsSuccess)
             return;
         
         Debug.Log("Authorization successful");

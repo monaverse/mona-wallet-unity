@@ -44,7 +44,7 @@ namespace Monaverse.Api.Tests.Editor
 
                 Assert.NotNull(getWalletCollectiblesResponse);
                 Assert.NotNull(getWalletCollectiblesResponse.Data);
-                Assert.AreEqual(1, getWalletCollectiblesResponse.TotalCount);
+                Assert.AreEqual(1, getWalletCollectiblesResponse.Data.TotalCount);
             });
         }
         
@@ -70,7 +70,7 @@ namespace Monaverse.Api.Tests.Editor
                 var walletCollectibleById = await monaApiClient.Collectibles.GetWalletCollectibleById(collectibleId);
 
                 Assert.NotNull(walletCollectibleById);
-                Assert.AreEqual(collectibleId, walletCollectibleById.Id);
+                Assert.AreEqual(collectibleId, walletCollectibleById.Data.Id);
             });
         }
     }
