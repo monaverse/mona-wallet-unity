@@ -9,6 +9,7 @@ namespace Monaverse.Api.Extensions
             => environment switch
             {
                 ApiEnvironment.Production => Constants.BaseUrlProduction,
+                ApiEnvironment.Development => Constants.BaseUrlDevelopment,
                 ApiEnvironment.Staging => Constants.BaseUrlStaging,
                 ApiEnvironment.Local => Constants.BaseUrlLocal,
                 _ => throw new InvalidOperationException($"invalid api environment {environment}")

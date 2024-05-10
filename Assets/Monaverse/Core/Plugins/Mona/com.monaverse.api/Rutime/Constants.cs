@@ -4,7 +4,7 @@ namespace Monaverse.Api
     {
         public const string MonaDomain = "monaverse.com";
         public const string BaseUrlLocal = "http://localhost:3007";
-        public const string BaseUrlDevelopment = "https://api-dev.helios.monaver.se";
+        public const string BaseUrlDevelopment = "https://api-wallet-sdk-dev.helios.monaver.se";
         public const string BaseUrlStaging = "https://api-staging.helios.monaver.se";
         public const string BaseUrlProduction = "https://api.helios.monaver.se";
         public const string ApplicationIdHeader = "X-Mona-Application-Id";

@@ -5,5 +5,6 @@ namespace Monaverse.Api.Configuration
         Production,
         Staging,
         Local,
+        Development,
     }
 }
