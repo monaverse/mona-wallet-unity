@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Monaverse.Api.Extensions;
 using Monaverse.Api.Logging;
+using Monaverse.Api.Modules.Auth.Requests;
 using Monaverse.Api.Modules.Auth.Responses;
 using Monaverse.Api.MonaHttpClient;
 using Monaverse.Api.MonaHttpClient.Extensions;
@@ -30,7 +31,7 @@ namespace Monaverse.Api.Modules.Auth
             var monaHttpRequest = new MonaHttpRequest(
                     url: _monaApiOptions.GetUrlWithPath(Constants.Endpoints.PostNonce),
                     method: RequestMethod.Post)
-                .WithBody(new { walletAddress = walletAddress });
+                .WithBody(new PostNonceRequest { WalletAddress = walletAddress });
 
             var response = await _monaHttpClient.SendAsync(monaHttpRequest);
             return response.ConvertTo<PostNonceResponse>();
@@ -69,10 +70,10 @@ namespace Monaverse.Api.Modules.Auth
                 var monaHttpRequest = new MonaHttpRequest(
                         url: _monaApiOptions.GetUrlWithPath(Constants.Endpoints.PostAuthorize),
                         method: RequestMethod.Post)
-                    .WithBody(new
+                    .WithBody(new AuthorizeRequest
                     {
-                        signature = signature,
-                        message = siweMessage
+                        Signature = signature,
+                        Message = siweMessage
                     });
 
                 var response = await _monaHttpClient.SendAsync(monaHttpRequest);
