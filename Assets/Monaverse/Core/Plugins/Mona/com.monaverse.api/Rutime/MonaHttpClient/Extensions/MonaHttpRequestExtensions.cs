@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Monaverse.Api.MonaHttpClient.Request;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Monaverse.Api.MonaHttpClient.Extensions
 {
@@ -27,7 +28,16 @@ namespace Monaverse.Api.MonaHttpClient.Extensions
         public static IMonaHttpRequest WithBody(this IMonaHttpRequest request,
             object body)
         {
-            var jsonBody = JsonConvert.SerializeObject(body);
+            var contractResolver = new DefaultContractResolver
+            {
+                NamingStrategy = new CamelCaseNamingStrategy()
+            };
+            
+            var jsonBody = JsonConvert.SerializeObject(body, new JsonSerializerSettings
+            {
+                ContractResolver = contractResolver,
+            });
+            
             request.WithJsonBody(jsonBody);
 
             return request;
