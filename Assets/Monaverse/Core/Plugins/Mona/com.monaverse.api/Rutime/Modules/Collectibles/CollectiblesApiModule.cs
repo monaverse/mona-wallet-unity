@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Monaverse.Api.Extensions;
 using Monaverse.Api.Logging;
 using Monaverse.Api.Modules.Collectibles.Responses;
+using Monaverse.Api.Modules.Common;
 using Monaverse.Api.MonaHttpClient;
 using Monaverse.Api.MonaHttpClient.Extensions;
 using Monaverse.Api.MonaHttpClient.Request;
@@ -22,7 +23,7 @@ namespace Monaverse.Api.Modules.Collectibles
             _monaHttpClient = monaHttpClient;
         }
         
-        public async Task<GetWalletCollectiblesResponse> GetWalletCollectibles()
+        public async Task<ApiResult<GetWalletCollectiblesResponse>> GetWalletCollectibles()
         {
             var monaHttpRequest = new MonaHttpRequest(
                 url: _monaApiOptions.GetUrlWithPath(Constants.Endpoints.GetWalletCollectibles),
@@ -32,7 +33,7 @@ namespace Monaverse.Api.Modules.Collectibles
             return response.ConvertTo<GetWalletCollectiblesResponse>();
         }
         
-        public async Task<GetWalletCollectibleResponse> GetWalletCollectibleById(string id)
+        public async Task<ApiResult<GetWalletCollectibleResponse>> GetWalletCollectibleById(string id)
         {
             var monaHttpRequest = new MonaHttpRequest(
                 url: _monaApiOptions.GetUrlWithPath(Constants.Endpoints.GetWalletCollectibleById(id)),

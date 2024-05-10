@@ -51,7 +51,7 @@ public class MonaWalletConnectTest : MonoBehaviour
 
         var postNonceResponse = await MonaApi.ApiClient.Auth.PostNonce(address);
         Debug.Log("[MonaWalletConnectTest] PostNonce Done!\nResponse: " + postNonceResponse);
-        _resultLabel.text = $"Nonce: {postNonceResponse.Nonce}";
+        _resultLabel.text = $"Nonce: {postNonceResponse.Data?.Nonce}";
     }
     
     public async void OnAuthorizeWallet()
@@ -66,30 +66,35 @@ public class MonaWalletConnectTest : MonoBehaviour
 
         _resultLabel.text = $"Validating Wallet {address}";
         
-        var validateWalletAddressResponse = await MonaApi.ApiClient.Auth.ValidateWalletAddress(address);
+        var validateWalletAddressResponse = await MonaApi.ApiClient.Auth.ValidateWallet(address);
         Debug.Log("[MonaWalletConnectTest] ValidateWallet Done!\nResponse: " + validateWalletAddressResponse);
-
         if (!validateWalletAddressResponse.IsSuccess)
         {
-            _resultLabel.text = validateWalletAddressResponse.ErrorMessage;
+            _resultLabel.text = validateWalletAddressResponse.Message;
+            return;
+        }
+        
+        if (!validateWalletAddressResponse.Data.IsValid)
+        {
+            _resultLabel.text = validateWalletAddressResponse.Data.ErrorMessage;
             return;
         }
 
         _resultLabel.text = "Valid Wallet Address. Signing Message...";
         
-        _postAuthorizeButton.interactable = validateWalletAddressResponse.IsSuccess;
+        _postAuthorizeButton.interactable = validateWalletAddressResponse.Data.IsValid;
         
-        var data = new PersonalSign(validateWalletAddressResponse.SiweMessage, address);
+        var data = new PersonalSign(validateWalletAddressResponse.Data.SiweMessage, address);
         var signature = await WalletConnect.Instance.RequestAsync<PersonalSign, string>(data);
         
         Debug.Log("[MonaWalletConnectTest] Wallet Connect Signature: " + signature);        
         
         _resultLabel.text = "Authorizing with Mona...";
         
-        var authorizeResponse = await MonaApi.ApiClient.Auth.Authorize(signature, validateWalletAddressResponse.SiweMessage);
+        var authorizeResponse = await MonaApi.ApiClient.Auth.Authorize(signature, validateWalletAddressResponse.Data.SiweMessage);
         Debug.Log("[MonaWalletConnectTest] Authorize Done!\nResponse: " + authorizeResponse);
 
-        if (!authorizeResponse)
+        if (!authorizeResponse.IsSuccess)
         {
             _resultLabel.text = "Authorization Failed";
             return;
@@ -97,9 +102,14 @@ public class MonaWalletConnectTest : MonoBehaviour
         
         _resultLabel.text = "Authorization Successful";
         
-        var collectibles = await MonaApi.ApiClient.Collectibles.GetWalletCollectibles();
-        Debug.Log("[MonaWalletConnectTest] Collectibles: " + collectibles);
+        var getCollectiblesResult = await MonaApi.ApiClient.Collectibles.GetWalletCollectibles();
+        Debug.Log("[MonaWalletConnectTest] Collectibles: " + getCollectiblesResult);
+        if (!getCollectiblesResult.IsSuccess)
+        {
+            _resultLabel.text = "GetCollectibles Failed: " + getCollectiblesResult.Message;
+            return;
+        }
         
-        _resultLabel.text = "Pulled Collectibles. Total Count: " + collectibles.TotalCount;
+        _resultLabel.text = "Pulled Collectibles. Total Count: " + getCollectiblesResult.Data.TotalCount;
     }
 }

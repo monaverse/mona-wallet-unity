@@ -27,6 +27,7 @@ namespace Monaverse.Api.Modules.Collectibles.Dtos
         public string Title { get; set; }
         public CollectibleNft Nft { get; set; }
         public List<CollectibleVersion> Versions { get; set; }
+        public Dictionary<string,string> Traits { get; set; }
         
         public sealed record CollectibleNft
         {
