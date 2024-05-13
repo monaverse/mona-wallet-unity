@@ -1,6 +1,6 @@
-namespace Monaverse.Api.Extensions
+namespace Monaverse.Wallets.Common
 {
-    public static class StringExtensions
+    public static class WalletExtensions
     {
         public static string ToChecksumAddress(this string address)
         {

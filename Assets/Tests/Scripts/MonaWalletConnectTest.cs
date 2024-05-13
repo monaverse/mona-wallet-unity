@@ -1,6 +1,6 @@
 using System.Linq;
 using Monaverse.Api;
-using Monaverse.Api.Extensions;
+using Monaverse.Wallets.Common;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
