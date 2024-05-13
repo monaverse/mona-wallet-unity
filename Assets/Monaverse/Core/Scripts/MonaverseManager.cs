@@ -21,7 +21,7 @@ namespace Monaverse.Core
         public bool showDebugLogs = false;
         
         public static MonaverseManager Instance { get; private set; }
-        public MonaverseSDK SDK { get; private set; }
+        public MonaWalletSDK SDK { get; private set; }
         
         private void Awake()
         {
@@ -49,7 +49,7 @@ namespace Monaverse.Core
                 return;
             }
             
-            var sdkOptions = new MonaverseSDK.SDKOptions
+            var sdkOptions = new MonaWalletSDK.SDKOptions
             {
                 applicationId = Instance.monaApplicationId,
                 walletConnectProjectId = Instance.walletConnectProjectId,
@@ -57,7 +57,7 @@ namespace Monaverse.Core
             };
 
             MonaDebug.IsEnabled = Instance.showDebugLogs;
-            SDK = new MonaverseSDK(sdkOptions);
+            SDK = new MonaWalletSDK(sdkOptions);
         }
     }
 }

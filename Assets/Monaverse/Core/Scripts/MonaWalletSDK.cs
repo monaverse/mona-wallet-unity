@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Monaverse.Core
 {
-    public sealed class MonaverseSDK
+    public sealed class MonaWalletSDK
     {
         public struct SDKOptions
         {
@@ -45,7 +45,7 @@ namespace Monaverse.Core
         public IMonaWallet ActiveWallet { get; private set; }
         public IMonaApiClient ApiClient { get; internal set; }
 
-        public MonaverseSDK(SDKOptions options)
+        public MonaWalletSDK(SDKOptions options)
         {
             Options = options;
             ApiClient = MonaApi.Init(options.applicationId);
