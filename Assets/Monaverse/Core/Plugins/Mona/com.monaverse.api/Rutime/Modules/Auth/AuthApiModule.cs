@@ -78,7 +78,8 @@ namespace Monaverse.Api.Modules.Auth
                 var response = await _monaHttpClient.SendAsync(monaHttpRequest);
                 var result = response.ConvertTo<AuthorizeResponse>();
 
-                _monaHttpClient.AccessToken = result.Data?.AccessToken;
+                if(result.Data != null && !string.IsNullOrEmpty(result.Data.AccessToken)) 
+                    _monaHttpClient.SaveSession(result.Data.AccessToken);
 
                 return result;
             }

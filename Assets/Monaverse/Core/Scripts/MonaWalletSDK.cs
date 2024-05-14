@@ -91,10 +91,14 @@ namespace Monaverse.Core
         /// </summary>
         public async Task Disconnect()
         {
+            //Disconnect wallet
             if (ActiveWallet != null)
                 await ActiveWallet.Disconnect();
             else
                 MonaDebug.LogWarning("No active wallet detected, unable to disconnect.");
+            
+            //Clear session
+            ApiClient.ClearSession();
         }
 
         /// <summary>

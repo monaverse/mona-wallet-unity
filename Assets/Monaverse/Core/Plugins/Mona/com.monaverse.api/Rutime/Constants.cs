@@ -8,6 +8,7 @@ namespace Monaverse.Api
         public const string BaseUrlStaging = "https://api-wallet-sdk-staging.helios.monaver.se";
         public const string BaseUrlProduction = "https://api-wallet-sdk.helios.monaver.se";
         public const string ApplicationIdHeader = "X-Mona-Application-Id";
+        public const string AccessTokenStorageKey = "mona-access-token" ;
         
         public static class Endpoints
         {
