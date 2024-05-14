@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Monaverse.Core.Scripts.Wallets.Common;
+using Monaverse.Core;
+using Monaverse.Redcode.Awaiting;
 using Monaverse.Wallets.Common;
+using UnityEngine;
 using WalletConnectSharp.Sign.Models;
 using WalletConnectUnity.Core;
 using WalletConnectUnity.Core.Evm;
@@ -21,15 +24,30 @@ namespace Monaverse.Wallets
 
         public async Task<string> Connect(MonaWalletConnection monaWalletConnection)
         {
-            //TODO: Open WalletConnect Modal and await for connection result
+            if (MonaWalletConnectUI.Instance == null)
+            {
+                GameObject.Instantiate(MonaverseManager.Instance.WalletConnectPrefab);
+                await new WaitForSeconds(0.5f);
+            }
+            
+            await MonaWalletConnectUI.Instance.Connect(monaWalletConnection.ChainId);
             _namespace = WalletConnect.Instance.ActiveSession.Namespaces.First();
 
             return await GetAddress();
         }
 
-        public Task<bool> Disconnect()
+        public async Task<bool> Disconnect()
         {
-            throw new System.NotImplementedException();
+            try
+            {
+                await WalletConnect.Instance.DisconnectAsync();
+                return true;
+            }
+            catch (Exception e)
+            {
+                MonaDebug.LogWarning($"Error disconnecting WalletConnect: {e.Message}");
+                return false;
+            }
         }
 
         public Task<string> GetAddress()

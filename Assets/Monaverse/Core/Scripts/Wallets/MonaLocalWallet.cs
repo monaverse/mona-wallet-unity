@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using Monaverse.Core.Scripts.Wallets.Common;
+using Monaverse.Core;
 using Nethereum.Signer;
 using Nethereum.Web3.Accounts;
 using Nethereum.Web3;

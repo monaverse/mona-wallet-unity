@@ -19,10 +19,13 @@ namespace Monaverse.Core
         
         [Tooltip("Whether to show the sdk debug logs")]
         public bool showDebugLogs = false;
-        
+
+        [Tooltip("Instantiates the WalletConnect SDK for Native platforms.")]
+        public GameObject WalletConnectPrefab;
         public static MonaverseManager Instance { get; private set; }
         public MonaWalletSDK SDK { get; private set; }
-        
+
+
         private void Awake()
         {
             if (Instance == null)
@@ -41,7 +44,7 @@ namespace Monaverse.Core
                 Initialize();
         }
         
-        public void Initialize()
+        public static void Initialize()
         {
             if (Instance == null)
             {
@@ -57,7 +60,7 @@ namespace Monaverse.Core
             };
 
             MonaDebug.IsEnabled = Instance.showDebugLogs;
-            SDK = new MonaWalletSDK(sdkOptions);
+            Instance.SDK = new MonaWalletSDK(sdkOptions);
         }
     }
 }

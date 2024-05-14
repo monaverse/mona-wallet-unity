@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using Monaverse.Core.Scripts.Wallets.Common;
+using Monaverse.Core;
 
 namespace Monaverse.Wallets
 {
