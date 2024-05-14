@@ -1,4 +1,4 @@
-namespace Monaverse.Core.Scripts.Wallets.Common
+namespace Monaverse.Core
 {
     public enum MonaWalletProvider
     {

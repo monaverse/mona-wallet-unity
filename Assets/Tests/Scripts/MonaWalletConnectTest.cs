@@ -1,107 +1,127 @@
-using System.Linq;
+using System;
+using System.Threading.Tasks;
 using Monaverse.Api;
-using Monaverse.Wallets.Common;
+using Monaverse.Core;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using WalletConnectUnity.Core;
-using WalletConnectUnity.Core.Evm;
-using WalletConnectUnity.Modal;
 
 public class MonaWalletConnectTest : MonoBehaviour
 {
+    [SerializeField] private Button _connectButton;
+    [Space] [SerializeField] private GameObject _dappButtons;
     [SerializeField] private Button _disconnectButton;
     [SerializeField] private Button _postNonceButton;
     [SerializeField] private Button _postAuthorizeButton;
     [SerializeField] private TMP_Text _resultLabel;
-    
-    private void Awake()
-    {
-        MonaApi.Init("fakeAppId");
-        
-        WalletConnect.Instance.ActiveSessionChanged += (_, @struct) =>
-        {
-            _disconnectButton.interactable = true;
-            _postNonceButton.interactable = true;
-            _postAuthorizeButton.interactable = true;
 
-            _resultLabel.text = "Connected";
-        };
+    private void Start()
+    {
+        _resultLabel.text = "Initializing...";
+        _connectButton.interactable = false;
+
+        _ = TryConnect();
     }
-    
-    public void OnDisconnectButton()
+
+    private async Task TryConnect()
+    {
+        try
+        {
+            _dappButtons.SetActive(false);
+
+            await MonaverseManager.Instance.SDK.ConnectWallet();
+
+            Debug.Log("[MonaWalletConnectTest] Connected!");
+
+            EnableDappButtons();
+            _resultLabel.text = "Connected!";
+        }
+        catch (Exception exception)
+        {
+            Debug.LogError("[MonaWalletConnectTest] Exception: " + exception);
+            EnableConnectButton();
+        }
+    }
+
+
+    #region UI Click Events
+
+    public async void OnConnectButton()
+    {
+        Debug.Log("[MonaWalletConnectTest] OnConnectButton");
+        _connectButton.interactable = false;
+
+        await TryConnect();
+    }
+
+    public async void OnDisconnectButton()
     {
         Debug.Log("[MonaWalletConnectTest] OnDisconnectButton");
 
-        _disconnectButton.interactable = false;
-        _postNonceButton.interactable = false;
-        _postAuthorizeButton.interactable = false;
-
-        WalletConnectModal.Disconnect();
+        try
+        {
+            _disconnectButton.interactable = false;
+            await MonaverseManager.Instance.SDK.Disconnect();
+            EnableConnectButton();
+        }
+        catch (Exception e)
+        {
+            _disconnectButton.interactable = true;
+            Debug.LogError("[MonaWalletConnectTest] Disconnect Exception: " + e);
+        }
     }
 
     public async void OnPostNonceButton()
     {
         Debug.Log("[MonaWalletConnectTest] OnPostNonceButton");
+        if (!await MonaverseManager.Instance.SDK.IsWalletConnected())
+        {
+            _resultLabel.text = "Wallet not connected";
+            return;
+        }
+
         _resultLabel.text = $"Generating Nonce...";
 
-        var session = WalletConnect.Instance.ActiveSession;
-        var address = WalletConnect.Instance.ActiveSession.CurrentAddress(session.Namespaces.Keys.FirstOrDefault())
-            .Address;
+        var address = await MonaverseManager.Instance.SDK.ActiveWallet.GetAddress();
 
         var postNonceResponse = await MonaApi.ApiClient.Auth.PostNonce(address);
         Debug.Log("[MonaWalletConnectTest] PostNonce Done!\nResponse: " + postNonceResponse);
         _resultLabel.text = $"Nonce: {postNonceResponse.Data?.Nonce}";
     }
-    
+
     public async void OnAuthorizeWallet()
     {
-        Debug.Log("[MonaWalletConnectTest] OnPostNonceButton");
-        
-        var session = WalletConnect.Instance.ActiveSession;
-        var address = WalletConnect.Instance.ActiveSession.CurrentAddress(session.Namespaces.Keys.FirstOrDefault())
-            .Address;
-        
-        address = address.ToChecksumAddress();
+        Debug.Log("[MonaWalletConnectTest] OnAuthorizeWallet");
+        _resultLabel.text = "Authorizing Wallet...";
 
-        _resultLabel.text = $"Validating Wallet {address}";
-        
-        var validateWalletAddressResponse = await MonaApi.ApiClient.Auth.ValidateWallet(address);
-        Debug.Log("[MonaWalletConnectTest] ValidateWallet Done!\nResponse: " + validateWalletAddressResponse);
-        if (!validateWalletAddressResponse.IsSuccess)
+        var authorizationResult = await MonaverseManager.Instance.SDK.AuthorizeWallet();
+
+        var resultText = authorizationResult switch
         {
-            _resultLabel.text = validateWalletAddressResponse.Message;
+            MonaWalletSDK.AuthorizationResult.WalletNotConnected => "Wallet Not Connected",
+            MonaWalletSDK.AuthorizationResult.Authorized => "Wallet Authorized",
+            MonaWalletSDK.AuthorizationResult.FailedAuthorizing => "Failed authorizing wallet",
+            MonaWalletSDK.AuthorizationResult.UserNotRegistered => "User not registered",
+            MonaWalletSDK.AuthorizationResult.FailedValidatingWallet => "Failed validating wallet",
+            MonaWalletSDK.AuthorizationResult.FailedSigningMessage => "Failed signing message",
+            MonaWalletSDK.AuthorizationResult.Error => "Unexpected error authorizing wallet",
+            _ => throw new ArgumentOutOfRangeException()
+        };
+
+        Debug.Log("[MonaWalletConnectTest] Authorization Result: " + resultText);
+        _resultLabel.text = resultText;
+    }
+
+    public async void OnGetCollectibles()
+    {
+        if (!MonaverseManager.Instance.SDK.IsWalletAuthorized())
+        {
+            _resultLabel.text = "Wallet must be authorized first!";
             return;
         }
         
-        if (!validateWalletAddressResponse.Data.IsValid)
-        {
-            _resultLabel.text = validateWalletAddressResponse.Data.ErrorMessage;
-            return;
-        }
+        _resultLabel.text = "Getting Collectibles...";
 
-        _resultLabel.text = "Valid Wallet Address. Signing Message...";
-        
-        _postAuthorizeButton.interactable = validateWalletAddressResponse.Data.IsValid;
-        
-        var data = new PersonalSign(validateWalletAddressResponse.Data.SiweMessage, address);
-        var signature = await WalletConnect.Instance.RequestAsync<PersonalSign, string>(data);
-        
-        Debug.Log("[MonaWalletConnectTest] Wallet Connect Signature: " + signature);        
-        
-        _resultLabel.text = "Authorizing with Mona...";
-        
-        var authorizeResponse = await MonaApi.ApiClient.Auth.Authorize(signature, validateWalletAddressResponse.Data.SiweMessage);
-        Debug.Log("[MonaWalletConnectTest] Authorize Done!\nResponse: " + authorizeResponse);
-
-        if (!authorizeResponse.IsSuccess)
-        {
-            _resultLabel.text = "Authorization Failed";
-            return;
-        }
-        
-        _resultLabel.text = "Authorization Successful";
-        
         var getCollectiblesResult = await MonaApi.ApiClient.Collectibles.GetWalletCollectibles();
         Debug.Log("[MonaWalletConnectTest] Collectibles: " + getCollectiblesResult);
         if (!getCollectiblesResult.IsSuccess)
@@ -109,7 +129,23 @@ public class MonaWalletConnectTest : MonoBehaviour
             _resultLabel.text = "GetCollectibles Failed: " + getCollectiblesResult.Message;
             return;
         }
-        
+
         _resultLabel.text = "Pulled Collectibles. Total Count: " + getCollectiblesResult.Data.TotalCount;
+    }
+
+    #endregion
+
+    private void EnableConnectButton()
+    {
+        _connectButton.interactable = true;
+        _connectButton.gameObject.SetActive(true);
+        _dappButtons.gameObject.SetActive(false);
+    }
+
+    private void EnableDappButtons()
+    {
+        _disconnectButton.interactable = true;
+        _dappButtons.SetActive(true);
+        _connectButton.gameObject.SetActive(false);
     }
 }

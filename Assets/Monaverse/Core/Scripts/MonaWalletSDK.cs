@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Monaverse.Api;
 using Monaverse.Api.Configuration;
 using Monaverse.Api.Modules.Auth.Responses;
-using Monaverse.Core.Scripts.Wallets.Common;
 using Monaverse.Wallets;
 using UnityEngine;
 
@@ -51,7 +50,16 @@ namespace Monaverse.Core
             ApiClient = MonaApi.Init(options.applicationId);
         }
         
-        public async Task<string> Connect(MonaWalletConnection monaWalletConnection)
+        public Task<string> ConnectWallet()
+        {
+            return ConnectWallet(new MonaWalletConnection
+            {
+                ChainId = 1,
+                MonaWalletProvider = MonaWalletProvider.WalletConnect
+            });
+        }
+        
+        public async Task<string> ConnectWallet(MonaWalletConnection monaWalletConnection)
         {
             ChainId = monaWalletConnection.ChainId;
             
@@ -93,7 +101,7 @@ namespace Monaverse.Core
         /// Checks if a wallet is connected.
         /// </summary>
         /// <returns>True if a wallet is connected, false otherwise.</returns>
-        public async Task<bool> IsConnected()
+        public async Task<bool> IsWalletConnected()
         {
             if (ActiveWallet == null)
                 return false;
@@ -108,12 +116,11 @@ namespace Monaverse.Core
             }
         }
         
-        
         /// <summary>
         /// Returns true if the there is an active session with the Monaverse
         /// </summary>
         /// <returns></returns>
-        public bool IsAuthorized()
+        public bool IsWalletAuthorized()
         {
             return ApiClient.IsAuthorized();
         }
@@ -123,7 +130,7 @@ namespace Monaverse.Core
             try
             {
                 //Check if wallet is connected
-                if (!await IsConnected())
+                if (!await IsWalletConnected())
                 {
                     MonaDebug.LogError("Wallet is not connected");
                     return AuthorizationResult.WalletNotConnected;

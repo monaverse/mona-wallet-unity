@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace Monaverse.Core.Scripts.Wallets.Common
+namespace Monaverse.Core
 {
     public sealed record MonaWalletConnection
     {
