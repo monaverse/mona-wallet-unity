@@ -35,7 +35,7 @@ namespace Monaverse.Api.Tests.Runtime
             var logger = new UnityMonaApiLogger(ApiLogLevel.Info);
             var client = new MonaApiHttpClient(logger, applicationId);
             var accessToken = Guid.NewGuid().ToString();
-            client.AccessToken = accessToken;
+            client.SaveSession(accessToken);
             var request = new MonaHttpRequest("https://localhost", RequestMethod.Post);
             Debug.Log("Before");
 

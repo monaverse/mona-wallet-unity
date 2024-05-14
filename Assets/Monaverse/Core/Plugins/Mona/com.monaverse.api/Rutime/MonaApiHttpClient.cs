@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Monaverse.Api.MonaHttpClient;
 using Monaverse.Api.MonaHttpClient.Logger;
@@ -14,6 +13,9 @@ namespace Monaverse.Api
         public MonaApiHttpClient(IHttpLogger httpLogger, string applicationId) : base(httpLogger)
         {
             _applicationId = applicationId;
+            var accessToken = PlayerPrefsObfuscator.Load(Constants.AccessTokenStorageKey);
+            if (!string.IsNullOrEmpty(accessToken))
+                AccessToken = accessToken;
         }
 
         public override async Task<IMonaHttpResponse> SendAsync(IMonaHttpRequest request)
@@ -26,6 +28,22 @@ namespace Monaverse.Api
                 request.WithBearerToken(AccessToken);
 
             return await base.SendAsync(request);
+        }
+        
+        public override void ClearSession()
+        {
+            base.ClearSession();
+            PlayerPrefsObfuscator.Delete(Constants.AccessTokenStorageKey);
+        }
+
+        public override void SaveSession(string accessToken)
+        {
+            base.SaveSession(accessToken);
+            
+            if(!string.IsNullOrEmpty(AccessToken))
+                PlayerPrefsObfuscator.Save(Constants.AccessTokenStorageKey, AccessToken);
+            else
+                ClearSession();
         }
     }
 }

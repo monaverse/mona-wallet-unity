@@ -10,8 +10,8 @@ namespace Monaverse.Api.MonaHttpClient
     public class UnityAsyncHttpClient : IMonaHttpClient
     {
         private readonly IHttpLogger _httpLogger;
-        public string AccessToken { get; set; }
-
+        public string AccessToken { get; protected set; }
+      
         public UnityAsyncHttpClient(IHttpLogger httpLogger)
         {
             _httpLogger = httpLogger;
@@ -45,6 +45,16 @@ namespace Monaverse.Api.MonaHttpClient
             _httpLogger.LogResponse(response);
 
             return response;
+        }
+        
+        public virtual void ClearSession()
+        {
+            AccessToken = null;
+        }
+
+        public virtual void SaveSession(string accessToken)
+        {
+            AccessToken = accessToken;
         }
     }
 }
