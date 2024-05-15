@@ -44,7 +44,7 @@ jobs:
                 
             #Upload Unity Package
             - name: Upload Unity Package
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               with:
                 name: monaverse-sdk-package
                 path: Monaverse.unitypackage
