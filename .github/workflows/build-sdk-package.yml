@@ -4,7 +4,6 @@ on:
     push:
         branches:
             - main
-            - cr/package-cicd
 
 jobs: 
     buildSDKPackage:
