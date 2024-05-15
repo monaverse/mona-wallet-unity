@@ -4,7 +4,7 @@ using UnityEditor;
 
 namespace Monaverse.Editor
 {
-    public class MonaverseEditorTools
+    public static class MonaverseEditorTools
     {
         [MenuItem("Tools/Monaverse/Export Package")]
         public static void ExportUnityPackage()
