@@ -45,7 +45,7 @@ jobs:
       # Create version.json
       - name: Create Version File
         run: |
-          echo '{ "version": "${{ steps.build-unity.outputs.buildVersion }}", "commit": "${{ github.sha }}" }' > version.json
+          echo '{ "version": "${{ steps.unityBuildStep.outputs.buildVersion }}", "commit": "${{ github.sha }}" }' > version.json
 
       # Package Files into a Folder
       - name: Package Files

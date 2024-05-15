@@ -4,6 +4,10 @@ on:
   workflow_call:
   workflow_dispatch:
   pull_request:
+    
+concurrency:
+  group: pr-pipeline-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   testRunner:
