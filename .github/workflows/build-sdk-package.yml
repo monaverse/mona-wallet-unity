@@ -30,6 +30,7 @@ jobs:
       #Export Unity Package
       - name: Export Unity Package
         uses: game-ci/unity-builder@v4
+        id: unityBuildStep
         env:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
@@ -41,10 +42,21 @@ jobs:
           buildMethod: Monaverse.Editor.MonaverseEditorTools.ExportUnityPackage
           allowDirtyBuild: true
           
+      # Create version.json
+      - name: Create Version File
+        run: |
+          echo '{ "version": "${{ steps.build-unity.outputs.buildVersion }}", "commit": "${{ github.sha }}" }' > version.json
+
+      # Package Files into a Folder
+      - name: Package Files
+        run: |
+          mkdir package
+          mv version.json package/
+          mv Monaverse.unitypackage package/
+
       #Upload Unity Package
       - name: Upload Unity Package
         uses: actions/upload-artifact@v4
         with:
-          name: monaverse-sdk-package.unitypackage
-          path: Monaverse.unitypackage
-          compression-level: 0
+          name: monaverse-sdk-package
+          path: package/
