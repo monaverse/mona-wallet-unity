@@ -5,45 +5,58 @@ on:
         branches:
             - main
 
-jobs: 
-    buildSDKPackage:
-        name: Build Monaverse SDK Package
-        runs-on: ubuntu-8-cores
-        steps:
+jobs:
+  buildSDKPackage:
+    name: Build Monaverse SDK Package
+    runs-on: ubuntu-8-cores
+    steps:
+        
+      # Check out the latest version of the project 
+      - name: Check out the project
+        uses: actions/checkout@v4
+        with:
+            fetch-depth: 0
+            lfs: true
             
-            # Check out the latest version of the project 
-            - name: Check out the project
-              uses: actions/checkout@v4
-              with:
-                  fetch-depth: 0
-                  lfs: true
-                  
-            #Cache Unity library
-            - name: Cache Unity Library
-              uses: actions/cache@v4
-              with:
-                  path: Library
-                  key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
-                  restore-keys: |
-                      Library-
-                    
-            #Export Unity Package
-            - name: Export Unity Package
-              uses: game-ci/unity-builder@v4
-              env:
-                UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-                UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-                UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
-              with:
-                targetPlatform: StandaloneLinux64
-                versioning: Semantic
-                unityVersion: "2022.3.17f1"
-                buildMethod: Monaverse.Editor.MonaverseEditorTools.ExportUnityPackage
-                allowDirtyBuild: true
-                
-            #Upload Unity Package
-            - name: Upload Unity Package
-              uses: actions/upload-artifact@v4
-              with:
-                name: monaverse-sdk-package
-                path: Monaverse.unitypackage
+      #Cache Unity library
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+            path: Library
+            key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+            restore-keys: |
+                Library-
+              
+      #Export Unity Package
+      - name: Export Unity Package
+        uses: game-ci/unity-builder@v4
+        id: unityBuildStep
+        env:
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+        with:
+          targetPlatform: StandaloneLinux64
+          versioning: Semantic
+          unityVersion: "2022.3.17f1"
+          buildMethod: Monaverse.Editor.MonaverseEditorTools.ExportUnityPackage
+          allowDirtyBuild: true
+          
+      # Create version.json
+      - name: Create Version File
+        run: |
+          echo '{ "version": "${{ steps.unityBuildStep.outputs.buildVersion }}", "commit": "${{ github.sha }}" }' > version.json
+
+      # Package Files into a Folder
+      - name: Package Files
+        run: |
+          mkdir package
+          mv version.json package/
+          mv Monaverse.unitypackage package/
+
+      #Upload Unity Package
+      - name: Upload Unity Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: monaverse-sdk-package
+          path: package/
