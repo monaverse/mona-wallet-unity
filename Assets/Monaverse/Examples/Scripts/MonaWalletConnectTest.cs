@@ -38,7 +38,7 @@ public class MonaWalletConnectTest : MonoBehaviour
         }
         catch (Exception exception)
         {
-            Debug.LogError("[MonaWalletConnectTest] Exception: " + exception);
+            Debug.Log("[MonaWalletConnectTest] failed: " + exception);
             EnableConnectButton();
         }
     }
