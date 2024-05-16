@@ -38,6 +38,160 @@ If there are no compiler errors in the console, you are all set!
 - The SDK has been tested using Unity 2022 LTS. We highly recommend using 2022 LTS.
 - The Newtonsoft and Nethereums DLLs are included as part of the Unity Package, feel free to deselect them if you already have them installed as a dependency to avoid conflicts.
 
+### Monaverse Manager
+All you need now is a `MonaverseManager` prefab present in your scene.
+
+Navigate to `Assets > Monaverse > Core > Prefabs > MonaverseManager` and drag it into your scene.
+
+- Make sure you set the `Mona Application Id`. You can get one from [Monaverse](https://Monaverse.com)
+- Optinally, you can set your own `WalletConnectProjectId`
 
 ## Usage
 
+In order to access the SDK, you only need to have a `MonaverseManager` in your scene.
+
+The `MonaverseManager` will help you go through the following steps in order to have access to a user's 3D collectibles store in their Web3 wallet.
+
+- Initialize SDK
+- Connect Wallet
+- Authorize Wallet
+- Get Collectibles
+
+### Initialize SDK
+
+If the `initializeOnAwake` toggle is checked in the `MonaverseManager` MonoBehavior, then initialization will be done automatically for you. Please be advised not to called any SDK functions from within the `Awake` function.
+
+![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/20456f7f-ac09-48d5-bcd6-cb0856e7ae74)
+
+On the other hand, if you prefer to do this manually from code, you can uncheck the toggle and call:
+
+```C#
+MonaverseManager.Initialize();
+```
+
+### Connect Wallet
+By default, the SDK uses `WalletConnect` with a ready to use projectId. Optionally, you can configure it with your own `WalletConnectProjectId` and set it in the `MonaverseManager` inspector.
+
+```C#
+// Connect to the user's Web3 wallet via WalletConnect
+var address = await MonaverseManager.Instance.SDK.ConnectWallet();
+```
+
+Calling the line above will open `WalletConnect`'s modal and let you choose your `Wallet` provider, once connected to your App the asynchronous function will return the selected account address.
+
+![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/348bffeb-6565-4c46-a0eb-7c6ec6416160)
+
+### Authorize Wallet
+Once connected, it's time to authorize the wallet with the `Monaverse` platform. Keep in mind the user must have an existing account with `Mona`.
+
+The following code will try to authorize the currently connected wallet. You must connect a wallet before calling this.
+
+```C#
+var authorizationResult = await MonaverseManager.Instance.SDK.AuthorizeWallet();
+```
+
+The `AuthorizeWallet` function returns an enum result with the following options:
+
+```C#
+public enum AuthorizationResult
+{
+    WalletNotConnected,
+    FailedValidatingWallet,
+    UserNotRegistered,
+    FailedSigningMessage,
+    FailedAuthorizing,
+    Authorized,
+    Error
+}
+```
+
+If the result is `Authorized`, your application is all set to pull the authenticated user 3D collectibles from their Web3 wallet.
+
+### Get Collectibles [Authorized]
+Once authorized, your application call get a paginated list of all the 3D collectibles available in a user's Web3 wallet to be imported and interated with from within your game or application.
+
+To get all collectibles for the authenticated user call:
+
+```C#
+var getCollectiblesResult = await MonaApi.ApiClient.Collectibles.GetWalletCollectibles();
+if (!getCollectiblesResult.IsSuccess)
+{
+    Debug.Log("There was an error pulling collectibles: " + getCollectiblesResult.Message);
+    return;
+}
+```
+
+The collectibles result `Data` is of type `GetWalletCollectiblesResponse` with the following properties:
+
+```C#
+  public List<CollectibleDto> Data { get; set; }
+  public int TotalCount { get; set; }
+  public int? NextPageKey { get; set; }
+```
+
+Here's an example of the `CollectibleDto` as JSON:
+
+```JSON
+{
+  "id": "bgsDpasdriLhk",
+  "type": "Avatar",
+  "checked": false,
+  "minted": false,
+  "nsfw": false,
+  "promoted": false,
+  "__v": 11,
+  "activeVersion": 0,
+  "artist": "John Doe",
+  "description": "Test",
+  "creator": "0xe42c4fe879955cEa16380e9dAf9E7b6B48126E93",
+  "slug": "grifter-squid-goerli",
+  "views": 0,
+  "accessibility": {
+    "accessLevel": "Public",
+    "accessibleAt": null,
+    "accessibleUntil": null
+  },
+  "_updated_at": "2024-05-03T18:36:56.258Z",
+  "_created_at": "2024-05-03T18:32:35.784Z",
+  "_deleted_at": null,
+  "collectionId": null,
+  "hidden": false,
+  "image": "bafasdak2ulwymssqfsaeadls65nt7xxftzh3c3npe7snkmhmfqxqoyu",
+  "lastSaleEventId": null,
+  "lastSalePrice": null,
+  "owner": "0xe42c4fe879955cEa16380e9dAf9E7b6B48126E93",
+  "owners": [
+    {
+      "address": "0xe42c4fe879955cEa16380e9dAf9E7b6B48126E93",
+      "amount": 1
+    }
+  ],
+  "parentId": null,
+  "price": null,
+  "properties": [],
+  "traits": {
+    "Genre": "Cyber Punk",
+    "Season": "Spring"
+  },
+  "subCollectionId": null,
+  "title": "Grifter Squaddie Goerli",
+  "nft": {
+    "contract": null,
+    "ipfsUrl": "bafybeig3tvmgazsdfgadfgsdfm7qrtq2undmaxpsy7xnc7m6flzlgffy",
+    "network": null,
+    "tokenHash": null,
+    "tokenId": null,
+    "tokenUri": null,
+    "transactionId": null,
+    "tokenStandard": null,
+    "amount": null
+  },
+  "creatorId": null,
+  "documentId": null,
+  "versions": [
+    {
+      "asset": "https://cdn-staging.mona.gallery/sdfe5433-suet-d9ik-rrgl-fsdfrww.vrm"
+    }
+  ]
+}
+```
