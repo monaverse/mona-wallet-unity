@@ -26,7 +26,7 @@ namespace Monaverse.Api.Modules.Common
         public static ApiResult<T> Success(T data)
             => new(true, string.Empty, data);
 
-        public new static ApiResult<T> Failed(string message)
-            => new(false, message);
+        public new static ApiResult<T> Failed(string message, T data = default)
+            => new(false, message, data);
     }
 }

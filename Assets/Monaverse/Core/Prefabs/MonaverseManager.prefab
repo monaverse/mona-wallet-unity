@@ -47,6 +47,6 @@ MonoBehaviour:
   _initializeOnAwake: 1
   monaApplicationId: 
   walletConnectProjectId: 6b35c2e9677ec328f020ce5bcf8e57b3
-  apiEnvironment: 1
+  apiEnvironment: 0
   showDebugLogs: 1
   WalletConnectPrefab: {fileID: 7460216263507741112, guid: 348a888aa81464d59b5b4a88649f4612, type: 3}
