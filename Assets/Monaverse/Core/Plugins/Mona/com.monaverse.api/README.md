@@ -2,20 +2,28 @@
 
 The Unity3D Monaverse API Package is designed to facilitate interoperability across the open metaverse by allowing Web3 metaverse and game platforms to empower their users to import 3D NFTs from their Web3 wallets into Unity-based games or applications. 
 
-As this is only the `API module`, projects must have an existing Web3 implementation for wallet connectivity and authentication. 
-(i.e. MetaMask, WalletConnect, Thirdweb, or similar integrations)
+This package only includes the `API` module, so projects must already have an existing Web3 implementation for wallet connectivity and authentication (e.g., MetaMask, WalletConnect, Thirdweb, or similar integrations).
 
 ### Important Notice
 
-> If your project lacks a wallet integration, please use the full Monaverse SDK, available at the root of this repository, to integrate these features fully.
+> If your project lacks a wallet integration, please use the full Monaverse SDK, available at the root of this repository, to fully integrate these features.
+
+### Download Package
+
+You can download the latest official `com.monaverse.api.unitypackage` from the [Releases](https://github.com/monaverse/mona-wallet-unity/releases) page.
+
+Alternatively, you can download the latest generated package from [Build Packages](https://github.com/monaverse/mona-wallet-unity/actions/workflows/build-sdk-package.yml?query=branch%3Amain) workflow page. The file is available at the bottom of each workflow run as `monaverse-sdk-package`. Please note that this version may not be stable.
 
 ## Prerequisites
 
 - Unity 2022.3.17f1 or above
 - Existing Web3 wallet integration for connecting and message signing
-- Nethereum Dlls _**(Ignore if this Nethereum is already included with your Wallet Integration)**_
-  - If after importing the API package there are compiler errors related to missing `Nethereum` assemblies, please add the Nethereum reference to your `manifest.json`. 
-  - i.e. `"com.nethereum.unity": "https://github.com/Nethereum/Nethereum.Unity.git#4.19.1"`
+
+### Nethereum dependency
+> This package depends on [Nethereum](https://github.com/Nethereum/Nethereum.Unity#4.19.1).
+>- If you are using the distributed `.unitypackage`, Nethereum will be included.
+>- There is chance your existing Wallet Integration already includes Nethereum. Feel free to remove ours if there are conflicting DLLs.
+>- If there are compiler errors related to missing `Nethereum` assemblies, you will need to manually add Nethereum via git or directly importing their DLLs
 
 ## Usage
 
@@ -27,12 +35,16 @@ Start by initializing the Monaverse API client using your application ID. You ca
 MonaApi.Init("your-application-id");
 ```
 
-### Authenticating the User
-Authentication involves verifying the wallet address and signing a message with your wallet provider.
+### Authorizing the User
+Authorizing involves verifying the wallet address and signing a SIWE message with the user's Web3 wallet.
+
+#### Prerequisites: 
+- The user must have an existing account with [Monaverse](https://monaverse.com/) 
+- You will need your existing Web3 wallet integration in order to connect to the user's wallet and have them sign the SIWE messages.
 
 ```csharp
 // Step 1: Verify Wallet Address
-// Obtain the wallet address via your existing Web3 wallet integration
+// Obtain the wallet address via your existing Web3 wallet integration (WalletConnect, Thirdweb, MetaMask, etc)
 string walletAddress = "user_wallet_address";
 
 // Validate the connected wallet with Mona
@@ -52,10 +64,12 @@ if (validateWalletResult.Data.Result == ValidateWalletResult.WalletIsNotRegister
     return;
 }
 
-// Step 2: Sign the Message and Authorize
+// Step 2: Sign the Message and Authorize (This step needs a Web3 wallet integration)
 // Sign the SiweMessage using your Web3 wallet integration
 // This is the equivalent to a Wallet Personal Sign
-var signature = await walletSigner.Sign(validateWalletResult.Data.SiweMessage);
+// Example of signing a message with WalletConnect:
+// var data = new PersonalSign(siweMessage, walletAddress);
+// var signature = await WalletConnect.Instance.RequestAsync<PersonalSign, string>(data);
 
 // Authorize with Monaverse using the signed message and the SiweMessage
 var authorizationResult = await MonaApi.ApiClient.Auth.Authorize(signature, validateWalletResult.Data.SiweMessage);
@@ -70,7 +84,7 @@ if (!authorizationResult.IsSuccess)
 ```
 
 ### Get Collectibles [Authorized]
-Once the user is successfully authorized, you can call the API to retrieve the 3D NFTs associated with their wallet.
+Once authorized, your application can retrieve a paginated list of all the 3D collectibles available in a user's Web3 wallet to be imported and interacted with within your game or application.
 
 _**Note**: You must Authorize the user before calling this endpoint_
 ```csharp
@@ -87,9 +101,10 @@ Debug.Log("GetWalletCollectibles: " + getWalletCollectiblesResult.Data);
 ```
 
 ### Get Collectibles By Id [Authorized]
-Once the user is successfully authorized, you can call the API to retrieve the 3D NFTs associated with their wallet.
+Call this API to retrieve a 3D Collectible by `ID` from the authorized user's wallet.
 
 _**Note**: You must Authorize the user before calling this endpoint_
+
 ```csharp
 // Fetch the 3D Collectible by Id
 var collectibleId = "collectible-unique-id";

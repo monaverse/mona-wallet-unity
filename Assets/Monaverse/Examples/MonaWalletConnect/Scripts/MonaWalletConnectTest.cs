@@ -34,11 +34,17 @@ namespace Monaverse.Examples
             Authorized
         }
 
+        /// <summary>
+        /// Initializes the UI to the disconnected state on start.
+        /// </summary>
         private void Start()
         {
             SetUIState(WalletState.Disconnected);
         }
 
+        /// <summary>
+        /// Tries to connect to a wallet or resumes an existing connection.
+        /// </summary>
         private async Task TryConnect()
         {
             try
@@ -66,6 +72,9 @@ namespace Monaverse.Examples
 
         #region UI Click Events
 
+        /// <summary>
+        /// Handles the connect button click event to initiate wallet connection.
+        /// </summary>
         public async void OnConnectButton()
         {
             Debug.Log("[MonaWalletConnectTest] OnConnectButton");
@@ -74,6 +83,9 @@ namespace Monaverse.Examples
             await TryConnect();
         }
 
+        /// <summary>
+        /// Handles the disconnect button click event to disconnect the wallet.
+        /// </summary>
         public async void OnDisconnectButton()
         {
             Debug.Log("[MonaWalletConnectTest] OnDisconnectButton");
@@ -91,6 +103,9 @@ namespace Monaverse.Examples
             }
         }
 
+        /// <summary>
+        /// Handles the authorize button click event to authorize the connected wallet.
+        /// </summary>
         public async void OnAuthorizeWallet()
         {
             try
@@ -129,6 +144,9 @@ namespace Monaverse.Examples
             }
         }
         
+        /// <summary>
+        /// Handles the sign-out button click event to sign out from the Monaverse.
+        /// </summary>
         public void OnSignOut()
         {
             try
@@ -152,6 +170,10 @@ namespace Monaverse.Examples
             }
         }
 
+        /// <summary>
+        /// Handles the GetCollectibles button click event to get authorized wallet collectibles.
+        /// The wallet must be authorized first.
+        /// </summary>
         public async void OnGetCollectibles()
         {
             if (!MonaverseManager.Instance.SDK.IsWalletAuthorized())
@@ -175,6 +197,10 @@ namespace Monaverse.Examples
 
         #endregion
 
+        /// <summary>
+        /// Sets the UI state based on the current wallet state.
+        /// </summary>
+        /// <param name="state"></param>
         private void SetUIState(WalletState state)
         {
             _dappButtons.SetActive(false);
