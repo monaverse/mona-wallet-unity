@@ -43,14 +43,15 @@ All you need now is a `MonaverseManager` prefab present in your scene.
 
 Navigate to `Assets > Monaverse > Core > Prefabs > MonaverseManager` and drag it into your scene.
 
-- Make sure you set the `Mona Application Id`. You can get one from [Monaverse](https://Monaverse.com)
-- Optinally, you can set your own `WalletConnectProjectId`
+Make sure you set the following fields:
+- `Mona Application Id`: You can get one from [Monaverse](https://Monaverse.com)
+- `WalletConnectProjectId`: Your project ID for WalletConnect. Get one at [Wallet Connect](https://cloud.walletconnect.com/sign-up)
 
 ## Usage
 
-In order to access the SDK, you only need to have a `MonaverseManager` in your scene.
+To access the SDK, you only need to include a `MonaverseManager` prefab instance in your scene.
 
-The `MonaverseManager` will help you go through the following steps in order to have access to a user's 3D collectibles store in their Web3 wallet.
+The `MonaverseManager` will guide you through the following steps to access a user's 3D collectibles stored in their Web3 wallet:
 
 - Initialize SDK
 - Connect Wallet
@@ -59,32 +60,33 @@ The `MonaverseManager` will help you go through the following steps in order to 
 
 ### Initialize SDK
 
-If the `initializeOnAwake` toggle is checked in the `MonaverseManager` MonoBehavior, then initialization will be done automatically for you. Please be advised not to called any SDK functions from within the `Awake` function.
+If the `initializeOnAwake` toggle is checked in the `MonaverseManager` MonoBehavior, initialization will be done automatically. Please do not call any SDK functions from within the `Awake` function.
 
 ![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/20456f7f-ac09-48d5-bcd6-cb0856e7ae74)
 
-On the other hand, if you prefer to do this manually from code, you can uncheck the toggle and call:
+Alternatively, if you prefer to initialize manually from code, you can uncheck the toggle and call:
 
 ```C#
 MonaverseManager.Initialize();
 ```
 
 ### Connect Wallet
-By default, the SDK uses `WalletConnect` with a ready to use projectId. Optionally, you can configure it with your own `WalletConnectProjectId` and set it in the `MonaverseManager` inspector.
+By default, the SDK uses `WalletConnect` with a ready-to-use projectId. Alternatively, you can configure it with your own `WalletConnectProjectId` and set it in the `MonaverseManager` inspector.
 
 ```C#
 // Connect to the user's Web3 wallet via WalletConnect
 var address = await MonaverseManager.Instance.SDK.ConnectWallet();
 ```
 
-Calling the line above will open `WalletConnect`'s modal and let you choose your `Wallet` provider, once connected to your App the asynchronous function will return the selected account address.
+Calling the line above will open `WalletConnect`'s modal, allowing you to choose your wallet provider.
+Once connected to your app, the asynchronous function will return the selected account address.
 
 ![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/348bffeb-6565-4c46-a0eb-7c6ec6416160)
 
 ### Authorize Wallet
-Once connected, it's time to authorize the wallet with the `Monaverse` platform. Keep in mind the user must have an existing account with `Mona`.
+Once connected, it's time to authorize the wallet with the `Monaverse` platform. Note that the user must have an existing account at [Monaverse](https://monaverse.com/).
 
-The following code will try to authorize the currently connected wallet. You must connect a wallet before calling this.
+The following code will attempt to authorize the currently connected wallet. You must connect a wallet before calling this.
 
 ```C#
 var authorizationResult = await MonaverseManager.Instance.SDK.AuthorizeWallet();
@@ -108,9 +110,9 @@ public enum AuthorizationResult
 If the result is `Authorized`, your application is all set to pull the authenticated user 3D collectibles from their Web3 wallet.
 
 ### Get Collectibles [Authorized]
-Once authorized, your application call get a paginated list of all the 3D collectibles available in a user's Web3 wallet to be imported and interated with from within your game or application.
+Once authorized, your application can retrieve a paginated list of all the 3D collectibles available in a user's Web3 wallet to be imported and interacted with within your game or application.
 
-To get all collectibles for the authenticated user call:
+To get all collectibles for the authenticated user, call:
 
 ```C#
 var getCollectiblesResult = await MonaApi.ApiClient.Collectibles.GetWalletCollectibles();
