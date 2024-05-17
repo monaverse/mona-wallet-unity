@@ -44,10 +44,12 @@ namespace Monaverse.Api.Modules.Auth
             {
                 var postNonceResponse = await PostNonce(walletAddress);
                 if (!postNonceResponse.IsSuccess)
-                    return ApiResult<ValidateWalletResponse>.Success(new ValidateWalletResponse(ValidateWalletResult.FailedGeneratingNonce, ErrorMessage: postNonceResponse.Message));
+                    return ApiResult<ValidateWalletResponse>.Failed(message: postNonceResponse.Message,
+                        data: new ValidateWalletResponse(ValidateWalletResult.FailedGeneratingNonce, ErrorMessage: postNonceResponse.Message));
 
                 if (!postNonceResponse.Data.IsExistingUser)
-                    return ApiResult<ValidateWalletResponse>.Success(new ValidateWalletResponse(ValidateWalletResult.WalletIsNotRegistered));
+                    return ApiResult<ValidateWalletResponse>.Failed(message: "Wallet is not registered", 
+                        data: new ValidateWalletResponse(ValidateWalletResult.WalletIsNotRegistered, ErrorMessage: postNonceResponse.Message));
 
                 var siweMessage = SiweMessageBuilder.BuildMessage(domain: Constants.MonaDomain,
                     address: walletAddress,
@@ -58,7 +60,8 @@ namespace Monaverse.Api.Modules.Auth
             catch (Exception exception)
             {
                 _monaApiLogger.LogError(exception.Message);
-                return ApiResult<ValidateWalletResponse>.Failed(exception.Message);
+                return ApiResult<ValidateWalletResponse>.Failed(message: exception.Message,
+                    data:new ValidateWalletResponse(ValidateWalletResult.Error, ErrorMessage: exception.Message));
             }
         }
 
@@ -78,7 +81,7 @@ namespace Monaverse.Api.Modules.Auth
                 var response = await _monaHttpClient.SendAsync(monaHttpRequest);
                 var result = response.ConvertTo<AuthorizeResponse>();
 
-                if(result.Data != null && !string.IsNullOrEmpty(result.Data.AccessToken)) 
+                if (result.Data != null && !string.IsNullOrEmpty(result.Data.AccessToken))
                     _monaHttpClient.SaveSession(result.Data.AccessToken);
 
                 return result;

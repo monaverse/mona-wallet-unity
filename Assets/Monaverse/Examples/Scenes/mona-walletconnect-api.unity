@@ -2124,6 +2124,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1824826482449299138, guid: 057b79a6bc70e4dcdbca1c90102b2de9, type: 3}
+      propertyPath: apiEnvironment
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2775405142357048175, guid: 057b79a6bc70e4dcdbca1c90102b2de9, type: 3}
       propertyPath: m_Name
       value: MonaverseManager

@@ -3,7 +3,9 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Monaverse.Api;
 using Monaverse.Api.Configuration;
+using Monaverse.Api.Logging;
 using Monaverse.Api.Modules.Auth.Responses;
+using Monaverse.Api.Options;
 using Monaverse.Wallets;
 using UnityEngine;
 
@@ -26,6 +28,11 @@ namespace Monaverse.Core
             /// The Monaverse API environment to use.
             /// </summary>
             public ApiEnvironment apiEnvironment;
+
+            /// <summary>
+            /// Whether to show the sdk debug logs
+            /// </summary>
+            public bool showDebugLogs;
         }
         
         public enum AuthorizationResult
@@ -47,7 +54,12 @@ namespace Monaverse.Core
         public MonaWalletSDK(SDKOptions options)
         {
             Options = options;
-            ApiClient = MonaApi.Init(options.applicationId);
+            ApiClient = MonaApi.Init(new DefaultApiOptions
+            {
+                ApplicationId = options.applicationId,
+                Environment = options.apiEnvironment,
+                LogLevel = options.showDebugLogs? ApiLogLevel.Info : ApiLogLevel.Off
+            });
         }
         
         public Task<string> ConnectWallet()
@@ -146,22 +158,16 @@ namespace Monaverse.Core
                 var validateWalletResponse = await ApiClient.Auth.ValidateWallet(address);
                 if (!validateWalletResponse.IsSuccess)
                 {
-                    MonaDebug.LogError(validateWalletResponse.Message);
-                    return AuthorizationResult.FailedValidatingWallet;
-                }
-                
-                //Check if wallet is registered in Monaverse.com
-                if (validateWalletResponse.Data.Result == ValidateWalletResult.WalletIsNotRegistered)
-                {
-                    MonaDebug.LogError(validateWalletResponse.Message);
-                    return AuthorizationResult.UserNotRegistered;
-                }
-                
-                //if wallet is not valid at this point, there must be an error generating nonce
-                if (validateWalletResponse.Data.Result != ValidateWalletResult.WalletIsValid)
-                {
-                    MonaDebug.LogError(validateWalletResponse.Message);
-                    return AuthorizationResult.FailedValidatingWallet;
+                    MonaDebug.LogError("Failed validating wallet: " + validateWalletResponse.Message);
+
+                    return validateWalletResponse.Data.Result switch
+                    {
+                        ValidateWalletResult.FailedGeneratingNonce => AuthorizationResult.FailedValidatingWallet,
+                        ValidateWalletResult.WalletIsNotRegistered => AuthorizationResult.UserNotRegistered,
+                        ValidateWalletResult.Error => AuthorizationResult.Error,
+                        ValidateWalletResult.WalletIsValid => throw new UnityException("Unexpected ValidateWalletResult: WalletIsValid"),
+                        _ => throw new ArgumentOutOfRangeException(" Unexpected ValidateWalletResult: " + validateWalletResponse.Data.Result)
+                    };
                 }
                 
                 //Sign message with the user's active wallet provider
