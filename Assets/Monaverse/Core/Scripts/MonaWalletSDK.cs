@@ -11,6 +11,9 @@ using UnityEngine;
 
 namespace Monaverse.Core
 {
+    /// <summary>
+    /// The entry point for the Monaverse Wallet SDK
+    /// </summary>
     public sealed class MonaWalletSDK
     {
         public struct SDKOptions
@@ -62,6 +65,12 @@ namespace Monaverse.Core
             });
         }
         
+        /// <summary>
+        /// Connects a user's Web3 wallet via WalletConnect.
+        /// This will open the WalletConnect UI modal and let the user connect their Web3 wallet
+        /// </summary>
+        /// <returns> A task that completes when the wallet connection is complete.
+        /// If successful, the task returns the address of the connected wallet.</returns>
         public Task<string> ConnectWallet()
         {
             return ConnectWallet(new MonaWalletConnection
@@ -71,6 +80,13 @@ namespace Monaverse.Core
             });
         }
         
+        /// <summary>
+        /// Connects a user's Web3 wallet via a given wallet provider.
+        /// </summary>
+        /// <param name="monaWalletConnection">The wallet provider and optional parameters.</param>
+        /// <returns>A task that completes when the wallet connection is complete.
+        /// If successful, the task returns the address of the connected wallet.</returns>
+        /// <exception cref="UnityException">Thrown if the wallet provider is not supported on this platform.</exception>
         public async Task<string> ConnectWallet(MonaWalletConnection monaWalletConnection)
         {
             ChainId = monaWalletConnection.ChainId;
@@ -99,7 +115,7 @@ namespace Monaverse.Core
         
         
         /// <summary>
-        /// Disconnects the user's wallet.
+        /// Disconnects the user's wallet and clears any active authorization
         /// </summary>
         public async Task Disconnect()
         {
@@ -133,14 +149,36 @@ namespace Monaverse.Core
         }
         
         /// <summary>
-        /// Returns true if the there is an active session with the Monaverse
+        /// Returns true if the there is an active session with the Monaverse API.
+        /// The session will remain authorized for 24 hours since the last time the user authorized their wallet.
+        /// The session can be cleared using the Disconnect method
+        /// The session can be cleared using the ApiClient.ClearSession method
+        /// This must be true before you can call any authorized API endpoints
         /// </summary>
-        /// <returns></returns>
+        /// <returns>True if the session is authorized, false otherwise.</returns>
         public bool IsWalletAuthorized()
         {
             return ApiClient.IsAuthorized();
         }
 
+        /// <summary>
+        /// This will authorize the user's wallet with the Monaverse platform.
+        /// Before calling this, make sure:
+        /// - The user is registered at Monaverse.com. You can validate if the user is registered using the ValidateWallet API endpoint.
+        /// - The user has connected their wallet.
+        /// </summary>
+        /// <returns>AuthorizationResult enum with the following values:
+        /// <see cref="AuthorizationResult"/>
+        /// - WalletNotConnected: The user's wallet is not connected
+        /// - FailedValidatingWallet: Failed validating the user's wallet
+        /// - UserNotRegistered: The user is not registered
+        /// - FailedSigningMessage: Failed signing the SIWE message
+        /// - FailedAuthorizing: Failed authorizing the user's wallet with the Monaverse API
+        /// - Authorized: The user's wallet is authorized and ready to use
+        /// - Error: An unknown error occurred
+        /// </returns>
+        /// <exception cref="UnityException"></exception>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public async Task<AuthorizationResult> AuthorizeWallet()
         {
             try

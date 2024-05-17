@@ -44,6 +44,12 @@ namespace Monaverse.Core
                 Initialize();
         }
         
+        /// <summary>
+        /// This must be called before using the SDK
+        /// If initializeOnAwake is set to true, this will be called automatically.
+        /// If initializeOnAwake is set to false, this must be called manually from your code
+        /// Please do not call any SDK functions from within the Awake function, including this.
+        /// </summary>
         public static void Initialize()
         {
             if (Instance == null)

@@ -197,3 +197,12 @@ Here's an example of the `CollectibleDto` as JSON:
   ]
 }
 ```
+
+## Examples
+
+The [MonaWalletConnect](https://github.com/monaverse/mona-wallet-unity/tree/main/Assets/Monaverse/Examples/MonaWalletConnect) sample scene will demonstrate how to wire actions to the UI and provide a complete workflow from connection to authorization.
+
+
+
+
+
