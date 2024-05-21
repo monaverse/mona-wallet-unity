@@ -42,7 +42,15 @@ namespace Monaverse.Api.Modules.Collectibles.Dtos
 
         public sealed record CollectibleVersion
         {
+            public CollectibleVersionAssets Assets { get; set; }
             public string Asset { get; set; }
+        }
+        
+        public sealed record CollectibleVersionAssets
+        {
+            public string Artifacts { get; set; }
+            public string Portals { get; set; }
+            public string Space { get; set; }
         }
     }
 }
