@@ -1,5 +1,6 @@
 using System;
 using System.Numerics;
+using System.Threading;
 using System.Threading.Tasks;
 using Monaverse.Api;
 using Monaverse.Api.Configuration;
@@ -53,7 +54,44 @@ namespace Monaverse.Core
         public BigInteger ChainId { get; private set; }
         public IMonaWallet ActiveWallet { get; private set; }
         public IMonaApiClient ApiClient { get; internal set; }
-
+        public static SynchronizationContext UnitySyncContext { get; private set; }
+        
+        
+        /// <summary>
+        ///  Event raised when the user's wallet is connected
+        ///  The wallet address is passed as a parameter
+        /// </summary>
+        public event EventHandler<string> Connected;
+        
+        /// <summary>
+        /// Event raised when there is an error while connecting the user's wallet
+        /// An exception is passed as a parameter
+        /// </summary>
+        public event EventHandler<Exception> ConnectionErrored;
+        
+        /// <summary>
+        /// Event raised when the user's wallet is disconnected
+        /// </summary>
+        public event EventHandler Disconnected;
+        
+        /// <summary>
+        /// Event raised when the user's wallet is authorized
+        /// </summary>
+        public event EventHandler Authorized;
+        
+        /// <summary>
+        /// Event raised when the user's wallet is not authorized
+        /// An authorization result is passed as a parameter
+        /// </summary>
+        public event EventHandler<AuthorizationResult> AuthorizationFailed;
+        
+        /// <summary>
+        /// Event raised when there is an error while signing a message with the user's wallet
+        /// An exception is passed as a parameter
+        /// </summary>
+        public event EventHandler<Exception> SignMessageErrored;
+        
+        
         public MonaWalletSDK(SDKOptions options)
         {
             Options = options;
@@ -63,6 +101,12 @@ namespace Monaverse.Core
                 Environment = options.apiEnvironment,
                 LogLevel = options.showDebugLogs? ApiLogLevel.Info : ApiLogLevel.Off
             });
+            
+            var currentSyncContext = SynchronizationContext.Current;
+            if (currentSyncContext.GetType().FullName != "UnityEngine.UnitySynchronizationContext")
+                throw new Exception(
+                    $"[Monaverse] SynchronizationContext is not of type UnityEngine.UnitySynchronizationContext. Current type is <i>{currentSyncContext.GetType().FullName}</i>. Make sure to initialize the Monaverse SDK from the main thread.");
+            UnitySyncContext = currentSyncContext;
         }
         
         /// <summary>
@@ -104,16 +148,18 @@ namespace Monaverse.Core
                 default: throw new UnityException($"{monaWalletConnection.MonaWalletProvider} not supported on this platform");
             }
             
-            await ActiveWallet.Connect(monaWalletConnection);
+            ActiveWallet.Connected += OnConnected;
+            ActiveWallet.ConnectionErrored += OnConnectionErrored;
+            ActiveWallet.Disconnected += OnDisconnected;
+            ActiveWallet.SignMessageErrored += OnSignMessageErrored;
             
-            var address = await ActiveWallet.GetAddress();
+            var address = await ActiveWallet.Connect(monaWalletConnection);
             
             MonaDebug.Log($"Connected wallet {monaWalletConnection.MonaWalletProvider} with address {address} on chain {ChainId}");
 
             return address;
         }
-        
-        
+
         /// <summary>
         /// Disconnects the user's wallet and clears any active authorization
         /// </summary>
@@ -187,6 +233,7 @@ namespace Monaverse.Core
                 if (!await IsWalletConnected())
                 {
                     MonaDebug.LogError("Wallet is not connected");
+                    OnAuthorizationFailed(AuthorizationResult.WalletNotConnected);
                     return AuthorizationResult.WalletNotConnected;
                 }
                 
@@ -198,7 +245,8 @@ namespace Monaverse.Core
                 {
                     MonaDebug.LogError("Failed validating wallet: " + validateWalletResponse.Message);
 
-                    return validateWalletResponse.Data.Result switch
+                    
+                    var result = validateWalletResponse.Data.Result switch
                     {
                         ValidateWalletResult.FailedGeneratingNonce => AuthorizationResult.FailedValidatingWallet,
                         ValidateWalletResult.WalletIsNotRegistered => AuthorizationResult.UserNotRegistered,
@@ -206,6 +254,9 @@ namespace Monaverse.Core
                         ValidateWalletResult.WalletIsValid => throw new UnityException("Unexpected ValidateWalletResult: WalletIsValid"),
                         _ => throw new ArgumentOutOfRangeException(" Unexpected ValidateWalletResult: " + validateWalletResponse.Data.Result)
                     };
+
+                    OnAuthorizationFailed(result);
+                    return result;
                 }
                 
                 //Sign message with the user's active wallet provider
@@ -213,6 +264,7 @@ namespace Monaverse.Core
                 if (string.IsNullOrEmpty(signature))
                 {
                     MonaDebug.LogError($"Failed signing message with {ActiveWallet.GetProvider().ToString()}");
+                    OnAuthorizationFailed(AuthorizationResult.FailedSigningMessage);
                     return AuthorizationResult.FailedSigningMessage;
                 }
                 
@@ -221,16 +273,73 @@ namespace Monaverse.Core
                 if (!authorizationResult.IsSuccess)
                 {
                     MonaDebug.LogError($"Failed authorizing wallet {authorizationResult.Message}");
+                    OnAuthorizationFailed(AuthorizationResult.FailedAuthorizing);
                     return AuthorizationResult.FailedAuthorizing;
                 }
+                
+                OnAuthorized();
                 
                 return AuthorizationResult.Authorized;
             }
             catch (Exception exception)
             {
                MonaDebug.LogException(exception);
+               OnAuthorizationFailed(AuthorizationResult.Error);
                return AuthorizationResult.Error;
             }
         }
+
+
+        #region Events Handlers
+
+        private void OnConnected(object sender, string connectedEvent)
+        {
+            UnitySyncContext.Post(_ =>
+            {
+                Connected?.Invoke(this, connectedEvent);
+            }, null);
+        }
+        
+        private void OnDisconnected(object sender, EventArgs e)
+        {
+            UnitySyncContext.Post(_ =>
+            {
+                Disconnected?.Invoke(this, e);
+            }, null);
+        }
+        
+        private void OnAuthorized()
+        {
+            UnitySyncContext.Post(_ =>
+            {
+                Authorized?.Invoke(this, EventArgs.Empty);
+            }, null);
+        }
+
+        private void OnAuthorizationFailed(AuthorizationResult authorizationResult)
+        {
+            UnitySyncContext.Post(_ =>
+            {
+                AuthorizationFailed?.Invoke(this, authorizationResult);
+            }, null);
+        }
+        
+        private void OnSignMessageErrored(object sender, Exception exception)
+        {
+            UnitySyncContext.Post(_ =>
+            {
+                SignMessageErrored?.Invoke(this, exception);
+            }, null);
+        }
+
+        private void OnConnectionErrored(object sender, Exception exception)
+        {
+            UnitySyncContext.Post(_ =>
+            {
+                ConnectionErrored?.Invoke(this, exception);
+            }, null);
+        }
+
+        #endregion
     }
 }
