@@ -202,6 +202,8 @@ namespace WalletConnectUnity.UI
 
         private IEnumerator BackInputRoutine()
         {
+#if ENABLE_LEGACY_INPUT_MANAGER
+            // Old input backends are enabled.
             while (_canvas.enabled)
             {
                 if (Input.GetKeyDown(KeyCode.Escape))
@@ -218,6 +220,8 @@ namespace WalletConnectUnity.UI
 
                 yield return null;
             }
+#endif
+            yield break;
         }
     }
 }
