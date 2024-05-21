@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Monaverse.Core;
 
@@ -11,5 +12,9 @@ namespace Monaverse.Wallets
         Task<string> SignMessage(string message);
         Task<bool> IsConnected();
         MonaWalletProvider GetProvider();
+        event EventHandler<string> Connected;
+        event EventHandler Disconnected;
+        event EventHandler<Exception> ConnectionErrored;
+        event EventHandler<Exception> SignMessageErrored;
     }
 }

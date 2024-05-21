@@ -29,9 +29,20 @@ namespace Monaverse.Wallets
 
         public async Task<string> Connect(MonaWalletConnection monaWalletConnection)
         {
-            _account = new Account(_privateKey);
-            _web3 = new Web3(_account);
-            return await GetAddress();
+            try
+            {
+                _account = new Account(_privateKey);
+                _web3 = new Web3(_account);
+            
+                var address = await GetAddress();
+                Connected?.Invoke(this, address);
+                return address;
+            }
+            catch (Exception exception)
+            {
+                ConnectionErrored?.Invoke(this, exception);
+                throw;
+            }
         }
 
         public Task<bool> Disconnect()
@@ -39,6 +50,7 @@ namespace Monaverse.Wallets
             _web3 = null;
             _account = null;
 
+            Disconnected?.Invoke(this, EventArgs.Empty);
             return Task.FromResult(true);
         }
 
@@ -52,24 +64,27 @@ namespace Monaverse.Wallets
 
         public async Task<string> SignMessage(string message)
         {
-            if (!await IsConnected())
-                return null;
-
-            var signer = new EthereumMessageSigner();
-
-            var signature = signer.EncodeUTF8AndSign(message, new EthECKey(_account.PrivateKey));
-
-            if (string.IsNullOrEmpty(signature))
+            try
             {
-                MonaDebug.LogError("Signature is null or empty.");
-                return null;
-            }
+                if (!await IsConnected())
+                    throw new Exception("Wallet not connected");
 
-            return signature;
+                var signer = new EthereumMessageSigner();
+                return signer.EncodeUTF8AndSign(message, new EthECKey(_account.PrivateKey));
+            }
+            catch (Exception exception)
+            {
+                SignMessageErrored?.Invoke(this, exception);
+                throw;
+            }
         }
 
         public Task<bool> IsConnected() => Task.FromResult(_web3 != null);
 
         public MonaWalletProvider GetProvider()=> _walletProvider;
+        public event EventHandler<string> Connected;
+        public event EventHandler Disconnected;
+        public event EventHandler<Exception> ConnectionErrored;
+        public event EventHandler<Exception> SignMessageErrored;
     }
 }

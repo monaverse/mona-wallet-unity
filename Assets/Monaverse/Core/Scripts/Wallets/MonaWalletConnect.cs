@@ -17,6 +17,11 @@ namespace Monaverse.Wallets
     {
         private readonly string _walletConnectProjectId;
         private KeyValuePair<string, Namespace> _namespace;
+        public event EventHandler<string> Connected;
+        public event EventHandler<Exception> ConnectionErrored;
+        public event EventHandler<Exception> SignMessageErrored;
+        public event EventHandler Disconnected;
+        
 
         public MonaWalletConnect(string walletConnectProjectId)
         {
@@ -36,18 +41,23 @@ namespace Monaverse.Wallets
                 await MonaWalletConnectUI.Instance.Connect(monaWalletConnection.ChainId);
                 _namespace = WalletConnect.Instance.ActiveSession.Namespaces.First();
 
-                return await GetAddress();
+                var address = await GetAddress();
+                Connected?.Invoke(this, address);
+                
+                return address;
             }
             catch (WalletConnectException walletConnectException)
             {
                 MonaDebug.LogException(walletConnectException);
                 //Forced disconnect to avoid lingering sessions
                 await Disconnect();
+                ConnectionErrored?.Invoke(this, walletConnectException);
                 throw;
             }
             catch (Exception exception)
             {
                 MonaDebug.LogException(exception);
+                ConnectionErrored?.Invoke(this, exception);
                 throw;
             }
         }
@@ -57,6 +67,7 @@ namespace Monaverse.Wallets
             try
             {
                 await WalletConnect.Instance.DisconnectAsync();
+                Disconnected?.Invoke(this, EventArgs.Empty);
                 return true;
             }
             catch (Exception e)
@@ -87,6 +98,8 @@ namespace Monaverse.Wallets
             catch (WalletConnectException walletConnectException)
             {
                 MonaDebug.LogError("WalletConnect error signing message: " + walletConnectException.Message);
+                SignMessageErrored?.Invoke(this, walletConnectException);
+                
                 //Forced disconnect to avoid lingering sessions
                 await Disconnect();
                 throw;
@@ -94,6 +107,7 @@ namespace Monaverse.Wallets
             catch (Exception exception)
             {
                 MonaDebug.LogError("Error signing message: " + exception.Message);
+                SignMessageErrored?.Invoke(this, exception);
                 throw;
             }
         }
