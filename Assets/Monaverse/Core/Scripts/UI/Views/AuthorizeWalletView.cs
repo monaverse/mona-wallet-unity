@@ -16,6 +16,8 @@ namespace Monaverse.UI.Views
         [SerializeField] private TMP_Text _walletStatusText;
         [SerializeField] private TMP_Text _walletAddressText;
         [SerializeField] private Button _authorizeButton;
+        [SerializeField] private GameObject _authorizedGroup;
+        [SerializeField] private GameObject _unauthorizedGroup;
         
         public override async void Show(MonaModal modal, IEnumerator effectCoroutine, object options = null)
         {
@@ -37,6 +39,8 @@ namespace Monaverse.UI.Views
             _walletStatusText.text = "Wallet Connected";
             _walletAddressText.text = "--";
             _authorizeStatusText.text = "Authorizing...";
+            parentModal.Header.EnableBackButton(false);
+            SetAuthorizedGroups(false);
             EnableAuthorizeButton(false);
         }
 
@@ -58,8 +62,7 @@ namespace Monaverse.UI.Views
                 
                 if (MonaverseManager.Instance.SDK.IsWalletAuthorized())
                 {
-                    _authorizeStatusText.text = "Wallet authorized";
-                    EnableAuthorizeButton(false);
+                    OnAuthorized(this, EventArgs.Empty);
                     return;
                 }
             
@@ -121,8 +124,8 @@ namespace Monaverse.UI.Views
         private void OnAuthorized(object sender, EventArgs e)
         {
             Debug.Log("[MonaWalletConnectTest.OnAuthorized]");
-            _authorizeStatusText.text = "Wallet authorized!";
             EnableAuthorizeButton(false);
+            SetAuthorizedGroups(true);
             parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Success, "Wallet Authorized");
         }
         
@@ -132,6 +135,12 @@ namespace Monaverse.UI.Views
         {
             _authorizeButton.interactable = isEnabled;
             _authorizeButton.gameObject.SetActive(isEnabled);
+        }
+        
+        private void SetAuthorizedGroups(bool isAuthorized)
+        {
+            _unauthorizedGroup.SetActive(!isAuthorized);
+            _authorizedGroup.SetActive(isAuthorized);
         }
     }
 }

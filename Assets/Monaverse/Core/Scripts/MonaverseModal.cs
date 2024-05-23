@@ -32,7 +32,7 @@ namespace Monaverse.Modal
             Initialize();
         }
         
-        public static void Open(ViewType view = ViewType.Connect)
+        public static void Open(ViewType view = ViewType.SelectWallet)
         {
             if (!IsReady)
             {
@@ -88,9 +88,10 @@ namespace Monaverse.Modal
         
         public enum ViewType
         {
-            Connect = 1,
-            Authorize = 2,
-            Collectibles = 3
+            SelectWallet = 1,
+            ConnectingWallet = 2,
+            Authorize = 3,
+            Collectibles = 4
         }
     }
 }

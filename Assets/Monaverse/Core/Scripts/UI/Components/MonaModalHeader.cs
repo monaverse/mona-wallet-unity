@@ -49,5 +49,7 @@ namespace Monaverse.UI.Components
         {
             Modal.CloseModal();
         }
+        
+        public void EnableBackButton(bool isEnabled) => LeftButton.gameObject.SetActive(isEnabled);
     }
 }

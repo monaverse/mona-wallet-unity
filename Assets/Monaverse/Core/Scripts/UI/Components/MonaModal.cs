@@ -19,25 +19,26 @@ namespace Monaverse.UI.Components
         [SerializeField] private Image _modalBorderImage;
         [SerializeField] private RectTransform _footerRectTransform;
         [field: SerializeField] public MonaModalHeader Header { get; private set; }
-        
+
         [Header("Settings")]
         [SerializeField, Range(0, 1)] private float _mobileMaxHeightPercent = 0.8f;
 
         public bool IsOpen => _canvas.enabled;
         public event EventHandler Opened;
         public event EventHandler Closed;
-        
+
         private readonly Stack<MonaModalView> _viewsStack = new();
         private bool _hasGlobalBackground;
         private bool _resizingModal;
-
+        
+        public int ViewCount => _viewsStack.Count;
 
         private void Awake()
         {
             _hasGlobalBackground = _globalBackgroundCanvas != null;
             HandleConstantPhysicalSize();
         }
-        
+
         private void HandleConstantPhysicalSize()
         {
             const float targetDPI = 160;
@@ -62,8 +63,7 @@ namespace Monaverse.UI.Components
                 _viewsStack.Peek().Hide();
 
             modal ??= this;
-
-
+            
             var resizeCoroutine = ResizeModalRoutine(view.GetViewHeight());
             _viewsStack.Push(view);
             view.Show(modal, resizeCoroutine, parameters);
@@ -104,7 +104,7 @@ namespace Monaverse.UI.Components
 
             Closed?.Invoke(this, EventArgs.Empty);
         }
-        
+
         public IEnumerator ResizeModalRoutine(float targetHeight)
         {
             if (_resizingModal) yield break;
@@ -135,7 +135,7 @@ namespace Monaverse.UI.Components
             _rectTransform.sizeDelta = new Vector2(rootTransformSizeDelta.x, targetHeight);
             _resizingModal = false;
         }
-        
+
         private void EnableModal()
         {
             _canvas.enabled = true;
@@ -145,7 +145,7 @@ namespace Monaverse.UI.Components
 
             Opened?.Invoke(this, EventArgs.Empty);
         }
-        
+
         private void DisableModal()
         {
             _canvas.enabled = false;

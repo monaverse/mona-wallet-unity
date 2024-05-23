@@ -14,10 +14,10 @@ namespace Monaverse.UI.Components
 
         public virtual string GetTitle() => _title;
 
-        
         public virtual void Show(MonaModal modal, IEnumerator effectCoroutine, object options = null)
         {
             parentModal = modal;
+            parentModal.Header.EnableBackButton(parentModal.ViewCount > 1);
             StartCoroutine(ShowAfterEffectRoutine(effectCoroutine));
         }
 
