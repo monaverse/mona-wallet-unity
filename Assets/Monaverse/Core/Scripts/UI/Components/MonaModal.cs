@@ -17,6 +17,7 @@ namespace Monaverse.UI.Components
         [SerializeField] private Canvas _globalBackgroundCanvas;
         [SerializeField] private Image _modalMaskImage;
         [SerializeField] private Image _modalBorderImage;
+        [SerializeField] private RectTransform _footerRectTransform;
         [field: SerializeField] public MonaModalHeader Header { get; private set; }
         
         [Header("Settings")]
@@ -29,6 +30,28 @@ namespace Monaverse.UI.Components
         private readonly Stack<MonaModalView> _viewsStack = new();
         private bool _hasGlobalBackground;
         private bool _resizingModal;
+
+
+        private void Awake()
+        {
+            _hasGlobalBackground = _globalBackgroundCanvas != null;
+            HandleConstantPhysicalSize();
+        }
+        
+        private void HandleConstantPhysicalSize()
+        {
+            const float targetDPI = 160;
+
+            // When using Game view instead of Device Simulator, you may want to change the target DPI for better scaling, e.g.:
+// #if (UNITY_EDITOR && (UNITY_ANDROID || UNITY_IOS))
+//             targetDPI = 96;
+// #endif
+
+            if (Screen.dpi != 0)
+                _rootCanvasScaler.scaleFactor = Screen.dpi / targetDPI;
+            else
+                _rootCanvasScaler.scaleFactor = 1f;
+        }
 
         public void OpenView(MonaModalView view, MonaModal modal = null, object parameters = null)
         {
@@ -87,7 +110,7 @@ namespace Monaverse.UI.Components
             if (_resizingModal) yield break;
             _resizingModal = true;
 
-            targetHeight = targetHeight + Header.Height + 12;
+            targetHeight = targetHeight + Header.Height + 12 + _footerRectTransform.rect.height;
 
 #if UNITY_ANDROID || UNITY_IOS
             if (DeviceUtils.GetDeviceType() == DeviceType.Phone)
