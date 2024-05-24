@@ -18,6 +18,8 @@ namespace Monaverse.UI.Views
         [SerializeField] private Button _authorizeButton;
         [SerializeField] private GameObject _authorizedGroup;
         [SerializeField] private GameObject _unauthorizedGroup;
+
+        [SerializeField] private MonaModalView _collectiblesView;
         
         public override async void Show(MonaModal modal, IEnumerator effectCoroutine, object options = null)
         {
@@ -67,7 +69,7 @@ namespace Monaverse.UI.Views
                 }
             
                 _authorizeStatusText.text = "Authorizing your wallet...\n\n(Check your Wallet App)";
-                await MonaverseManager.Instance.SDK.AuthorizeWallet(); 
+                await MonaverseManager.Instance.SDK.AuthorizeWallet();
             }
             catch (Exception exception)
             {
@@ -121,16 +123,19 @@ namespace Monaverse.UI.Views
             parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Error, "Authorization Failed");
         }
 
-        private void OnAuthorized(object sender, EventArgs e)
+        private async void OnAuthorized(object sender, EventArgs e)
         {
             Debug.Log("[MonaWalletConnectTest.OnAuthorized]");
             EnableAuthorizeButton(false);
             SetAuthorizedGroups(true);
             parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Success, "Wallet Authorized");
+            
+            await new WaitForSeconds(2f);
+            parentModal.OpenView(_collectiblesView);
         }
         
         #endregion
-
+        
         private void EnableAuthorizeButton(bool isEnabled)
         {
             _authorizeButton.interactable = isEnabled;

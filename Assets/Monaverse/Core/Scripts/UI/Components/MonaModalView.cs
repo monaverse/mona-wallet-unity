@@ -13,6 +13,7 @@ namespace Monaverse.UI.Components
         protected MonaModal parentModal;
 
         public virtual string GetTitle() => _title;
+        public bool IsActive => _canvas.enabled;
 
         public virtual void Show(MonaModal modal, IEnumerator effectCoroutine, object options = null)
         {
