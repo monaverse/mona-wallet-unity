@@ -22,9 +22,12 @@ namespace Monaverse.UI.Views
             }
             
             base.Show(modal, effectCoroutine, options);
-            
+        }
+
+        protected override async void OnOpened(object options = null)
+        {
             var monaWalletConnection = (MonaWalletConnection)options;
-            await ConnectWallet(monaWalletConnection);
+            await ConnectWallet(monaWalletConnection); 
         }
 
         private async Task ConnectWallet(MonaWalletConnection options)

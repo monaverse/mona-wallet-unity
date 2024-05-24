@@ -12,19 +12,22 @@ namespace Monaverse.UI.Views
 {
     public class AuthorizeWalletView : MonaModalView
     {
+        [SerializeField] private MonaWalletInfo _walletInfo;
         [SerializeField] private TMP_Text _authorizeStatusText;
-        [SerializeField] private TMP_Text _walletStatusText;
-        [SerializeField] private TMP_Text _walletAddressText;
         [SerializeField] private Button _authorizeButton;
         [SerializeField] private GameObject _authorizedGroup;
         [SerializeField] private GameObject _unauthorizedGroup;
 
         [SerializeField] private MonaModalView _collectiblesView;
         
-        public override async void Show(MonaModal modal, IEnumerator effectCoroutine, object options = null)
+        public override void Show(MonaModal modal, IEnumerator effectCoroutine, object options = null)
         {
             base.Show(modal, effectCoroutine, options);
             SetDefaults();
+        }
+        
+        protected override async void OnOpened(object options = null)
+        {
             await TryAuthorize();
         }
 
@@ -34,16 +37,16 @@ namespace Monaverse.UI.Views
             MonaverseManager.Instance.SDK.AuthorizationFailed += OnAuthorizationFailed;
             MonaverseManager.Instance.SDK.ConnectionErrored += OnConnectionErrored;
             MonaverseManager.Instance.SDK.SignMessageErrored += OnSignMessageErrored;
+            MonaverseManager.Instance.SDK.Disconnected += OnDisconnected;
         }
 
         private void SetDefaults()
         {
-            _walletStatusText.text = "Wallet Connected";
-            _walletAddressText.text = "--";
             _authorizeStatusText.text = "Authorizing...";
             parentModal.Header.EnableBackButton(false);
             SetAuthorizedGroups(false);
             EnableAuthorizeButton(false);
+            _walletInfo.Show();
         }
 
         private async Task TryAuthorize()
@@ -52,15 +55,9 @@ namespace Monaverse.UI.Views
             {
                 if (!await MonaverseManager.Instance.SDK.IsWalletConnected())
                 {
-                    _walletStatusText.text = "Wallet Disconnected";
-                    _walletAddressText.text = "--";
-                    _authorizeStatusText.text = "Lost connection to wallet...";
-                    await new WaitForSeconds(2f);
                     parentModal.CloseView();
                     return;
                 }
-                
-                _walletAddressText.text = await MonaverseManager.Instance.SDK.ActiveWallet.GetAddress();
                 
                 if (MonaverseManager.Instance.SDK.IsWalletAuthorized())
                 {
@@ -68,7 +65,7 @@ namespace Monaverse.UI.Views
                     return;
                 }
             
-                _authorizeStatusText.text = "Authorizing your wallet...\n\n(Check your Wallet App)";
+                _authorizeStatusText.text = "Authorizing your wallet...";
                 await MonaverseManager.Instance.SDK.AuthorizeWallet();
             }
             catch (Exception exception)
@@ -86,20 +83,25 @@ namespace Monaverse.UI.Views
             await TryAuthorize();
         }
 
-        public async void OnDisconnectButton()
-        {
-            parentModal.CloseView();
-            await MonaverseManager.Instance.SDK.Disconnect();
-            parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Success, "Wallet Disconnected");
-        }
-
         #endregion
-
 
         #region SDK Events
 
+        
+        private void OnDisconnected(object sender, EventArgs e)
+        {
+            if(!IsActive)
+                return;
+            
+            parentModal.CloseView();
+            parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Success, "Wallet Disconnected");
+        }
+        
         private void OnSignMessageErrored(object sender, Exception exception)
         {
+            if(!IsActive)
+                return;
+            
             Debug.LogError("[AuthorizeWalletView] OnSignMessageErrored: " + exception.Message);
             _authorizeStatusText.text = "Failed creating the signature. Make sure your Wallet App is open.";
             EnableAuthorizeButton(true);
@@ -108,15 +110,19 @@ namespace Monaverse.UI.Views
 
         private void OnConnectionErrored(object sender, Exception exception)
         {
+            if(!IsActive)
+                return;
+            
             Debug.LogError("[AuthorizeWalletView] OnConnectionErrored: " + exception.Message);
-            _walletStatusText.text = "Wallet Disconnected";
-            _walletAddressText.text = "--";
             _authorizeStatusText.text = "Lost connection to the wallet...";
             EnableAuthorizeButton(false);
         }
 
         private void OnAuthorizationFailed(object sender, MonaWalletSDK.AuthorizationResult authorizationResult)
         {
+            if(!IsActive)
+                return;
+            
             Debug.LogError("[AuthorizeWalletView] OnAuthorizationFailed: " + authorizationResult);
             _authorizeStatusText.text = "Failed authorizing the wallet. Reason: " + authorizationResult;
             EnableAuthorizeButton(true);
@@ -125,6 +131,9 @@ namespace Monaverse.UI.Views
 
         private async void OnAuthorized(object sender, EventArgs e)
         {
+            if(!IsActive)
+                return;
+            
             Debug.Log("[MonaWalletConnectTest.OnAuthorized]");
             EnableAuthorizeButton(false);
             SetAuthorizedGroups(true);

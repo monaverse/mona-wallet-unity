@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Monaverse.Core;
+using Monaverse.Core.Utils;
 using Monaverse.Redcode.Awaiting;
 using Monaverse.UI.Components;
 using UnityEngine;
@@ -17,6 +18,7 @@ namespace Monaverse.UI.Views
         [SerializeField] private ScrollRect _scrollRect;
         [SerializeField] private List<MonaListItem> _cardsPool = new();
         [SerializeField] private GameObject _noItemsFound;
+        [SerializeField] private MonaWalletInfo _walletInfo;
         
         [Header("Asset References")] [SerializeField]
         private MonaListItem _cardPrefab;
@@ -32,14 +34,21 @@ namespace Monaverse.UI.Views
         private int _countPerPageRealtime = 0;
         private int _usedCardsCount = 0;
         private bool _reachedMaxItemCount = false;
-        
-        
+
+        private void Start()
+        {
+            MonaverseManager.Instance.SDK.Disconnected += OnDisconnected;
+        }
+
         public override async void Show(MonaModal modal, IEnumerator effectCoroutine, object options = null)
         {
             base.Show(modal, effectCoroutine, options);
-
             _countPerPageRealtime = _countPerPage;
-
+        }
+        
+        protected override async void OnOpened(object options = null)
+        {
+            _walletInfo.Show();
             await LoadNextPage();
         }
         
@@ -126,7 +135,7 @@ namespace Monaverse.UI.Views
             {
                 var collectible = collectibles[i];
                 var card = _cardsPool[i + _usedCardsCount];
-                var sprite = GetSprite("https://res.cloudinary.com/mona-gallery/image/fetch/q_auto,f_auto,w_400/https://arweave.net/FOz9x9UkiUSP_SLPSgKja6ZzF0qJDLdmvmiO9jtdYWY");
+                var sprite = GetSprite(collectible.Image.ResolveTokenUrl());
 
                 card.Initialize(new MonaListItem.ListItemParams
                 {
@@ -173,6 +182,15 @@ namespace Monaverse.UI.Views
                 if ((i - oldSize + 1) % 3 == 0)
                     await new WaitForEndOfFrame();
             }
+        }
+        
+        private void OnDisconnected(object sender, EventArgs e)
+        {
+            if(!IsActive)
+                return;
+            
+            parentModal.CloseView();
+            parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Success, "Wallet Disconnected");
         }
     }
 }

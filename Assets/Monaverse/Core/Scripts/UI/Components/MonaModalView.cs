@@ -19,18 +19,21 @@ namespace Monaverse.UI.Components
         {
             parentModal = modal;
             parentModal.Header.EnableBackButton(parentModal.ViewCount > 1);
-            StartCoroutine(ShowAfterEffectRoutine(effectCoroutine));
+            StartCoroutine(ShowAfterEffectRoutine(effectCoroutine, options));
         }
+        
+        protected virtual void OnOpened(object options = null) {}
 
         public virtual void Hide()
         {
             _canvas.enabled = false;
         }
         
-        protected virtual IEnumerator ShowAfterEffectRoutine(IEnumerator effectCoroutine)
+        protected virtual IEnumerator ShowAfterEffectRoutine(IEnumerator effectCoroutine, object options)
         {
             yield return StartCoroutine(effectCoroutine);
             _canvas.enabled = true;
+            OnOpened(options);
         }
 
         public float GetViewHeight()

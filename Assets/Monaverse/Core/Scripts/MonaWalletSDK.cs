@@ -54,6 +54,8 @@ namespace Monaverse.Core
         public BigInteger ChainId { get; private set; }
         public IMonaWallet ActiveWallet { get; private set; }
         public IMonaApiClient ApiClient { get; internal set; }
+        public MonaverseSession Session { get; private set; }
+        
         public static SynchronizationContext UnitySyncContext { get; private set; }
         
         
@@ -101,6 +103,9 @@ namespace Monaverse.Core
                 Environment = options.apiEnvironment,
                 LogLevel = options.showDebugLogs? ApiLogLevel.Info : ApiLogLevel.Off
             });
+            
+            Session = new MonaverseSession();
+            Session.Load();
             
             var currentSyncContext = SynchronizationContext.Current;
             if (currentSyncContext.GetType().FullName != "UnityEngine.UnitySynchronizationContext")
@@ -153,11 +158,12 @@ namespace Monaverse.Core
             ActiveWallet.Disconnected += OnDisconnected;
             ActiveWallet.SignMessageErrored += OnSignMessageErrored;
             
-            var address = await ActiveWallet.Connect(monaWalletConnection);
+            Session.WalletAddress = await ActiveWallet.Connect(monaWalletConnection);
+            Session.Save();
             
-            MonaDebug.Log($"Connected wallet {monaWalletConnection.MonaWalletProvider} with address {address} on chain {ChainId}");
+            MonaDebug.Log($"Connected wallet {monaWalletConnection.MonaWalletProvider} with address {Session.WalletAddress} on chain {ChainId}");
 
-            return address;
+            return Session.WalletAddress;
         }
 
         /// <summary>
@@ -169,11 +175,21 @@ namespace Monaverse.Core
             if (ActiveWallet != null)
                 await ActiveWallet.Disconnect();
             else
+            {
+                OnDisconnected(this, EventArgs.Empty);
                 MonaDebug.LogWarning("No active wallet detected, unable to disconnect.");
+            }
             
             //Clear session
             ApiClient.ClearSession();
+            Session.Clear();
         }
+
+        /// <summary>
+        /// Checks if a wallet session has been initialized by calling Connect.
+        /// </summary>
+        /// <returns></returns>
+        public bool IsWalletSessionActive() => ActiveWallet != null;
 
         /// <summary>
         /// Checks if a wallet is connected.
@@ -288,7 +304,6 @@ namespace Monaverse.Core
                return AuthorizationResult.Error;
             }
         }
-
 
         #region Events Handlers
 

@@ -30,7 +30,7 @@ namespace Monaverse.UI.Components
         private readonly Stack<MonaModalView> _viewsStack = new();
         private bool _hasGlobalBackground;
         private bool _resizingModal;
-        
+
         public int ViewCount => _viewsStack.Count;
 
         private void Awake()
@@ -60,10 +60,15 @@ namespace Monaverse.UI.Components
                 EnableModal();
 
             if (_viewsStack.Count > 0)
-                _viewsStack.Peek().Hide();
+            {
+                //Loop through all views and hide them
+                foreach (var existingView in _viewsStack)
+                    existingView.Hide();
+                // _viewsStack.Peek().Hide();
+            }
 
             modal ??= this;
-            
+
             var resizeCoroutine = ResizeModalRoutine(view.GetViewHeight());
             _viewsStack.Push(view);
             view.Show(modal, resizeCoroutine, parameters);
