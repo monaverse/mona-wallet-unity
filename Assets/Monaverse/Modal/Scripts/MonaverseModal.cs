@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Monaverse.Api.Modules.Collectibles.Dtos;
 using Monaverse.Modal.UI.Components;
 using UnityEngine;
 
@@ -22,6 +23,8 @@ namespace Monaverse.Modal
         public static event EventHandler Ready;
         public static event EventHandler ModalOpened;
         public static event EventHandler ModalClosed;
+        public static event EventHandler<CollectibleDto> ImportCollectibleClicked;
+        public static event EventHandler<IList<CollectibleDto>> CollectiblesLoaded;
         
         private void Awake()
         {
@@ -60,6 +63,7 @@ namespace Monaverse.Modal
         {
             Instance.Modal.Opened += (_, _) => ModalOpened?.Invoke(Instance, EventArgs.Empty);
             Instance.Modal.Closed += (_, _) => ModalClosed?.Invoke(Instance, EventArgs.Empty);
+            
             IsReady = true;
             Ready?.Invoke(Instance, EventArgs.Empty);
         }
@@ -76,6 +80,16 @@ namespace Monaverse.Modal
             Debug.LogError("[MonaverseModal] MonaverseModal already exists. Destroying...");
             Destroy(gameObject);
             return false;
+        }
+        
+        internal static void TriggerImportCollectibleClicked(CollectibleDto collectibleDto)
+        {
+            ImportCollectibleClicked?.Invoke(Instance, collectibleDto);
+        }
+        
+        internal static void TriggerCollectiblesLoaded(IList<CollectibleDto> collectibles)
+        {
+            CollectiblesLoaded?.Invoke(Instance, collectibles);
         }
         
         [Serializable]

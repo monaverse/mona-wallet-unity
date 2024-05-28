@@ -1,3 +1,4 @@
+using System;
 using Monaverse.Modal.UI.Components;
 using TMPro;
 using UnityEngine;
@@ -18,7 +19,14 @@ namespace Monaverse.Modal.UI.Views
         [SerializeField] private TMP_Text _networkLabel;
         [SerializeField] private TMP_Text _tokenIdLabel;
 
+        [Header("Buttons")]
+        [SerializeField] private Button _importButton;
+        [SerializeField] private Button _previewButton;
+        
         private MonaRemoteSprite _remoteSprite;
+        
+        private Action _onImportClick;
+        private Action _onPreviewClick;
         
         public struct CollectibleDetailsParams
         {
@@ -31,11 +39,28 @@ namespace Monaverse.Modal.UI.Views
             public bool minted;
             public float price;
             public string description;
+            public Action onImportClick;
+            public Action onPreviewClick;
+        }
+
+        private void Start()
+        {
+            _importButton.onClick.AddListener(OnImportClick);
+            _previewButton.onClick.AddListener(OnPreviewClick);
+        }
+
+        private void OnPreviewClick()
+        {
+            _onPreviewClick?.Invoke();
+        }
+
+        private void OnImportClick()
+        {
+            _onImportClick?.Invoke();
         }
 
         public void Initialize(in CollectibleDetailsParams parameters)
         {
-            
             _remoteSprite = MonaRemoteSpriteFactory.GetRemoteSprite(parameters.imageUrl);
             _remoteSprite.SubscribeImage(_collectibleImage);
             _collectibleImage.color = Color.white;
@@ -48,6 +73,10 @@ namespace Monaverse.Modal.UI.Views
             _artistLabel.text = parameters.artist;
             _networkLabel.text = parameters.network;
             _tokenIdLabel.text = parameters.tokenId.ToString();
+            
+            //Set buttons
+            _onImportClick = parameters.onImportClick;
+            _onPreviewClick = parameters.onPreviewClick;
         }
 
         public override void Hide()

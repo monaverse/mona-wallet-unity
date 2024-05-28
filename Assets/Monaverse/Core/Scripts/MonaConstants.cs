@@ -12,5 +12,11 @@ namespace Monaverse.Core
         {
             public const string SessionWalletAddressKey = "mona-session-wallet-address" ;
         }
+
+        public class MonaversePages
+        {
+            public const string Monaverse = "https://monaverse.com";
+            public const string ArtifactDetailsBaseUrl = "https://monaverse.com/artifacts"; 
+        }
     }
 }

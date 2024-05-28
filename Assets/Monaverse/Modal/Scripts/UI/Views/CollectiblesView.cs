@@ -35,7 +35,7 @@ namespace Monaverse.Modal.UI.Views
         private int _countPerPageRealtime = 0;
         private int _usedCardsCount = 0;
         private bool _reachedMaxItemCount = false;
-
+        
         private void Start()
         {
             MonaverseManager.Instance.SDK.Disconnected += OnDisconnected;
@@ -135,34 +135,46 @@ namespace Monaverse.Modal.UI.Views
             for (var i = 0; i < collectiblePageCount; i++)
             {
                 var collectible = collectibles[i];
-                var card = _cardsPool[i + _usedCardsCount];
+                var monaListItem = _cardsPool[i + _usedCardsCount];
                 var imageUrl = collectible.GetImageUrl();
                 var sprite = GetSprite(imageUrl);
+                
+                //configure details view
+                var collectibleDetailsParams = new CollectibleDetailsView.CollectibleDetailsParams
+                {
+                    title = collectible.Title,
+                    imageUrl = imageUrl,
+                    typeText = collectible.Type,
+                    description = collectible.Description,
+                    tokenId = collectible.Nft.TokenId,
+                    artist = collectible.Artist,
+                    minted = collectible.Minted,
+                    network = collectible.Nft.Network,
+                    price = collectible.Price,
+                    onImportClick = () =>
+                    {
+                        MonaverseModal.TriggerImportCollectibleClicked(collectible);
+                    },
+                    onPreviewClick = () =>
+                    {
+                        Application.OpenURL(collectible.GetMarketplaceUrl());
+                    }
+                };
 
-                card.Initialize(new MonaListItem.ListItemParams
+                //configure list item
+                monaListItem.Initialize(new MonaListItem.ListItemParams
                 {
                     title = collectible.Title,
                     remoteSprite = sprite,
                     onClick = () =>
                     {
-                        Debug.Log("Clicked " + collectible.Title);
-                        var collectibleDetailsParams = new CollectibleDetailsView.CollectibleDetailsParams
-                        {
-                            title = collectible.Title,
-                            imageUrl = imageUrl,
-                            typeText = collectible.Type,
-                            description = collectible.Description,
-                            tokenId = collectible.Nft.TokenId,
-                            artist = collectible.Artist,
-                            minted = collectible.Minted,
-                            network = collectible.Nft.Network,
-                            price = collectible.Price
-                        };
                         parentModal.OpenView(_collectiblesDetailsView, parameters: collectibleDetailsParams);
                     },
                     isInstalled = false
                 });
             }
+            
+            MonaverseModal.TriggerCollectiblesLoaded(collectibles);
 
             _usedCardsCount += collectiblePageCount;
             _nextPageToLoad++;
