@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Monaverse.Api.Modules.Collectibles.Dtos;
 using Monaverse.Core;
 using Monaverse.Core.Utils;
 using Monaverse.Redcode.Awaiting;
@@ -28,6 +29,8 @@ namespace Monaverse.Modal.UI.Views
         [SerializeField, Range(0.01f, 0.9f)]
         private float _loadThreshold = 0.5f;
         private readonly Dictionary<string, MonaRemoteSprite> _sprites = new();
+        
+        private List<CollectibleDto> _collectibles;
 
         private bool _isPageLoading = false;
         private int _maxCount;
@@ -101,24 +104,29 @@ namespace Monaverse.Modal.UI.Views
                 }
             }
 
-            var result = await MonaverseManager.Instance.SDK.ApiClient.Collectibles.GetWalletCollectibles();
+            //Load cache if any
+            if(_collectibles is { Count: > 0 })
+                await RefreshView(_collectibles);
 
-            if (!result.IsSuccess)
+            var getWalletCollectiblesResult = await MonaverseManager.Instance.SDK.ApiClient.Collectibles.GetWalletCollectibles();
+            if(!IsActive)
+                return;
+            
+            if (!getWalletCollectiblesResult.IsSuccess)
             {
-                MonaDebug.LogError($"[CollectiblesView] Failed to get collectibles: {result.Message}");
+                MonaDebug.LogError($"[CollectiblesView] Failed to get collectibles: {getWalletCollectiblesResult.Message}");
                 return;
             }
 
-            var collectiblesTotalCount = result.Data.TotalCount;
-            var collectiblePageCount = result.Data.Data.Count;
+            var collectiblesTotalCount = getWalletCollectiblesResult.Data.TotalCount;
+            var collectiblePageCount = getWalletCollectiblesResult.Data.Data.Count;
             
             parentModal.Header.Title = $"Collectibles ({collectiblesTotalCount})";
-            
             _noItemsFound.SetActive(collectiblesTotalCount == 0);
 
             if (_maxCount == -1)
             {
-                _maxCount = result.Data.TotalCount;
+                _maxCount = getWalletCollectiblesResult.Data.TotalCount;
 
                 if (_nextPageToLoad * _countPerPageRealtime > _maxCount)
                 {
@@ -127,12 +135,24 @@ namespace Monaverse.Modal.UI.Views
                 }
             }
 
-            var collectibles = result.Data.Data;
+            var collectibles = getWalletCollectiblesResult.Data.Data;
+            await RefreshView(collectibles);
+            
+            MonaverseModal.TriggerCollectiblesLoaded(collectibles);
 
-            if (collectiblePageCount > _cardsPool.Count - _usedCardsCount)
-                await IncreaseCardsPoolSize(collectiblePageCount + _usedCardsCount);
+            _collectibles = collectibles;
+            _usedCardsCount += collectiblePageCount;
+            _nextPageToLoad++;
 
-            for (var i = 0; i < collectiblePageCount; i++)
+            _isPageLoading = false;
+        }
+        
+        public async Task RefreshView(List<CollectibleDto> collectibles)
+        {
+            if (collectibles.Count > _cardsPool.Count - _usedCardsCount)
+                await IncreaseCardsPoolSize(collectibles.Count + _usedCardsCount);
+
+            for (var i = 0; i < collectibles.Count; i++)
             {
                 var collectible = collectibles[i];
                 var monaListItem = _cardsPool[i + _usedCardsCount];
@@ -173,13 +193,6 @@ namespace Monaverse.Modal.UI.Views
                     isInstalled = false
                 });
             }
-            
-            MonaverseModal.TriggerCollectiblesLoaded(collectibles);
-
-            _usedCardsCount += collectiblePageCount;
-            _nextPageToLoad++;
-
-            _isPageLoading = false;
         }
         
         private MonaRemoteSprite GetSprite(string collectibleImageUrl)
@@ -213,6 +226,8 @@ namespace Monaverse.Modal.UI.Views
         
         private void OnDisconnected(object sender, EventArgs e)
         {
+            _collectibles = null;
+            
             if(!IsActive)
                 return;
             
