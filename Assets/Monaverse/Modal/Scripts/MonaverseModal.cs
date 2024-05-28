@@ -90,7 +90,8 @@ namespace Monaverse.Modal
             SelectWallet = 1,
             ConnectingWallet = 2,
             Authorize = 3,
-            Collectibles = 4
+            Collectibles = 4,
+            CollectiblesDetail = 5
         }
     }
 }

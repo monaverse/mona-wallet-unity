@@ -19,6 +19,7 @@ namespace Monaverse.Modal.UI.Views
         [SerializeField] private List<MonaListItem> _cardsPool = new();
         [SerializeField] private GameObject _noItemsFound;
         [SerializeField] private MonaWalletInfo _walletInfo;
+        [SerializeField] private CollectibleDetailsView _collectiblesDetailsView;
         
         [Header("Asset References")] [SerializeField]
         private MonaListItem _cardPrefab;
@@ -135,7 +136,8 @@ namespace Monaverse.Modal.UI.Views
             {
                 var collectible = collectibles[i];
                 var card = _cardsPool[i + _usedCardsCount];
-                var sprite = GetSprite(collectible.GetImageUrl());
+                var imageUrl = collectible.GetImageUrl();
+                var sprite = GetSprite(imageUrl);
 
                 card.Initialize(new MonaListItem.ListItemParams
                 {
@@ -144,6 +146,19 @@ namespace Monaverse.Modal.UI.Views
                     onClick = () =>
                     {
                         Debug.Log("Clicked " + collectible.Title);
+                        var collectibleDetailsParams = new CollectibleDetailsView.CollectibleDetailsParams
+                        {
+                            title = collectible.Title,
+                            imageUrl = imageUrl,
+                            typeText = collectible.Type,
+                            description = collectible.Description,
+                            tokenId = collectible.Nft.TokenId,
+                            artist = collectible.Artist,
+                            minted = collectible.Minted,
+                            network = collectible.Nft.Network,
+                            price = collectible.Price
+                        };
+                        parentModal.OpenView(_collectiblesDetailsView, parameters: collectibleDetailsParams);
                     },
                     isInstalled = false
                 });
@@ -190,7 +205,7 @@ namespace Monaverse.Modal.UI.Views
                 return;
             
             parentModal.CloseView();
-            parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Success, "Wallet Disconnected");
+            parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Error, "Wallet Disconnected");
         }
     }
 }
