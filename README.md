@@ -41,7 +41,7 @@ If there are no compiler errors in the console, you are all set!
 ### Monaverse Manager
 All you need now is a `MonaverseManager` prefab present in your scene.
 
-Navigate to `Assets > Monaverse > Core > Prefabs > MonaverseManager` and drag it into your scene.
+In your project window, navigate to `Assets > Monaverse > Core > Prefabs > MonaverseManager` and drag the prefab into your scene.
 
 Make sure you set the following fields:
 - `Mona Application Id`: You can get one from [Monaverse](https://Monaverse.com)
