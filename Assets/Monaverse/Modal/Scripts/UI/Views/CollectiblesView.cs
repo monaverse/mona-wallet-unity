@@ -173,6 +173,7 @@ namespace Monaverse.Modal.UI.Views
                     price = collectible.Price,
                     onImportClick = () =>
                     {
+                        parentModal.CloseModal();
                         MonaverseModal.TriggerImportCollectibleClicked(collectible);
                     },
                     onPreviewClick = () =>
