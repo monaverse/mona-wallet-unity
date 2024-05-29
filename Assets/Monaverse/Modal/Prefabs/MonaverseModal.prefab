@@ -1330,6 +1330,7 @@ MonoBehaviour:
   _canvas: {fileID: 7700864209685985441}
   _title: Collectibles
   rootTransform: {fileID: 6614105950436087617}
+  _closeOnLoaded: 0
   _parent: {fileID: 5568964017830893844}
   _scrollRect: {fileID: 216745002814512128}
   _cardsPool:

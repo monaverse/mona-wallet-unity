@@ -14,6 +14,7 @@ namespace Monaverse.Modal.UI.Components
         [SerializeField] private GameObject _defaultViewObject;
         [SerializeField] private Color _defaultBorderColor;
         [SerializeField] private TMP_Text _tagText;
+        [SerializeField] private GameObject _supportedViewObject;
         
         private MonaModalView _targetView;
         private object _targetViewParameters;
@@ -63,6 +64,8 @@ namespace Monaverse.Modal.UI.Components
 
             if (parameters.isInstalled)
                 EnableDefaultView();
+            
+            _supportedViewObject.SetActive(parameters.isSupported);
 
             _initialized = true;
         }
@@ -94,6 +97,7 @@ namespace Monaverse.Modal.UI.Components
             public Action onClick;
             public Color borderColor;
             public bool isInstalled;
+            public bool isSupported;
             public string tagText;
         }
     }

@@ -7,6 +7,7 @@ using Monaverse.Core;
 using Monaverse.Core.Utils;
 using Monaverse.Redcode.Awaiting;
 using Monaverse.Modal.UI.Components;
+using Monaverse.Modal.UI.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,6 +15,9 @@ namespace Monaverse.Modal.UI.Views
 {
     public class CollectiblesView : MonaModalView
     {
+        [Header("Options")]
+        [SerializeField] private bool _closeOnLoaded;
+        
         [Header("Scene References")]
         [SerializeField] private RectTransform _parent;
         [SerializeField] private ScrollRect _scrollRect;
@@ -46,7 +50,7 @@ namespace Monaverse.Modal.UI.Views
             MonaverseManager.Instance.SDK.Disconnected += OnDisconnected;
         }
 
-        public override async void Show(MonaModal modal, IEnumerator effectCoroutine, object options = null)
+        public override void Show(MonaModal modal, IEnumerator effectCoroutine, object options = null)
         {
             base.Show(modal, effectCoroutine, options);
             _countPerPageRealtime = _countPerPage;
@@ -145,13 +149,20 @@ namespace Monaverse.Modal.UI.Views
             var collectibles = getWalletCollectiblesResult.Data.Data;
             await RefreshView(collectibles);
             
-            MonaverseModal.TriggerCollectiblesLoaded(collectibles);
+            //Filter using the CollectibleFilter
+            MonaverseModal.TriggerCollectiblesLoaded(collectibles.GetFilteredCollectibles());
 
             _collectibles = collectibles;
             _usedCardsCount += collectiblePageCount;
             _nextPageToLoad++;
 
             _isPageLoading = false;
+
+            if (_closeOnLoaded)
+            {
+                await new WaitForSeconds(2f);
+                parentModal.CloseModal();
+            }
         }
         
         public async Task RefreshView(List<CollectibleDto> collectibles)
@@ -167,6 +178,7 @@ namespace Monaverse.Modal.UI.Views
                 var monaListItem = _cardsPool[i + _usedCardsCount];
                 var imageUrl = collectible.GetImageUrl();
                 var sprite = GetSprite(imageUrl);
+                var canBeImported = collectible.CanBeImported();
                 
                 //configure details view
                 var collectibleDetailsParams = new CollectibleDetailsView.CollectibleDetailsParams
@@ -188,7 +200,8 @@ namespace Monaverse.Modal.UI.Views
                     onPreviewClick = () =>
                     {
                         Application.OpenURL(collectible.GetMarketplaceUrl());
-                    }
+                    },
+                    canImport = canBeImported
                 };
 
                 //configure list item
@@ -200,7 +213,8 @@ namespace Monaverse.Modal.UI.Views
                     {
                         parentModal.OpenView(_collectiblesDetailsView, parameters: collectibleDetailsParams);
                     },
-                    isInstalled = false
+                    isInstalled = false,
+                    isSupported = canBeImported
                 });
             }
         }

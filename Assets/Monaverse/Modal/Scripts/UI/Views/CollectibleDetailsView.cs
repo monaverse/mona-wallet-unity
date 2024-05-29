@@ -41,6 +41,7 @@ namespace Monaverse.Modal.UI.Views
             public string description;
             public Action onImportClick;
             public Action onPreviewClick;
+            public bool canImport;
         }
 
         private void Start()
@@ -77,6 +78,9 @@ namespace Monaverse.Modal.UI.Views
             //Set buttons
             _onImportClick = parameters.onImportClick;
             _onPreviewClick = parameters.onPreviewClick;
+
+            //Determines compatibility with the application
+            _importButton.interactable = parameters.canImport;
         }
 
         public override void Hide()

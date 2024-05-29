@@ -13,7 +13,7 @@ namespace Monaverse.Modal.UI.Views
         [SerializeField] private TMP_Text _connectStatusText;
         [SerializeField] private MonaModalView _authorizeWalletView;
         
-        public override async void Show(MonaModal modal, IEnumerator effectCoroutine, object options = null)
+        public override void Show(MonaModal modal, IEnumerator effectCoroutine, object options = null)
         {
             if (options == null)
             {

@@ -10,7 +10,7 @@ namespace Monaverse.Modal.UI.Views
         [SerializeField] private MonaModalView _connectingWalletView;
         [SerializeField] private MonaModalView _collectiblesView;
 
-        protected override async void OnOpened(object options = null)
+        protected override void OnOpened(object options = null)
         {
             if(MonaverseManager.Instance.SDK.IsWalletAuthorized())
                 parentModal.OpenView(_collectiblesView);
