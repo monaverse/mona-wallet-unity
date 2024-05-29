@@ -21,6 +21,7 @@ namespace Monaverse.Modal.UI.Views
         [SerializeField] private GameObject _noItemsFound;
         [SerializeField] private MonaWalletInfo _walletInfo;
         [SerializeField] private CollectibleDetailsView _collectiblesDetailsView;
+        [SerializeField] private GameObject _loadingAnimator;
         
         [Header("Asset References")] [SerializeField]
         private MonaListItem _cardPrefab;
@@ -31,6 +32,7 @@ namespace Monaverse.Modal.UI.Views
         private readonly Dictionary<string, MonaRemoteSprite> _sprites = new();
         
         private List<CollectibleDto> _collectibles;
+        private int _totalCount;
 
         private bool _isPageLoading = false;
         private int _maxCount;
@@ -105,10 +107,18 @@ namespace Monaverse.Modal.UI.Views
             }
 
             //Load cache if any
-            if(_collectibles is { Count: > 0 })
+            if (_collectibles is { Count: > 0 })
+            {
                 await RefreshView(_collectibles);
+            }
+            else
+            {
+                _loadingAnimator.SetActive(true);
+            }
 
             var getWalletCollectiblesResult = await MonaverseManager.Instance.SDK.ApiClient.Collectibles.GetWalletCollectibles();
+            _loadingAnimator.SetActive(false);
+            
             if(!IsActive)
                 return;
             
@@ -118,12 +128,9 @@ namespace Monaverse.Modal.UI.Views
                 return;
             }
 
-            var collectiblesTotalCount = getWalletCollectiblesResult.Data.TotalCount;
+            _totalCount = getWalletCollectiblesResult.Data.TotalCount;
             var collectiblePageCount = getWalletCollectiblesResult.Data.Data.Count;
             
-            parentModal.Header.Title = $"Collectibles ({collectiblesTotalCount})";
-            _noItemsFound.SetActive(collectiblesTotalCount == 0);
-
             if (_maxCount == -1)
             {
                 _maxCount = getWalletCollectiblesResult.Data.TotalCount;
@@ -149,6 +156,8 @@ namespace Monaverse.Modal.UI.Views
         
         public async Task RefreshView(List<CollectibleDto> collectibles)
         {
+            parentModal.Header.Title = $"Collectibles ({_totalCount})";
+            
             if (collectibles.Count > _cardsPool.Count - _usedCardsCount)
                 await IncreaseCardsPoolSize(collectibles.Count + _usedCardsCount);
 
@@ -228,6 +237,7 @@ namespace Monaverse.Modal.UI.Views
         private void OnDisconnected(object sender, EventArgs e)
         {
             _collectibles = null;
+            _totalCount = 0;
             
             if(!IsActive)
                 return;
