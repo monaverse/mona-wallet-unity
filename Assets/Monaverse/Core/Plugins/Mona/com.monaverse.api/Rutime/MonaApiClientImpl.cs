@@ -35,5 +35,8 @@ namespace Monaverse.Api
 
         public void ClearSession()
             => _monaHttpClient.ClearSession();
+
+        public string GetAccessToken()
+            => _monaHttpClient.AccessToken;
     }
 }

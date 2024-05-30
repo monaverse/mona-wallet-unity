@@ -9,5 +9,6 @@ namespace Monaverse.Api
         ICollectiblesApiModule Collectibles { get; }
         bool IsAuthorized();
         void ClearSession();
+        string GetAccessToken();
     }
 }
