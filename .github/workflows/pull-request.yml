@@ -33,7 +33,7 @@ jobs:
           gitPrivateToken: ${{ secrets.TOKEN_ACCESS_UNITY_PACKAGES }}
           unityVersion: "2022.3.17f1"
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: Test results
           path: ${{ steps.testRunner.outputs.artifactsPath }}
