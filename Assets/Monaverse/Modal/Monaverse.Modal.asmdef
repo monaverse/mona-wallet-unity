@@ -1,0 +1,18 @@
+{
+    "name": "Monaverse.Modal",
+    "rootNamespace": "Monaverse.Modal",
+    "references": [
+        "Unity.TextMeshPro",
+        "Monaverse.Core",
+        "Monaverse.Api"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

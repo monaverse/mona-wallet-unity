@@ -3,6 +3,7 @@
 	"references": [
 		"Unity.TextMeshPro",
 		"Monaverse.Api",
-		"Monaverse.Core"
+		"Monaverse.Core",
+		"Monaverse.Modal"
 	]
 }

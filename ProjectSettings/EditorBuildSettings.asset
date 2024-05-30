@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Monaverse/Examples/MonaWalletConnect/Scenes/mona-walletconnect-api.unity
-    guid: 10962fbc1eddf4258a5026100df8af9f
+    path: Assets/Monaverse/Examples/MonaverseModal/Scenes/mona-modal-example.unity
+    guid: 17ed025ec26074c008098e95149796f9
   m_configObjects: {}
