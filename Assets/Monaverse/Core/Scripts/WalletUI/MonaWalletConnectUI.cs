@@ -43,13 +43,6 @@ namespace Monaverse
                 throw _exception;
             }
             
-            var sessionResumed = await WalletConnect.Instance.TryResumeSessionAsync();
-            if (sessionResumed)
-            {
-                MonaDebug.Log("[MonaWalletConnectUI] Session resumed");
-                return;
-            }
-            
             _connected = false;
 
             WalletConnect.Instance.SessionConnected += OnSessionConnected;

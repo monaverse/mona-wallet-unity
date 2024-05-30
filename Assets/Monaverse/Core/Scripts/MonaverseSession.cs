@@ -1,31 +1,36 @@
+using Monaverse.Core.Utils;
 using UnityEngine;
 
 namespace Monaverse.Core
 {
     public class MonaverseSession
     {
-        public bool IsActive => !string.IsNullOrEmpty(WalletAddress);
-        public string WalletAddress { get; set; }
+        public string AccessToken { get; private set; }
+        public string WalletAddress { get; private set; }
         
-        public void Load()
+        public bool IsWalletConnected => !string.IsNullOrEmpty(WalletAddress);
+        public bool IsWalletAuthorized => !string.IsNullOrEmpty(AccessToken);
+
+        internal MonaverseSession(string accessToken = null)
+        {
+            AccessToken = accessToken;
+        }
+
+        internal void Load()
         {
             WalletAddress = PlayerPrefs.GetString(MonaConstants.Session.SessionWalletAddressKey);
         }
+
+        internal string SaveAccessToken(string accessToken)
+            => AccessToken = accessToken;
         
-        public void Save()
+        internal string SaveWalletAddress(string walletAddress)
+            => WalletAddress = walletAddress.UpdatePlayerPrefs(MonaConstants.Session.SessionWalletAddressKey);
+
+        internal void Clear()
         {
-            if (!string.IsNullOrEmpty(WalletAddress))
-                PlayerPrefs.SetString(MonaConstants.Session.SessionWalletAddressKey, WalletAddress);
-            else
-                PlayerPrefs.DeleteKey(MonaConstants.Session.SessionWalletAddressKey);
-            
-            PlayerPrefs.Save();
-        }
-        
-        public void Clear()
-        {
-            WalletAddress = null;
-            Save();
+            WalletAddress = SaveWalletAddress(null);
+            AccessToken = null;
         }
     }
 }

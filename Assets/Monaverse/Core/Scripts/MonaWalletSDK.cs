@@ -104,7 +104,7 @@ namespace Monaverse.Core
                 LogLevel = options.showDebugLogs? ApiLogLevel.Info : ApiLogLevel.Off
             });
             
-            Session = new MonaverseSession();
+            Session = new MonaverseSession(ApiClient.GetAccessToken());
             Session.Load();
             
             var currentSyncContext = SynchronizationContext.Current;
@@ -158,8 +158,8 @@ namespace Monaverse.Core
             ActiveWallet.Disconnected += OnDisconnected;
             ActiveWallet.SignMessageErrored += OnSignMessageErrored;
             
-            Session.WalletAddress = await ActiveWallet.Connect(monaWalletConnection);
-            Session.Save();
+            var walletAddress = await ActiveWallet.Connect(monaWalletConnection);
+            Session.SaveWalletAddress(walletAddress);
             
             MonaDebug.Log($"Connected wallet {monaWalletConnection.MonaWalletProvider} with address {Session.WalletAddress} on chain {ChainId}");
 
@@ -171,28 +171,23 @@ namespace Monaverse.Core
         /// </summary>
         public async Task Disconnect()
         {
-            //Disconnect wallet
-            if (ActiveWallet != null)
-                await ActiveWallet.Disconnect();
-            else
-            {
-                OnDisconnected(this, EventArgs.Empty);
-                MonaDebug.LogWarning("No active wallet detected, unable to disconnect.");
-            }
-            
             //Clear session
             ApiClient.ClearSession();
             Session.Clear();
+
+            if (ActiveWallet == null)
+            {
+                OnDisconnected(this, EventArgs.Empty);
+                return;
+            }
+
+            //Disconnect wallet
+            await ActiveWallet.Disconnect();
         }
 
         /// <summary>
-        /// Checks if a wallet session has been initialized by calling Connect.
-        /// </summary>
-        /// <returns></returns>
-        public bool IsWalletSessionActive() => ActiveWallet != null;
-
-        /// <summary>
         /// Checks if a wallet is connected.
+        /// This must be true before calling AuthorizeWallet
         /// </summary>
         /// <returns>True if a wallet is connected, false otherwise.</returns>
         public async Task<bool> IsWalletConnected()
@@ -212,6 +207,7 @@ namespace Monaverse.Core
         
         /// <summary>
         /// Returns true if the there is an active session with the Monaverse API.
+        /// If true, you don't need to call ConnectWallet
         /// The session will remain authorized for 24 hours since the last time the user authorized their wallet.
         /// The session can be cleared using the Disconnect method
         /// The session can be cleared using the ApiClient.ClearSession method
@@ -220,7 +216,7 @@ namespace Monaverse.Core
         /// <returns>True if the session is authorized, false otherwise.</returns>
         public bool IsWalletAuthorized()
         {
-            return ApiClient.IsAuthorized();
+            return Session.IsWalletAuthorized;
         }
 
         /// <summary>
@@ -292,6 +288,8 @@ namespace Monaverse.Core
                     OnAuthorizationFailed(AuthorizationResult.FailedAuthorizing);
                     return AuthorizationResult.FailedAuthorizing;
                 }
+
+                Session.SaveAccessToken(ApiClient.GetAccessToken());
                 
                 OnAuthorized();
                 

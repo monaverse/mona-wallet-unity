@@ -39,7 +39,7 @@ namespace Monaverse.Modal.UI.Components
         public void Show()
         {
             var session = MonaverseManager.Instance.SDK.Session;
-            if(session.IsActive)
+            if(session.IsWalletConnected)
                 SetWalletInfo("Wallet Connected", session.WalletAddress);
             else
                 SetWalletInfo("Wallet Disconnected", "--");
