@@ -7,6 +7,8 @@ namespace Monaverse.Examples
 {
     public class MonaverseModalExample : MonoBehaviour
     {
+        [SerializeField] private MonaCollectibleListExample _compatibleItems;
+        [SerializeField] private MonaCollectibleItemExample _importedItem;
         private void Start()
         {
             MonaverseModal.ImportCollectibleClicked += OnImportCollectibleClicked;
@@ -18,9 +20,10 @@ namespace Monaverse.Examples
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="loadedCollectibles">A list of loaded collectibles</param>
-        private void OnCollectiblesLoaded(object sender, IList<CollectibleDto> loadedCollectibles)
+        private async void OnCollectiblesLoaded(object sender, List<CollectibleDto> loadedCollectibles)
         {
             Debug.Log("[MonaverseModalExample.OnCollectiblesLoaded] loaded " + loadedCollectibles.Count + " collectibles");
+            await _compatibleItems.SetCollectibles(loadedCollectibles);
         }
 
         /// <summary>
@@ -31,6 +34,7 @@ namespace Monaverse.Examples
         private void OnImportCollectibleClicked(object sender, CollectibleDto collectible)
         {
             Debug.Log("[MonaverseModalExample.OnImportCollectibleClicked] " + collectible.Title);
+            _importedItem.SetCollectible(collectible);
         }
         
         /// <summary>
