@@ -54,7 +54,7 @@ namespace Monaverse.Modal
         /// By default, all collectibles are loaded
         /// For custom compatibility, pass an optional filter function in the Open method 
         /// </summary>
-        public static event EventHandler<IList<CollectibleDto>> CollectiblesLoaded;
+        public static event EventHandler<List<CollectibleDto>> CollectiblesLoaded;
         
         public Func<CollectibleDto, bool> CollectibleFilter { get; private set; }
         
@@ -148,7 +148,7 @@ namespace Monaverse.Modal
             ImportCollectibleClicked?.Invoke(Instance, collectibleDto);
         }
         
-        internal static void TriggerCollectiblesLoaded(IList<CollectibleDto> collectibles)
+        internal static void TriggerCollectiblesLoaded(List<CollectibleDto> collectibles)
         {
             CollectiblesLoaded?.Invoke(Instance, collectibles);
         }
