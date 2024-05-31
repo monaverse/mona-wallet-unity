@@ -1,6 +1,6 @@
 namespace Monaverse.Core
 {
-    internal static class MonaConstants
+    public static class MonaConstants
     {
         public class Media
         {
