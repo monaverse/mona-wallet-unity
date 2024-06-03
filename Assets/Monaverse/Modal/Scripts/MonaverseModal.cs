@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Monaverse.Api.Modules.Collectibles.Dtos;
+using Monaverse.Core.Utils;
 using Monaverse.Modal.UI.Components;
 using UnityEngine;
 
@@ -47,6 +48,11 @@ namespace Monaverse.Modal
         /// For custom compatibility, pass an optional filter function in the Open method
         /// </summary>
         public static event EventHandler<CollectibleDto> ImportCollectibleClicked;
+        
+        /// This will override the default behavior of the preview button
+        /// By default, it will open the respective URL in the browser
+        /// </summary>
+        public static event EventHandler<CollectibleDto> PreviewCollectibleClicked;
         
         /// <summary>
         /// Called when a set of collectibles are loaded in the MonaverseModal Collectibles view
@@ -146,6 +152,17 @@ namespace Monaverse.Modal
         internal static void TriggerImportCollectibleClicked(CollectibleDto collectibleDto)
         {
             ImportCollectibleClicked?.Invoke(Instance, collectibleDto);
+        }
+        
+        internal static void TriggerPreviewCollectibleClicked(CollectibleDto collectibleDto)
+        {
+            if (PreviewCollectibleClicked == null)
+            {
+                Application.OpenURL(collectibleDto.GetMarketplaceUrl());
+                return;
+            }
+            
+            PreviewCollectibleClicked.Invoke(Instance, collectibleDto);
         }
         
         internal static void TriggerCollectiblesLoaded(List<CollectibleDto> collectibles)
