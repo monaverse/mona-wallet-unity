@@ -62,6 +62,14 @@ namespace Monaverse.Modal
         /// </summary>
         public static event EventHandler<List<CollectibleDto>> CollectiblesLoaded;
         
+        /// <summary>
+        /// Called when a collectible is selected in the Collectibles view
+        /// This is a UI only event.
+        /// Essentially, this is called when a collectible item is clicked on the Collectible view
+        /// and before the Collectible details view is opened
+        /// </summary>
+        public static event EventHandler<CollectibleDto> CollectibleSelected;
+        
         public Func<CollectibleDto, bool> CollectibleFilter { get; private set; }
         
         private void Awake()
@@ -168,6 +176,11 @@ namespace Monaverse.Modal
         internal static void TriggerCollectiblesLoaded(List<CollectibleDto> collectibles)
         {
             CollectiblesLoaded?.Invoke(Instance, collectibles);
+        }
+        
+        internal static void TriggerCollectibleSelected(CollectibleDto collectibleDto)
+        {
+            CollectibleSelected?.Invoke(Instance, collectibleDto);
         }
         
         [Serializable]

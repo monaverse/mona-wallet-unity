@@ -216,6 +216,7 @@ namespace Monaverse.Modal.UI.Views
                     remoteSprite = sprite,
                     onClick = () =>
                     {
+                        MonaverseModal.TriggerCollectibleSelected(collectible);
                         parentModal.OpenView(_collectiblesDetailsView, parameters: collectibleDetailsParams);
                     },
                     isInstalled = false,
