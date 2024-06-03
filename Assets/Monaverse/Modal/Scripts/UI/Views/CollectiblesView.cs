@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Monaverse.Api.Modules.Collectibles.Dtos;
 using Monaverse.Core;
@@ -171,6 +172,10 @@ namespace Monaverse.Modal.UI.Views
             
             if (collectibles.Count > _cardsPool.Count - _usedCardsCount)
                 await IncreaseCardsPoolSize(collectibles.Count + _usedCardsCount);
+            
+            //Sort using the CollectibleFilter if any
+            if(MonaverseModal.Instance.CollectibleFilter != null)
+                collectibles = collectibles.OrderBy(i=> i.CanBeImported() ? 0 : 1).ToList();
 
             for (var i = 0; i < collectibles.Count; i++)
             {
