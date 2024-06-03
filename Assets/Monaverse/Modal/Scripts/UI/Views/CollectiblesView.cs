@@ -204,7 +204,7 @@ namespace Monaverse.Modal.UI.Views
                     },
                     onPreviewClick = () =>
                     {
-                        Application.OpenURL(collectible.GetMarketplaceUrl());
+                        MonaverseModal.TriggerPreviewCollectibleClicked(collectible);
                     },
                     canImport = canBeImported
                 };
