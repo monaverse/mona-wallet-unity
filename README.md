@@ -64,6 +64,38 @@ You may pass an optional filter function used to determine compatibility with yo
 MonaverseModal.Open(collectible => collectible.Artist == "<insert artist here>");
 ```
 
+### Modal Flow
+The `MonaverseModal` will take the user through various views in order to connect and authorize their wallet with the Monaverse platform.
+Once authorization is granted, the user will have access to their collectibles and be able to interact with them from your application.
+
+#### Connect Your Wallet
+The user may select the wallet provider of their choice via Wallet Connect
+![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/b71ce3ef-2259-48f0-a03d-317a9c7aa832)
+
+![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/d7d308eb-ffd4-47c8-be7d-f741bd9d1b75)
+
+#### Authorize Your Wallet
+Once connected, the SDK will try to authorize the user's wallet with the Monaverse platform.
+Note: The user must be registered at [Monaverse.com](https://monaverse.com)
+
+![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/b3b802a7-009a-4b36-81a4-18bccc2f8c6f)
+
+![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/3cb757fc-2047-47b3-819c-5e9e7e6dbcdf)
+
+#### Collectibles View
+From this view, the user can browse through their collectibles.
+As a developer, you may signal the SDK on how to identify which collectibles are compatible with your application (See the `filter function` in the `Open Modal` section). Compatible items will have a checkmark on their left hand side.
+
+![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/1eedee72-1d62-4333-8a89-4a9499207e8f)
+
+#### Collectible Detail View
+Displays details of a selected collectible with `Preview` and `Import` actions available.
+You must tell the SDK how to handle the `Import` action via events.
+By default, the `Preview` action will open the respective webpage to a collectible's details page in the `Monaverse.com` marketplace
+
+![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/286e6ce3-49d3-4159-9c92-62f3db1c636d)
+
+
 ### Events
 The `MonaverseModal` class exposes a set of events for you to handle optionally from your code.
 
