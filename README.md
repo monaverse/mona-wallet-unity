@@ -36,171 +36,79 @@ If there are no compiler errors in the console, you are all set!
 
 - If you have an existing Web3 integration in your project such as `Thirdweb`, `WalletConnect`, etc. Please try using our [API-only](https://github.com/monaverse/mona-wallet-unity/tree/main/Assets/Monaverse/Core/Plugins/Mona/com.monaverse.api) package instead.
 - The SDK has been tested using Unity 2022 LTS. We highly recommend using 2022 LTS.
-- The Newtonsoft and Nethereums DLLs are included as part of the Unity Package, feel free to deselect them if you already have them installed as a dependency to avoid conflicts.
+- The Newtonsoft and Nethereums DLLs are included as part of the Unity Package, feel free to deselect/remove them if you already have them installed as a dependency to avoid conflicts.
 
-### Monaverse Manager
-All you need now is a `MonaverseManager` prefab present in your scene.
 
-In your project window, navigate to `Assets > Monaverse > Core > Prefabs > MonaverseManager` and drag the prefab into your scene.
+## Monaverse Modal
 
-Make sure you set the following fields:
-- `Mona Application Id`: You can get one from [Monaverse](https://Monaverse.com)
-- `WalletConnectProjectId`: Your project ID for WalletConnect. Get one at [Wallet Connect](https://cloud.walletconnect.com/sign-up)
+It's the simplest and most minimal way to interact with the 3D collectibles from your wallet, enabled the Monaverse platform.
 
-## Usage
+### Usage
+1. Install the SDK following the steps described above.
+2. Add a WalletConnect ProjectId to the `MonaverseManager` component. 
+   3. If you don't have a WalletConnect ProjectID, you can create one in [WalletConnect Cloud](https://cloud.walletconnect.com/).
+3. Drag and drop the [MonaverseModal](https://github.com/monaverse/mona-wallet-unity/tree/main/Assets/Monaverse/Modal/Prefabs) prefab to the first scene in your game.
+4. Open the modal at any time after `Awake`
 
-To access the SDK, you only need to include a `MonaverseManager` prefab instance in your scene.
+### Open Modal
+From your code, use this to open the modal.
 
-The `MonaverseManager` will guide you through the following steps to access a user's 3D collectibles stored in their Web3 wallet:
-
-- Initialize SDK
-- Connect Wallet
-- Authorize Wallet
-- Get Collectibles
-
-### Initialize SDK
-
-If the `initializeOnAwake` toggle is checked in the `MonaverseManager` MonoBehavior, initialization will be done automatically. Please do not call any SDK functions from within the `Awake` function.
-
-![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/20456f7f-ac09-48d5-bcd6-cb0856e7ae74)
-
-Alternatively, if you prefer to initialize manually from code, you can uncheck the toggle and call:
-
-```C#
-MonaverseManager.Initialize();
+```c#
+MonaverseModal.Open();
 ```
 
-### Connect Wallet
-By default, the SDK uses `WalletConnect` with a ready-to-use projectId. Alternatively, you can configure it with your own `WalletConnectProjectId` and set it in the `MonaverseManager` inspector.
+You may pass an optional filter function used to determine compatibility with your game.
 
-```C#
-// Connect to the user's Web3 wallet via WalletConnect
-var address = await MonaverseManager.Instance.SDK.ConnectWallet();
+```c#
+//Example: Filter collectibles by artist
+MonaverseModal.Open(collectible => collectible.Artist == "<insert artist here>");
 ```
 
-Calling the line above will open `WalletConnect`'s modal, allowing you to choose your wallet provider.
-Once connected to your app, the asynchronous function will return the selected account address.
+### Modal Flow
+The `MonaverseModal` will take the user through various views in order to connect and authorize their wallet with the Monaverse platform.
+Once authorization is granted, the user will have access to their collectibles and be able to interact with them from your application.
 
-![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/348bffeb-6565-4c46-a0eb-7c6ec6416160)
+#### Connect Your Wallet
+The user may select the wallet provider of their choice via Wallet Connect
+![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/b71ce3ef-2259-48f0-a03d-317a9c7aa832)
 
-### Authorize Wallet
-Once connected, it's time to authorize the wallet with the `Monaverse` platform. Note that the user must have an existing account at [Monaverse](https://monaverse.com/).
+![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/d7d308eb-ffd4-47c8-be7d-f741bd9d1b75)
 
-The following code will attempt to authorize the currently connected wallet. You must connect a wallet before calling this.
+#### Authorize Your Wallet
+Once connected, the SDK will try to authorize the user's wallet with the Monaverse platform.
+Note: The user must be registered at [Monaverse.com](https://monaverse.com)
 
-```C#
-var authorizationResult = await MonaverseManager.Instance.SDK.AuthorizeWallet();
-```
+![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/b3b802a7-009a-4b36-81a4-18bccc2f8c6f)
 
-The `AuthorizeWallet` function returns an enum result with the following options:
+![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/3cb757fc-2047-47b3-819c-5e9e7e6dbcdf)
 
-```C#
-public enum AuthorizationResult
-{
-    WalletNotConnected,
-    FailedValidatingWallet,
-    UserNotRegistered,
-    FailedSigningMessage,
-    FailedAuthorizing,
-    Authorized,
-    Error
-}
-```
+#### Collectibles View
+From this view, the user can browse through their collectibles.
+As a developer, you may signal the SDK on how to identify which collectibles are compatible with your application (See the `filter function` in the `Open Modal` section). Compatible items will have a checkmark on their left hand side.
 
-If the result is `Authorized`, your application is all set to pull the authenticated user 3D collectibles from their Web3 wallet.
+![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/1eedee72-1d62-4333-8a89-4a9499207e8f)
 
-### Get Collectibles [Authorized]
-Once authorized, your application can retrieve a paginated list of all the 3D collectibles available in a user's Web3 wallet to be imported and interacted with within your game or application.
+#### Collectible Detail View
+Displays details of a selected collectible with `Preview` and `Import` actions available.
+You must tell the SDK how to handle the `Import` action via events.
+By default, the `Preview` action will open the respective webpage to a collectible's details page in the `Monaverse.com` marketplace
 
-To get all collectibles for the authenticated user, call:
+![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/286e6ce3-49d3-4159-9c92-62f3db1c636d)
 
-```C#
-var getCollectiblesResult = await MonaApi.ApiClient.Collectibles.GetWalletCollectibles();
-if (!getCollectiblesResult.IsSuccess)
-{
-    Debug.Log("There was an error pulling collectibles: " + getCollectiblesResult.Message);
-    return;
-}
-```
 
-The collectibles result `Data` is of type `GetWalletCollectiblesResponse` with the following properties:
+### Events
+The `MonaverseModal` class exposes a set of events for you to handle optionally from your code.
 
-```C#
-  public List<CollectibleDto> Data { get; set; }
-  public int TotalCount { get; set; }
-  public int? NextPageKey { get; set; }
-```
+- [Ready](https://github.com/monaverse/mona-wallet-unity/blob/545dacf71152f1ff4a399bd7143323263b025661/Assets/Monaverse/Modal/Scripts/MonaverseModal.cs#L32)
+- [ModalOpened](https://github.com/monaverse/mona-wallet-unity/blob/545dacf71152f1ff4a399bd7143323263b025661/Assets/Monaverse/Modal/Scripts/MonaverseModal.cs#L37)
+- [ModalClosed](https://github.com/monaverse/mona-wallet-unity/blob/545dacf71152f1ff4a399bd7143323263b025661/Assets/Monaverse/Modal/Scripts/MonaverseModal.cs#L42)
+- [ImportCollectibleClicked](https://github.com/monaverse/mona-wallet-unity/blob/545dacf71152f1ff4a399bd7143323263b025661/Assets/Monaverse/Modal/Scripts/MonaverseModal.cs#L50)
+- [PreviewCollectibleClicked](https://github.com/monaverse/mona-wallet-unity/blob/545dacf71152f1ff4a399bd7143323263b025661/Assets/Monaverse/Modal/Scripts/MonaverseModal.cs#L55)
+- [CollectiblesLoaded](https://github.com/monaverse/mona-wallet-unity/blob/545dacf71152f1ff4a399bd7143323263b025661/Assets/Monaverse/Modal/Scripts/MonaverseModal.cs#L63)
+- [CollectibleSelected](https://github.com/monaverse/mona-wallet-unity/blob/545dacf71152f1ff4a399bd7143323263b025661/Assets/Monaverse/Modal/Scripts/MonaverseModal.cs#L71)
 
-Here's an example of the `CollectibleDto` as JSON:
 
-```JSON
-{
-  "id": "bgsDpasdriLhk",
-  "type": "Avatar",
-  "checked": false,
-  "minted": false,
-  "nsfw": false,
-  "promoted": false,
-  "__v": 11,
-  "activeVersion": 0,
-  "artist": "John Doe",
-  "description": "Test",
-  "creator": "0xe42c4fe879955cEa16380e9dAf9E7b6B48126E93",
-  "slug": "grifter-squid-goerli",
-  "views": 0,
-  "accessibility": {
-    "accessLevel": "Public",
-    "accessibleAt": null,
-    "accessibleUntil": null
-  },
-  "_updated_at": "2024-05-03T18:36:56.258Z",
-  "_created_at": "2024-05-03T18:32:35.784Z",
-  "_deleted_at": null,
-  "collectionId": null,
-  "hidden": false,
-  "image": "bafasdak2ulwymssqfsaeadls65nt7xxftzh3c3npe7snkmhmfqxqoyu",
-  "lastSaleEventId": null,
-  "lastSalePrice": null,
-  "owner": "0xe42c4fe879955cEa16380e9dAf9E7b6B48126E93",
-  "owners": [
-    {
-      "address": "0xe42c4fe879955cEa16380e9dAf9E7b6B48126E93",
-      "amount": 1
-    }
-  ],
-  "parentId": null,
-  "price": null,
-  "properties": [],
-  "traits": {
-    "Genre": "Cyber Punk",
-    "Season": "Spring"
-  },
-  "subCollectionId": null,
-  "title": "Grifter Squaddie Goerli",
-  "nft": {
-    "contract": null,
-    "ipfsUrl": "bafybeig3tvmgazsdfgadfgsdfm7qrtq2undmaxpsy7xnc7m6flzlgffy",
-    "network": null,
-    "tokenHash": null,
-    "tokenId": null,
-    "tokenUri": null,
-    "transactionId": null,
-    "tokenStandard": null,
-    "amount": null
-  },
-  "creatorId": null,
-  "documentId": null,
-  "versions": [
-    {
-      "asset": "https://cdn-staging.mona.gallery/sdfe5433-suet-d9ik-rrgl-fsdfrww.vrm"
-    }
-  ]
-}
-```
 
-## Examples
-
-The [MonaWalletConnect](https://github.com/monaverse/mona-wallet-unity/tree/main/Assets/Monaverse/Examples/MonaWalletConnect) sample scene will demonstrate how to wire actions to the UI and provide a complete workflow from connection to authorization.
 
 
 
