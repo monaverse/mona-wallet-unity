@@ -118,8 +118,7 @@ namespace Monaverse.Modal.UI.Components
             targetHeight = targetHeight + Header.Height + 12 + _footerRectTransform.rect.height;
 
 #if UNITY_ANDROID || UNITY_IOS
-            if (DeviceUtils.GetDeviceType() == DeviceType.Phone)
-                targetHeight += 8;
+            targetHeight += 8;
 #endif
 
             var rootTransformSizeDelta = _rectTransform.sizeDelta;
