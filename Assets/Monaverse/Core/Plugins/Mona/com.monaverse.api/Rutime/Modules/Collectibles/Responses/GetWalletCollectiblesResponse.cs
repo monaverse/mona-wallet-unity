@@ -7,6 +7,6 @@ namespace Monaverse.Api.Modules.Collectibles.Responses
     {
         public List<CollectibleDto> Data { get; set; }
         public int TotalCount { get; set; }
-        public int? NextPageKey { get; set; }
+        public string NextPageKey { get; set; }
     }
 }
