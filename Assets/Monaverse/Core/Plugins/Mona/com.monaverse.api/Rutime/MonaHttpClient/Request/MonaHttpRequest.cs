@@ -104,11 +104,10 @@ namespace Monaverse.Api.MonaHttpClient.Request
                 if (sb.Length > 0)
                     sb.Append("&");
 
-                sb.AppendFormat($"{kvp.Key}={kvp.Value}");
+                sb.AppendFormat($"{kvp.Key}={Uri.EscapeDataString(kvp.Value)}");
             }
 
             result += sb.ToString();
-            result = Uri.EscapeDataString(result);
 
             return result;
         }

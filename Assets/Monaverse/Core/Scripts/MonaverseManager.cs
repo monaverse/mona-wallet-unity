@@ -18,7 +18,7 @@ namespace Monaverse.Core
         public ApiEnvironment apiEnvironment = ApiEnvironment.Staging;
         
         [Tooltip("Whether to show the sdk debug logs")]
-        public bool showDebugLogs = false;
+        public bool showDebugLogs;
 
         [Tooltip("Instantiates the WalletConnect SDK for Native platforms.")]
         public GameObject WalletConnectPrefab;
@@ -62,7 +62,8 @@ namespace Monaverse.Core
             {
                 applicationId = Instance.monaApplicationId,
                 walletConnectProjectId = Instance.walletConnectProjectId,
-                apiEnvironment = Instance.apiEnvironment
+                apiEnvironment = Instance.apiEnvironment,
+                showDebugLogs = Instance.showDebugLogs
             };
 
             MonaDebug.IsEnabled = Instance.showDebugLogs;
