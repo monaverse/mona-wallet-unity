@@ -18,69 +18,63 @@ jobs:
             fetch-depth: 0
             lfs: true'
             
-      - name: Configure Semantic Release
-        run: echo '{"branches":[],"plugins":["@semantic-release/commit-analyzer","@semantic-release/release-notes-generator","@semantic-release/github"]}' > .releaserc.json
-            
+      #Cache Unity library
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+            path: Library
+            key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+            restore-keys: |
+                Library-
+
+      #Export Unity Package
+      - name: Export Unity Package
+        uses: game-ci/unity-builder@v4
+        id: unityBuildStep
+        env:
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+        with:
+          targetPlatform: StandaloneLinux64
+          unityVersion: "2022.3.17f1"
+          buildMethod: Monaverse.Editor.MonaverseEditorTools.ExportUnityPackage
+          allowDirtyBuild: true
+
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v4
         id: semanticReleaseStep
         with:
           tag_format: ${version}
           dry_run: true
-          branches: | 
+          branches: |
             [
               'main', 
               'cr/semantic-release'
             ]
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        
       
       # Print the version
       - name: Print Version
         run: |
           echo ${{ steps.semanticReleaseStep.outputs.new_release_version }}
-          echo Release Notes: ${{ steps.semanticReleaseStep.outputs.new_release_notes }}
-      
-#      #Cache Unity library
-#      - name: Cache Unity Library
-#        uses: actions/cache@v4
-#        with:
-#            path: Library
-#            key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
-#            restore-keys: |
-#                Library-
-#              
-#      #Export Unity Package
-#      - name: Export Unity Package
-#        uses: game-ci/unity-builder@v4
-#        id: unityBuildStep
-#        env:
-#          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-#          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-#          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
-#        with:
-#          targetPlatform: StandaloneLinux64
-#          unityVersion: "2022.3.17f1"
-#          buildMethod: Monaverse.Editor.MonaverseEditorTools.ExportUnityPackage
-#          allowDirtyBuild: true
-#          
-#      # Create version.json
-#      - name: Create Version File
-#        run: |
-#          echo '{ "version": "${{ steps.unityBuildStep.outputs.buildVersion }}", "commit": "${{ github.sha }}" }' > version.json
-#
-#      # Package Files into a Folder
-#      - name: Package Files
-#        run: |
-#          mkdir package
-#          mv version.json package/
-#          mv Monaverse.unitypackage package/
-#
-#      #Upload Unity Package
-#      - name: Upload Unity Package
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: monaverse-sdk-package
-#          path: package/
+          
+      # Create version.json
+      - name: Create Version File
+        run: |
+          echo '{ "version": "${{ steps.semanticReleaseStep.outputs.new_release_version }}", "commit": "${{ github.sha }}" }' > version.json
+
+      # Package Files into a Folder
+      - name: Package Files
+        run: |
+          mkdir package
+          mv version.json package/
+          mv Monaverse.unitypackage package/
+
+      #Upload Unity Package
+      - name: Upload Unity Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: monaverse-sdk-package
+          path: package/
