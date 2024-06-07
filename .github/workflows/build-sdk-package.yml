@@ -24,6 +24,11 @@ jobs:
         with:
           tag_format: ${version}
           dry_run: true
+          branches: | 
+            [
+              'main', 
+              'cr/semantic-release'
+            ]
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
