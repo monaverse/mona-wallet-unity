@@ -18,6 +18,9 @@ jobs:
             fetch-depth: 0
             lfs: true'
             
+      - name: Configure Semantic Release
+        run: echo '{"branches":[],"plugins":["@semantic-release/commit-analyzer","@semantic-release/release-notes-generator","@semantic-release/github"]}' > .releaserc.json
+            
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v4
         id: semanticReleaseStep
@@ -32,7 +35,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          
+        
       
       # Print the version
       - name: Print Version
