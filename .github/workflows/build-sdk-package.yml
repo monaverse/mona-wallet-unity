@@ -41,6 +41,7 @@ jobs:
       - name: Print Version
         run: |
           echo ${{ steps.semanticReleaseStep.outputs.new_release_version }}
+          echo Release Notes: ${{ steps.semanticReleaseStep.outputs.new_release_notes }}
       
 #      #Cache Unity library
 #      - name: Cache Unity Library
