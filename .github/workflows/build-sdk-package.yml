@@ -4,7 +4,7 @@ on:
     push:
         branches:
             - main
-
+            - cr/semantic-release
 jobs:
   buildSDKPackage:
     name: Build Monaverse SDK Package
@@ -16,47 +16,63 @@ jobs:
         uses: actions/checkout@v4
         with:
             fetch-depth: 0
-            lfs: true
+            lfs: true'
             
-      #Cache Unity library
-      - name: Cache Unity Library
-        uses: actions/cache@v4
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v4
+        id: semanticReleaseStep
         with:
-            path: Library
-            key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
-            restore-keys: |
-                Library-
-              
-      #Export Unity Package
-      - name: Export Unity Package
-        uses: game-ci/unity-builder@v4
-        id: unityBuildStep
+          tag_format: ${version}
+          dry_run: true
+          branch: main
         env:
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
-        with:
-          targetPlatform: StandaloneLinux64
-          versioning: Semantic
-          unityVersion: "2022.3.17f1"
-          buildMethod: Monaverse.Editor.MonaverseEditorTools.ExportUnityPackage
-          allowDirtyBuild: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           
-      # Create version.json
-      - name: Create Version File
+      
+      # Print the version
+      - name: Print Version
         run: |
-          echo '{ "version": "${{ steps.unityBuildStep.outputs.buildVersion }}", "commit": "${{ github.sha }}" }' > version.json
-
-      # Package Files into a Folder
-      - name: Package Files
-        run: |
-          mkdir package
-          mv version.json package/
-          mv Monaverse.unitypackage package/
-
-      #Upload Unity Package
-      - name: Upload Unity Package
-        uses: actions/upload-artifact@v4
-        with:
-          name: monaverse-sdk-package
-          path: package/
+          echo ${{ steps.semanticReleaseStep.outputs.new_release_version }}
+      
+#      #Cache Unity library
+#      - name: Cache Unity Library
+#        uses: actions/cache@v4
+#        with:
+#            path: Library
+#            key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+#            restore-keys: |
+#                Library-
+#              
+#      #Export Unity Package
+#      - name: Export Unity Package
+#        uses: game-ci/unity-builder@v4
+#        id: unityBuildStep
+#        env:
+#          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+#          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+#          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+#        with:
+#          targetPlatform: StandaloneLinux64
+#          unityVersion: "2022.3.17f1"
+#          buildMethod: Monaverse.Editor.MonaverseEditorTools.ExportUnityPackage
+#          allowDirtyBuild: true
+#          
+#      # Create version.json
+#      - name: Create Version File
+#        run: |
+#          echo '{ "version": "${{ steps.unityBuildStep.outputs.buildVersion }}", "commit": "${{ github.sha }}" }' > version.json
+#
+#      # Package Files into a Folder
+#      - name: Package Files
+#        run: |
+#          mkdir package
+#          mv version.json package/
+#          mv Monaverse.unitypackage package/
+#
+#      #Upload Unity Package
+#      - name: Upload Unity Package
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: monaverse-sdk-package
+#          path: package/
