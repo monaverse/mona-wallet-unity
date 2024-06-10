@@ -6,6 +6,7 @@ namespace Monaverse.Core
         {
             public const string MonaCloudinaryBaseURL = "https://res.cloudinary.com/mona-gallery/image/fetch";
             public const string MonaIpfsGateway = "https://ipfs.mona.gallery/ipfs";
+            public const string MonaPlaceholderLogoWhite = "https://res.cloudinary.com/mona-gallery/image/upload/q_auto,f_auto,w_400//zodiac/logos/logo-white-svg";
         }
         
         public class Session

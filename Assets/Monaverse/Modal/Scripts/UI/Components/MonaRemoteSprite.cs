@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Monaverse.Core.Utils;
@@ -13,6 +14,9 @@ namespace Monaverse.Modal.UI.Components
 
         public static MonaRemoteSprite GetRemoteSprite(string uri)
         {
+            if(string.IsNullOrEmpty(uri))
+                throw new ArgumentNullException(nameof(uri));
+            
             if (UriSpritesMap.TryGetValue(uri, out var spriteObj) && spriteObj is MonaRemoteSprite sprite)
             {
                 return sprite;
