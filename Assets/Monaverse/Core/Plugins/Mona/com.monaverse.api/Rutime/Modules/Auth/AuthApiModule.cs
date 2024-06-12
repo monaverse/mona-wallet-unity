@@ -27,10 +27,46 @@ namespace Monaverse.Api.Modules.Auth
             _monaHttpClient = monaHttpClient;
         }
 
+        public async Task<ApiResult> GenerateOtp(GenerateOtpRequest request)
+        {
+            var monaHttpRequest = new MonaHttpRequest(
+                    url: _monaApiOptions.GetUrlWithPath(Constants.Endpoints.GenerateOtp),
+                    method: RequestMethod.Post)
+                .WithBody(request);
+            
+            var response = await _monaHttpClient.SendAsync(monaHttpRequest);
+            return response.ToApiResult();
+        }
+        
+        public async Task<ApiResult<VerifyOtpResponse>> VerifyOtp(VerifyOtpRequest request)
+        {
+            var monaHttpRequest = new MonaHttpRequest(
+                    url: _monaApiOptions.GetUrlWithPath(Constants.Endpoints.VerifyOtp),
+                    method: RequestMethod.Post)
+                .WithBody(request);
+            
+            var response = await _monaHttpClient.SendAsync(monaHttpRequest);
+            return response.ConvertTo<VerifyOtpResponse>();
+        }
+        
+        public async Task<ApiResult<RefreshTokenResponse>> RefreshToken(RefreshTokenRequest request)
+        {
+            var monaHttpRequest = new MonaHttpRequest(
+                    url: _monaApiOptions.GetUrlWithPath(Constants.Endpoints.RefreshToken),
+                    method: RequestMethod.Post)
+                .WithBody(request);
+            
+            var response = await _monaHttpClient.SendAsync(monaHttpRequest);
+            return response.ConvertTo<RefreshTokenResponse>();
+        }
+
+
+        #region Legacy Endpoints
+        
         public async Task<ApiResult<PostNonceResponse>> PostNonce(string walletAddress)
         {
             var monaHttpRequest = new MonaHttpRequest(
-                    url: _monaApiOptions.GetUrlWithPath(Constants.Endpoints.PostNonce),
+                    url: _monaApiOptions.GetUrlWithPathLegacy(Constants.Endpoints.PostNonce),
                     method: RequestMethod.Post)
                 .WithBody(new PostNonceRequest { WalletAddress = walletAddress });
 
@@ -70,7 +106,7 @@ namespace Monaverse.Api.Modules.Auth
             try
             {
                 var monaHttpRequest = new MonaHttpRequest(
-                        url: _monaApiOptions.GetUrlWithPath(Constants.Endpoints.PostAuthorize),
+                        url: _monaApiOptions.GetUrlWithPathLegacy(Constants.Endpoints.PostAuthorize),
                         method: RequestMethod.Post)
                     .WithBody(new AuthorizeRequest
                     {
@@ -92,5 +128,7 @@ namespace Monaverse.Api.Modules.Auth
                 return ApiResult.Failed(exception.Message);
             }
         }
+
+        #endregion
     }
 }
