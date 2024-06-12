@@ -1,6 +1,6 @@
 # Mona Wallet Unity
 
-[![Build Packages](https://github.com/monaverse/mona-wallet-unity/actions/workflows/build-sdk-package.yml/badge.svg?branch=main)](https://github.com/monaverse/mona-wallet-unity/actions/workflows/build-sdk-package.yml?query=branch%3Amain)
+[![Build Package](https://github.com/monaverse/mona-wallet-unity/actions/workflows/main.workflow.yml/badge.svg?branch=main)](https://github.com/monaverse/mona-wallet-unity/actions/workflows/main.workflow.yml?query=branch%3Amain)
 
 
 Enable your users to connect their Web3 wallets to the open metaverse, allowing them to import and interact with their 3D NFTs within your Unity-based games and applications using our SDK.
