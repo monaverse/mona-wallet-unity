@@ -26,7 +26,7 @@ namespace Monaverse.Api.Modules.Collectibles
         public async Task<ApiResult<GetWalletCollectiblesResponse>> GetWalletCollectibles()
         {
             var monaHttpRequest = new MonaHttpRequest(
-                url: _monaApiOptions.GetUrlWithPath(Constants.Endpoints.GetWalletCollectibles),
+                url: _monaApiOptions.GetUrlWithPathLegacy(Constants.Endpoints.GetWalletCollectibles),
                 method: RequestMethod.Get);
             
             var response = await _monaHttpClient.SendAsync(monaHttpRequest);
@@ -36,7 +36,7 @@ namespace Monaverse.Api.Modules.Collectibles
         public async Task<ApiResult<GetWalletCollectibleResponse>> GetWalletCollectibleById(string id)
         {
             var monaHttpRequest = new MonaHttpRequest(
-                url: _monaApiOptions.GetUrlWithPath(Constants.Endpoints.GetWalletCollectibleById(id)),
+                url: _monaApiOptions.GetUrlWithPathLegacy(Constants.Endpoints.GetWalletCollectibleById(id)),
                 method: RequestMethod.Get);
             
             var response = await _monaHttpClient.SendAsync(monaHttpRequest);
