@@ -1,30 +1,42 @@
-name: Build Packages
+name: Build Package Workflow
 
 on:
-    push:
-        branches:
-            - main
+  workflow_call:
+    inputs:
+      dryRun:
+        description: 'Boolean input to determine if a new release should be published'
+        required: true
+        type: boolean
+      environment:
+        required: true
+        type: string
+     
+concurrency:
+  group: wallet-sdk-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+        
 jobs:
   buildSDKPackage:
-    name: Build Monaverse SDK Package
+    name: Build SDK Package
     runs-on: ubuntu-8-cores
+    environment: ${{ inputs.environment }}
     steps:
-        
+      
       # Check out the latest version of the project 
       - name: Check out the project
         uses: actions/checkout@v4
         with:
-            fetch-depth: 0
-            lfs: true'
-            
+          fetch-depth: 0
+          lfs: true'
+      
       #Cache Unity library
       - name: Cache Unity Library
         uses: actions/cache@v4
         with:
-            path: Library
-            key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
-            restore-keys: |
-                Library-
+          path: Library
+          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-
 
       #Export Unity Package
       - name: Export Unity Package
@@ -44,6 +56,7 @@ jobs:
         uses: cycjimmy/semantic-release-action@v4
         id: semanticReleaseStep
         with:
+          dry_run: ${{ inputs.dryRun }}
           tag_format: ${version}
           branches: |
             [
@@ -56,7 +69,7 @@ jobs:
       - name: Print Version
         run: |
           echo ${{ steps.semanticReleaseStep.outputs.new_release_version }}
-          
+      
       # Create version.json
       - name: Create Version File
         run: |

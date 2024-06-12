@@ -1,0 +1,14 @@
+name: Main Pipeline
+
+on:
+  push:
+    branches:
+      - main
+            
+jobs:
+  buildSDKPackage:
+    uses: ./.github/workflows/build-package.reusable.workflow.yml
+    with:
+      dryRun: true # We will not publish a new release immediately
+      environment: staging
+    secrets: inherit

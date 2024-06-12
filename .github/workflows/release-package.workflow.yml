@@ -1,0 +1,12 @@
+name: Release Package Pipeline
+
+on:
+  workflow_dispatch: #
+
+jobs:
+  buildSDKPackage:
+    uses: ./.github/workflows/build-package.reusable.workflow.yml
+    with:
+      dryRun: false # A new release will be published
+      environment: production # Reviewer approval will be asked for this environment
+    secrets: inherit
