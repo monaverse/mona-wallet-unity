@@ -4,6 +4,7 @@ using Monaverse.Api.Modules.Collectibles;
 using Monaverse.Api.Modules.User;
 using Monaverse.Api.MonaHttpClient.Request;
 using Monaverse.Api.MonaHttpClient.Response;
+using Monaverse.Api.Session;
 
 namespace Monaverse.Api
 {
@@ -12,12 +13,9 @@ namespace Monaverse.Api
         IAuthApiModule Auth { get; }
         ICollectiblesApiModule Collectibles { get; }
         IUserApiModule User { get; }
+        IMonaApiSession Session { get; }
         bool IsAuthorized();
-        void ClearSession();
-        string GetLegacyAccessToken();
         
-        void SaveLegacySession(string accessToken);
-        void SaveSession(string accessToken, string refreshToken);
         string GetUrlWithPath(string path);
         string GetUrlWithPathLegacy(string path);
 

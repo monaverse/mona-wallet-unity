@@ -1,6 +1,7 @@
 using Monaverse.Api.Logging;
 using Monaverse.Api.MonaHttpClient;
 using Monaverse.Api.Options;
+using Monaverse.Api.Session;
 using UnityEngine;
 
 namespace Monaverse.Api
@@ -31,7 +32,12 @@ namespace Monaverse.Api
         {
             var monaApiLogger = new UnityMonaApiLogger(monaApiOptions.LogLevel);
             var monaHttpClient = new UnityAsyncHttpClient(monaApiLogger);
-            _apiClient = new MonaApiClientImpl(monaApiOptions, monaApiLogger, monaHttpClient);
+            var monaApiSession = new TokenSession();
+            _apiClient = new MonaApiClientImpl(monaApiOptions, 
+                monaApiLogger, 
+                monaHttpClient, 
+                monaApiSession);
+            
             return _apiClient;
         }
         
@@ -39,7 +45,7 @@ namespace Monaverse.Api
             IMonaApiLogger monaApiLogger,
             IMonaHttpClient monaHttpClient)
         {
-            _apiClient = new MonaApiClientImpl(monaApiOptions, monaApiLogger, monaHttpClient);
+            _apiClient = new MonaApiClientImpl(monaApiOptions, monaApiLogger, monaHttpClient, new TokenSession());
             return _apiClient;
         }
     }

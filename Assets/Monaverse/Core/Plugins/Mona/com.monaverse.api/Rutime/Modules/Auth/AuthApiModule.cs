@@ -43,7 +43,7 @@ namespace Monaverse.Api.Modules.Auth
             var result = response.ConvertTo<VerifyOtpResponse>();
             
             if(result.IsSuccess)
-                _monaApiClient.SaveSession(result.Data.Access, result.Data.Refresh);
+                _monaApiClient.Session.SaveSession(result.Data.Access, result.Data.Refresh);
             
             return result;
         }
@@ -59,7 +59,7 @@ namespace Monaverse.Api.Modules.Auth
             var result = response.ConvertTo<RefreshTokenResponse>();
             
             if(result.IsSuccess)
-                _monaApiClient.SaveSession(result.Data.Access, result.Data.Refresh);
+                _monaApiClient.Session.SaveSession(result.Data.Access, result.Data.Refresh);
 
             return result;
         }
@@ -122,7 +122,7 @@ namespace Monaverse.Api.Modules.Auth
                 var result = response.ConvertTo<AuthorizeResponse>();
 
                 if (result.Data != null && !string.IsNullOrEmpty(result.Data.AccessToken))
-                    _monaApiClient.SaveLegacySession(result.Data.AccessToken);
+                    _monaApiClient.Session.SaveLegacySession(result.Data.AccessToken);
 
                 return result;
             }
