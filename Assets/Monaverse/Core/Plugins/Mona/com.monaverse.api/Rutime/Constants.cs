@@ -15,7 +15,9 @@ namespace Monaverse.Api
         public const string ApiDomainProduction = "https://api.monaverse.com";
         
         public const string ApplicationIdHeader = "X-Mona-Application-Id";
-        public const string AccessTokenStorageKey = "mona-access-token" ;
+        public const string LegacyAccessTokenStorageKey = "mona-access-token" ;
+        public const string AccessKey = "mona-access" ;
+        public const string RefreshKey = "mona-refresh" ;
         
         public static class Endpoints
         {
@@ -24,9 +26,17 @@ namespace Monaverse.Api
             public const string GetWalletCollectibles = "v1/wallet-sdk/wallet/collectibles";
             public static string GetWalletCollectibleById(string id) => $"v1/wallet-sdk/wallet/collectibles/{id}";
             
-            public const string GenerateOtp = "public/auth/otp/generate";
-            public const string VerifyOtp = "public/auth/otp/verify";
-            public const string RefreshToken = "public/auth/token/refresh";
+            public static class Auth
+            {
+                public const string GenerateOtp = "public/auth/otp/generate";
+                public const string VerifyOtp = "public/auth/otp/verify";
+                public const string RefreshToken = "public/auth/token/refresh";
+            }
+            
+            public static class User
+            {
+                public const string GetUser = "public/user";
+            }
         }
     }
 }

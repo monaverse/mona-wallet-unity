@@ -12,34 +12,30 @@ namespace Monaverse.Api.Modules.Collectibles
 {
     internal sealed class CollectiblesApiModule : ICollectiblesApiModule
     {
-        private readonly IMonaApiOptions _monaApiOptions;
-        private readonly IMonaHttpClient _monaHttpClient;
+        private readonly IMonaApiClient _monaApiClient;
 
-        public CollectiblesApiModule(IMonaApiOptions monaApiOptions,
-            IMonaApiLogger monaApiLogger,
-            IMonaHttpClient monaHttpClient)
+        public CollectiblesApiModule(IMonaApiClient monaApiClient)
         {
-            _monaApiOptions = monaApiOptions;
-            _monaHttpClient = monaHttpClient;
+            _monaApiClient = monaApiClient;
         }
         
         public async Task<ApiResult<GetWalletCollectiblesResponse>> GetWalletCollectibles()
         {
             var monaHttpRequest = new MonaHttpRequest(
-                url: _monaApiOptions.GetUrlWithPathLegacy(Constants.Endpoints.GetWalletCollectibles),
+                url: _monaApiClient.GetUrlWithPathLegacy(Constants.Endpoints.GetWalletCollectibles),
                 method: RequestMethod.Get);
             
-            var response = await _monaHttpClient.SendAsync(monaHttpRequest);
+            var response = await _monaApiClient.SendLegacy(monaHttpRequest);
             return response.ConvertTo<GetWalletCollectiblesResponse>();
         }
         
         public async Task<ApiResult<GetWalletCollectibleResponse>> GetWalletCollectibleById(string id)
         {
             var monaHttpRequest = new MonaHttpRequest(
-                url: _monaApiOptions.GetUrlWithPathLegacy(Constants.Endpoints.GetWalletCollectibleById(id)),
+                url: _monaApiClient.GetUrlWithPathLegacy(Constants.Endpoints.GetWalletCollectibleById(id)),
                 method: RequestMethod.Get);
             
-            var response = await _monaHttpClient.SendAsync(monaHttpRequest);
+            var response = await _monaApiClient.SendLegacy(monaHttpRequest);
             return response.ConvertTo<GetWalletCollectibleResponse>();
         }
     }

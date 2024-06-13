@@ -30,7 +30,7 @@ namespace Monaverse.Api
         public static IMonaApiClient Init(IMonaApiOptions monaApiOptions)
         {
             var monaApiLogger = new UnityMonaApiLogger(monaApiOptions.LogLevel);
-            var monaHttpClient = new MonaApiHttpClient(monaApiLogger, monaApiOptions.ApplicationId);
+            var monaHttpClient = new UnityAsyncHttpClient(monaApiLogger);
             _apiClient = new MonaApiClientImpl(monaApiOptions, monaApiLogger, monaHttpClient);
             return _apiClient;
         }

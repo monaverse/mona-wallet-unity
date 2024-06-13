@@ -21,12 +21,14 @@ namespace Monaverse.Api.MonaHttpClient.Extensions
             if (typeof(T) == typeof(string))
                 return ApiResult<T>.Success((T)Convert.ChangeType(response.GetResponseString(), typeof(T)));
                 
-            var data = JsonConvert.DeserializeObject<T>(response.GetResponseString(), new JsonSerializerSettings
+            var json = response.GetResponseString();
+            
+            var data = JsonConvert.DeserializeObject<T>(json, new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore
             });
                 
-            return ApiResult<T>.Success(data);
+            return ApiResult<T>.Success(data, json);
         }
         
         public static ApiResult ToApiResult(this IMonaHttpResponse response)

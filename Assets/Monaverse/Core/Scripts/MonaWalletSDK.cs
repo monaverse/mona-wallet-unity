@@ -104,7 +104,7 @@ namespace Monaverse.Core
                 LogLevel = options.showDebugLogs? ApiLogLevel.Info : ApiLogLevel.Off
             });
             
-            Session = new MonaverseSession(ApiClient.GetAccessToken());
+            Session = new MonaverseSession(ApiClient.GetLegacyAccessToken());
             Session.Load();
             
             var currentSyncContext = SynchronizationContext.Current;
@@ -289,7 +289,7 @@ namespace Monaverse.Core
                     return AuthorizationResult.FailedAuthorizing;
                 }
 
-                Session.SaveAccessToken(ApiClient.GetAccessToken());
+                Session.SaveAccessToken(ApiClient.GetLegacyAccessToken());
                 
                 OnAuthorized();
                 

@@ -7,8 +7,5 @@ namespace Monaverse.Api.MonaHttpClient
     public interface IMonaHttpClient
     {
         Task<IMonaHttpResponse> SendAsync(IMonaHttpRequest request);
-        string AccessToken { get; }
-        void ClearSession();
-        void SaveSession(string accessToken);
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using Monaverse.Api.Modules.Auth.Requests;
 using TMPro;
 using UnityEngine;
@@ -17,10 +18,12 @@ namespace Monaverse.Api.Samples
         [SerializeField] private TMP_Text _generateOtpResultText;
         [SerializeField] private TMP_Text _verifyOtpResultText;
         [SerializeField] private TMP_Text _refreshTokenResultText;
+        [SerializeField] private TMP_InputField _getUserResultText;
 
         [SerializeField] private Button _generateOtpButton;
         [SerializeField] private Button _verifyOtpButton;
         [SerializeField] private Button _refreshTokenButton;
+        [SerializeField] private Button _getUserButton;
 
         private IMonaApiClient _monaverseApi;
         
@@ -32,8 +35,11 @@ namespace Monaverse.Api.Samples
             _generateOtpButton.onClick.AddListener(GenerateOtp);
             _verifyOtpButton.onClick.AddListener(VerifyOtp);
             _refreshTokenButton.onClick.AddListener(RefreshToken);
+            _getUserButton.onClick.AddListener(GetUser);
         }
-        
+
+      
+
         private async void GenerateOtp()
         {
             var request = new GenerateOtpRequest
@@ -73,6 +79,18 @@ namespace Monaverse.Api.Samples
             
             _accessTokenInputField.text = result.Data.Access;
             _refreshTokenInputField.text = result.Data.Refresh;
+        }
+
+        private async void GetUser()
+        {
+            var result = await _monaverseApi.User.GetUser();
+            if (!result.IsSuccess)
+            {
+                _getUserResultText.text = "Failed " + result.Message;
+                return;
+            }
+
+            _getUserResultText.text = result.JsonData;
         }
     }
 }
