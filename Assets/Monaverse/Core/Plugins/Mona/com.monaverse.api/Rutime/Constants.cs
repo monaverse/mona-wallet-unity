@@ -36,6 +36,7 @@ namespace Monaverse.Api
             public static class User
             {
                 public const string GetUser = "public/user";
+                public static string GetUserTokens(int chainId, string address) => $"public/user/{chainId}/{address}/tokens";
             }
         }
     }
