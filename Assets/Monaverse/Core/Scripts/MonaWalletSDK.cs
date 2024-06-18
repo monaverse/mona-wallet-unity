@@ -104,7 +104,7 @@ namespace Monaverse.Core
                 LogLevel = options.showDebugLogs? ApiLogLevel.Info : ApiLogLevel.Off
             });
             
-            Session = new MonaverseSession(ApiClient.GetAccessToken());
+            Session = new MonaverseSession(ApiClient.Session.LegacyAccessToken);
             Session.Load();
             
             var currentSyncContext = SynchronizationContext.Current;
@@ -172,7 +172,7 @@ namespace Monaverse.Core
         public async Task Disconnect()
         {
             //Clear session
-            ApiClient.ClearSession();
+            ApiClient.Session.ClearSession();
             Session.Clear();
 
             if (ActiveWallet == null)
@@ -289,7 +289,7 @@ namespace Monaverse.Core
                     return AuthorizationResult.FailedAuthorizing;
                 }
 
-                Session.SaveAccessToken(ApiClient.GetAccessToken());
+                Session.SaveAccessToken(ApiClient.Session.LegacyAccessToken);
                 
                 OnAuthorized();
                 

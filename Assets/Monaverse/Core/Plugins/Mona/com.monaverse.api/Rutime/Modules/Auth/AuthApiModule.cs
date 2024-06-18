@@ -1,63 +1,67 @@
 using System;
 using System.Threading.Tasks;
-using Monaverse.Api.Extensions;
 using Monaverse.Api.Logging;
 using Monaverse.Api.Modules.Auth.Requests;
 using Monaverse.Api.Modules.Auth.Responses;
 using Monaverse.Api.Modules.Common;
-using Monaverse.Api.MonaHttpClient;
 using Monaverse.Api.MonaHttpClient.Extensions;
 using Monaverse.Api.MonaHttpClient.Request;
-using Monaverse.Api.Options;
 
 namespace Monaverse.Api.Modules.Auth
 {
     internal sealed class AuthApiModule : IAuthApiModule
     {
-        private readonly IMonaApiOptions _monaApiOptions;
+        private readonly IMonaApiClient _monaApiClient;
         private readonly IMonaApiLogger _monaApiLogger;
-        private readonly IMonaHttpClient _monaHttpClient;
 
-        public AuthApiModule(IMonaApiOptions monaApiOptions,
-            IMonaApiLogger monaApiLogger,
-            IMonaHttpClient monaHttpClient)
+        public AuthApiModule(IMonaApiClient monaApiClient,
+            IMonaApiLogger monaApiLogger)
         {
-            _monaApiOptions = monaApiOptions;
+            _monaApiClient = monaApiClient;
             _monaApiLogger = monaApiLogger;
-            _monaHttpClient = monaHttpClient;
         }
 
         public async Task<ApiResult> GenerateOtp(GenerateOtpRequest request)
         {
             var monaHttpRequest = new MonaHttpRequest(
-                    url: _monaApiOptions.GetUrlWithPath(Constants.Endpoints.GenerateOtp),
+                    url: _monaApiClient.GetUrlWithPath(Constants.Endpoints.Auth.GenerateOtp),
                     method: RequestMethod.Post)
                 .WithBody(request);
             
-            var response = await _monaHttpClient.SendAsync(monaHttpRequest);
+            var response = await _monaApiClient.Send(monaHttpRequest);
             return response.ToApiResult();
         }
         
         public async Task<ApiResult<VerifyOtpResponse>> VerifyOtp(VerifyOtpRequest request)
         {
             var monaHttpRequest = new MonaHttpRequest(
-                    url: _monaApiOptions.GetUrlWithPath(Constants.Endpoints.VerifyOtp),
+                    url: _monaApiClient.GetUrlWithPath(Constants.Endpoints.Auth.VerifyOtp),
                     method: RequestMethod.Post)
                 .WithBody(request);
             
-            var response = await _monaHttpClient.SendAsync(monaHttpRequest);
-            return response.ConvertTo<VerifyOtpResponse>();
+            var response = await _monaApiClient.Send(monaHttpRequest);
+            var result = response.ConvertTo<VerifyOtpResponse>();
+            
+            if(result.IsSuccess)
+                _monaApiClient.Session.SaveSession(result.Data.Access, result.Data.Refresh);
+            
+            return result;
         }
         
         public async Task<ApiResult<RefreshTokenResponse>> RefreshToken(RefreshTokenRequest request)
         {
             var monaHttpRequest = new MonaHttpRequest(
-                    url: _monaApiOptions.GetUrlWithPath(Constants.Endpoints.RefreshToken),
+                    url: _monaApiClient.GetUrlWithPath(Constants.Endpoints.Auth.RefreshToken),
                     method: RequestMethod.Post)
                 .WithBody(request);
             
-            var response = await _monaHttpClient.SendAsync(monaHttpRequest);
-            return response.ConvertTo<RefreshTokenResponse>();
+            var response = await _monaApiClient.Send(monaHttpRequest);
+            var result = response.ConvertTo<RefreshTokenResponse>();
+            
+            if(result.IsSuccess)
+                _monaApiClient.Session.SaveSession(result.Data.Access, result.Data.Refresh);
+
+            return result;
         }
 
 
@@ -66,11 +70,11 @@ namespace Monaverse.Api.Modules.Auth
         public async Task<ApiResult<PostNonceResponse>> PostNonce(string walletAddress)
         {
             var monaHttpRequest = new MonaHttpRequest(
-                    url: _monaApiOptions.GetUrlWithPathLegacy(Constants.Endpoints.PostNonce),
+                    url: _monaApiClient.GetUrlWithPathLegacy(Constants.Endpoints.PostNonce),
                     method: RequestMethod.Post)
                 .WithBody(new PostNonceRequest { WalletAddress = walletAddress });
 
-            var response = await _monaHttpClient.SendAsync(monaHttpRequest);
+            var response = await _monaApiClient.SendLegacy(monaHttpRequest);
             return response.ConvertTo<PostNonceResponse>();
         }
 
@@ -106,7 +110,7 @@ namespace Monaverse.Api.Modules.Auth
             try
             {
                 var monaHttpRequest = new MonaHttpRequest(
-                        url: _monaApiOptions.GetUrlWithPathLegacy(Constants.Endpoints.PostAuthorize),
+                        url: _monaApiClient.GetUrlWithPathLegacy(Constants.Endpoints.PostAuthorize),
                         method: RequestMethod.Post)
                     .WithBody(new AuthorizeRequest
                     {
@@ -114,11 +118,11 @@ namespace Monaverse.Api.Modules.Auth
                         Message = siweMessage
                     });
 
-                var response = await _monaHttpClient.SendAsync(monaHttpRequest);
+                var response = await _monaApiClient.SendLegacy(monaHttpRequest);
                 var result = response.ConvertTo<AuthorizeResponse>();
 
                 if (result.Data != null && !string.IsNullOrEmpty(result.Data.AccessToken))
-                    _monaHttpClient.SaveSession(result.Data.AccessToken);
+                    _monaApiClient.Session.SaveLegacySession(result.Data.AccessToken);
 
                 return result;
             }

@@ -15,16 +15,20 @@ namespace Monaverse.Api.Modules.Common
     public record ApiResult<T> : ApiResult
     {
         public T Data { get; set; }
+        public string JsonData { get; set; }
 
-        public ApiResult(bool isSuccess, string message, T data)
+        public ApiResult(bool isSuccess, string message, T data, string jsonData = null)
             : base(isSuccess, message)
-            => Data = data;
+        {
+            Data = data;
+            JsonData = jsonData;
+        }
 
         public ApiResult(bool isSuccess, string message) : base(isSuccess, message)
             => Data = default;
 
-        public static ApiResult<T> Success(T data)
-            => new(true, string.Empty, data);
+        public static ApiResult<T> Success(T data, string jsonData = null)
+            => new(true, string.Empty, data, jsonData);
 
         public static ApiResult<T> Failed(string message, T data = default)
             => new(false, message, data);

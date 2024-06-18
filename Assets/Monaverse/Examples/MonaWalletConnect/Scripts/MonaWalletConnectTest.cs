@@ -180,7 +180,7 @@ namespace Monaverse.Examples
             
                 _signOutButton.interactable = false; 
 
-                MonaverseManager.Instance.SDK.ApiClient.ClearSession();
+                MonaverseManager.Instance.SDK.ApiClient.Session.ClearSession();
                 
                 _signOutButton.interactable = true;
             
