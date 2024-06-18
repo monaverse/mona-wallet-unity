@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Monaverse.Api.Modules.Collectibles.Dtos;
 using Monaverse.Core.Utils;
 using Monaverse.Modal.UI.Components;
+using Monaverse.Modal.UI.Views;
 using UnityEngine;
 
 namespace Monaverse.Modal
@@ -15,7 +16,8 @@ namespace Monaverse.Modal
 
         [field: SerializeField, Space] private MonaModal Modal { get; set; }
 
-        [field: SerializeField] private List<ViewConfiguration> _views;
+        private List<MonaModalView> _views;
+        private MonaModalView _defaultView;
         
         internal static MonaverseModal Instance { get; private set; }
         
@@ -101,17 +103,17 @@ namespace Monaverse.Modal
                 return;
             }
             
-            
-            const ViewType defaultView = ViewType.SelectWallet;
-            var viewConfiguration = Instance._views.Find(x => x.viewType == defaultView);
-            if (viewConfiguration == null)
+            if(Instance._defaultView == null)
+                Instance._defaultView = Instance._views.Find(x => x is GenerateOtpView);
+           
+            if (Instance._defaultView == null)
             {
-                Debug.LogError($"[MonaverseModal] No view found for {defaultView}");
+                Debug.LogError($"[MonaverseModal] No view found for {nameof(GenerateOtpView)}");
                 return;
             }
             
             Instance.CollectibleFilter = collectibleFilter;
-            Instance.Modal.OpenView(viewConfiguration.view);
+            Instance.Modal.OpenView(Instance._defaultView);
         }
         
         /// <summary>
@@ -138,6 +140,15 @@ namespace Monaverse.Modal
         {
             Instance.Modal.Opened += (_, _) => ModalOpened?.Invoke(Instance, EventArgs.Empty);
             Instance.Modal.Closed += (_, _) => ModalClosed?.Invoke(Instance, EventArgs.Empty);
+            
+            //Find and reference all existing modal views in children
+            Instance._views = new List<MonaModalView>();
+            foreach (Transform child in Instance.Modal.transform)
+            {
+                var view = child.GetComponent<MonaModalView>();
+                if (view != null)
+                    Instance._views.Add(view);
+            }
             
             IsReady = true;
             Ready?.Invoke(Instance, EventArgs.Empty);
@@ -187,16 +198,6 @@ namespace Monaverse.Modal
         public class ViewConfiguration
         {
             public MonaModalView view;
-            public ViewType viewType;
-        }
-        
-        public enum ViewType
-        {
-            SelectWallet = 1,
-            ConnectingWallet = 2,
-            Authorize = 3,
-            Collectibles = 4,
-            CollectiblesDetail = 5
         }
     }
 }

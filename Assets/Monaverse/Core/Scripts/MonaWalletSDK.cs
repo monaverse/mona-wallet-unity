@@ -104,7 +104,7 @@ namespace Monaverse.Core
                 LogLevel = options.showDebugLogs? ApiLogLevel.Info : ApiLogLevel.Off
             });
             
-            Session = new MonaverseSession(ApiClient.Session.LegacyAccessToken);
+            Session = new MonaverseSession(ApiClient.Session.AccessToken);
             Session.Load();
             
             var currentSyncContext = SynchronizationContext.Current;
@@ -216,7 +216,12 @@ namespace Monaverse.Core
         /// <returns>True if the session is authorized, false otherwise.</returns>
         public bool IsWalletAuthorized()
         {
-            return Session.IsWalletAuthorized;
+            return Session.IsAuthenticated;
+        }
+
+        public bool IsAuthenticated()
+        {
+            return Session.IsAuthenticated;
         }
 
         /// <summary>

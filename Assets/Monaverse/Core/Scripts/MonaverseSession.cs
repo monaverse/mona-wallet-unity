@@ -9,7 +9,7 @@ namespace Monaverse.Core
         public string WalletAddress { get; private set; }
         
         public bool IsWalletConnected => !string.IsNullOrEmpty(WalletAddress);
-        public bool IsWalletAuthorized => !string.IsNullOrEmpty(AccessToken);
+        public bool IsAuthenticated => !string.IsNullOrEmpty(AccessToken);
 
         internal MonaverseSession(string accessToken = null)
         {
