@@ -11,8 +11,9 @@ namespace Monaverse.Core
         
         public class Session
         {
-            public const string SessionVersion = "v1";
+            public const string SessionVersion = "v2";
             public const string SessionWalletAddressKey = SessionVersion + "mona-session-wallet-address" ;
+            public const string SessionEmailKey = SessionVersion + "mona-session-email-address" ;
         }
 
         public class MonaversePages

@@ -1,5 +1,4 @@
 using System;
-using Monaverse.Api.Modules.Auth.Requests;
 using Monaverse.Core;
 using Monaverse.Modal.UI.Components;
 using TMPro;
@@ -23,6 +22,12 @@ namespace Monaverse.Modal.UI.Views
         
         protected override void OnOpened(object options = null)
         {
+            if (options == null)
+            {
+                parentModal.CloseView();
+                return;
+            }
+            
             _verifyOtpButton.interactable = true;
             _emailAddress = (string) options;
         }
@@ -32,16 +37,12 @@ namespace Monaverse.Modal.UI.Views
             try
             {
                 _verifyOtpButton.interactable = false;
-                var result = await MonaverseManager.Instance.SDK.ApiClient.Auth
-                    .VerifyOtp(new VerifyOtpRequest
-                    {
-                        Email = _emailAddress,
-                        Otp = _otpInputField.text
-                    });
+                var result = await MonaverseManager.Instance.SDK
+                    .VerifyOneTimePassword(_emailAddress, _otpInputField.text);
                 
                 _verifyOtpButton.interactable = true;
                 
-                if (result.IsSuccess)
+                if (result)
                 {
                     parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Success, "Login Successful");
                     parentModal.OpenView(_getTokensView);
@@ -49,7 +50,6 @@ namespace Monaverse.Modal.UI.Views
                 }
 
                 parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Error, "Failed signing in");
-                MonaDebug.LogError("VerifyOtp Failed: " + result.Message);
             }
             catch (Exception exception)
             {

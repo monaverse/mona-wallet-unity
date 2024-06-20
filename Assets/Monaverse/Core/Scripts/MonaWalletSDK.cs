@@ -1,11 +1,15 @@
 using System;
+using System.Linq;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using Monaverse.Api;
 using Monaverse.Api.Configuration;
 using Monaverse.Api.Logging;
+using Monaverse.Api.Modules.Auth.Requests;
 using Monaverse.Api.Modules.Auth.Responses;
+using Monaverse.Api.Modules.Common;
+using Monaverse.Api.Modules.User.Responses;
 using Monaverse.Api.Options;
 using Monaverse.Wallets;
 using UnityEngine;
@@ -82,11 +86,21 @@ namespace Monaverse.Core
         public event EventHandler Authorized;
         
         /// <summary>
+        /// Event raised when the user is logged out
+        /// </summary>
+        public event EventHandler LoggedOut;
+
+        /// <summary>
+        /// Event raised when the user is authenticated with the Monaverse API
+        /// </summary>
+        public event EventHandler Authenticated;
+        
+        /// <summary>
         /// Event raised when the user's wallet is not authorized
         /// An authorization result is passed as a parameter
         /// </summary>
         public event EventHandler<AuthorizationResult> AuthorizationFailed;
-        
+
         /// <summary>
         /// Event raised when there is an error while signing a message with the user's wallet
         /// An exception is passed as a parameter
@@ -104,7 +118,7 @@ namespace Monaverse.Core
                 LogLevel = options.showDebugLogs? ApiLogLevel.Info : ApiLogLevel.Off
             });
             
-            Session = new MonaverseSession(ApiClient.Session.AccessToken);
+            Session = new MonaverseSession(ApiClient.Session.AccessToken, ApiClient.Session.RefreshToken);
             Session.Load();
             
             var currentSyncContext = SynchronizationContext.Current;
@@ -113,6 +127,111 @@ namespace Monaverse.Core
                     $"[Monaverse] SynchronizationContext is not of type UnityEngine.UnitySynchronizationContext. Current type is <i>{currentSyncContext.GetType().FullName}</i>. Make sure to initialize the Monaverse SDK from the main thread.");
             UnitySyncContext = currentSyncContext;
         }
+
+        public async Task<bool> GenerateOneTimePassword(string email)
+        {
+            try
+            {
+                var result = await ApiClient.Auth
+                    .GenerateOtp(new GenerateOtpRequest
+                    {
+                        Email = email
+                    });
+                
+                return result.IsSuccess;
+            }
+            catch (Exception exception)
+            {
+                MonaDebug.LogException(exception);
+                return false;
+            }
+        }
+        
+        public async Task<bool> VerifyOneTimePassword(string email, string otp)
+        {
+            try
+            {
+                var result = await ApiClient.Auth
+                    .VerifyOtp(new VerifyOtpRequest
+                    {
+                        Email = email,
+                        Otp = otp
+                    });
+                
+                if(!result.IsSuccess)
+                    return false;
+                
+                Session.SaveSession(accessToken: result.Data.Access, 
+                    refreshToken: result.Data.Refresh,
+                    emailAddress: email);
+                
+                OnAuthenticated();
+                
+                return true;
+            }
+            catch (Exception exception)
+            {
+                MonaDebug.LogException(exception);
+                return false;
+            }
+        }
+
+        public async Task<ApiResult<GetUserResponse>> GetUser()
+        {
+            try
+            {
+                if (!IsAuthenticated())
+                    return ApiResult<GetUserResponse>.Failed("Not authenticated");   
+                
+                var result = await ApiClient.User
+                    .GetUser();
+
+                if (!result.IsSuccess) return result;
+                
+                Session.Wallets = result.Data.Wallets.ToHashSet();
+                Session.SaveSessionEmail(result.Data.Email);
+
+                return result;
+            }
+            catch (Exception exception)
+            {
+                MonaDebug.LogException(exception);
+                return ApiResult<GetUserResponse>.Failed(exception.Message);
+            }
+        }
+        
+        public async Task<ApiResult<GetUserTokensResponse>> GetUserTokens(int chainId, string address)
+        {
+            try
+            {
+                if (!IsAuthenticated())
+                    return ApiResult<GetUserTokensResponse>.Failed("Not authenticated");                    
+                
+                var result = await ApiClient.User
+                    .GetUserTokens(chainId: chainId,
+                        address: address);
+
+               //TODO: Do some caching here
+                
+                return result;
+            }
+            catch (Exception exception)
+            {
+                MonaDebug.LogException(exception);
+                return ApiResult<GetUserTokensResponse>.Failed(exception.Message);
+            }
+        }
+
+        public void Logout()
+        {
+            //Clear session
+            ApiClient.Session.ClearSession();
+            Session.Clear();
+            
+            OnLoggedOut();
+        }
+
+        #region Legacy Methods
         
         /// <summary>
         /// Connects a user's Web3 wallet via WalletConnect.
@@ -120,6 +239,7 @@ namespace Monaverse.Core
         /// </summary>
         /// <returns> A task that completes when the wallet connection is complete.
         /// If successful, the task returns the address of the connected wallet.</returns>
+        [Obsolete("Please use OTP-based login instead.")]
         public Task<string> ConnectWallet()
         {
             return ConnectWallet(new MonaWalletConnection
@@ -136,6 +256,7 @@ namespace Monaverse.Core
         /// <returns>A task that completes when the wallet connection is complete.
         /// If successful, the task returns the address of the connected wallet.</returns>
         /// <exception cref="UnityException">Thrown if the wallet provider is not supported on this platform.</exception>
+        [Obsolete("Please use OTP-based login instead.")]
         public async Task<string> ConnectWallet(MonaWalletConnection monaWalletConnection)
         {
             ChainId = monaWalletConnection.ChainId;
@@ -294,7 +415,7 @@ namespace Monaverse.Core
                     return AuthorizationResult.FailedAuthorizing;
                 }
 
-                Session.SaveAccessToken(ApiClient.Session.LegacyAccessToken);
+                Session.SaveLegacySession(ApiClient.Session.LegacyAccessToken);
                 
                 OnAuthorized();
                 
@@ -307,6 +428,9 @@ namespace Monaverse.Core
                return AuthorizationResult.Error;
             }
         }
+
+        #endregion
+        
 
         #region Events Handlers
 
@@ -326,11 +450,27 @@ namespace Monaverse.Core
             }, null);
         }
         
+        private void OnAuthenticated()
+        {
+            UnitySyncContext.Post(_ =>
+            {
+                Authenticated?.Invoke(this, EventArgs.Empty);
+            }, null);
+        }
+        
         private void OnAuthorized()
         {
             UnitySyncContext.Post(_ =>
             {
                 Authorized?.Invoke(this, EventArgs.Empty);
+            }, null);
+        }
+        
+        private void OnLoggedOut()
+        {
+            UnitySyncContext.Post(_ =>
+            {
+                LoggedOut?.Invoke(this, EventArgs.Empty);
             }, null);
         }
 

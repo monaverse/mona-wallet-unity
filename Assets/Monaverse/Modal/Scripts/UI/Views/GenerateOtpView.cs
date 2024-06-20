@@ -1,5 +1,4 @@
 using System;
-using Monaverse.Api.Modules.Auth.Requests;
 using Monaverse.Core;
 using Monaverse.Modal.UI.Components;
 using TMPro;
@@ -36,15 +35,13 @@ namespace Monaverse.Modal.UI.Views
             try
             {
                 _generateOtpButton.interactable = false;
-                var result = await MonaverseManager.Instance.SDK.ApiClient.Auth
-                    .GenerateOtp(new GenerateOtpRequest
-                    {
-                        Email = _emailInputField.text
-                    });
+
+                var result = await MonaverseManager.Instance.SDK
+                    .GenerateOneTimePassword(_emailInputField.text);
 
                 _generateOtpButton.interactable = true;
                 
-                if (result.IsSuccess)
+                if (result)
                 {
                     parentModal.OpenView(_verifyOtpView, parameters: _emailInputField.text);
                     return;

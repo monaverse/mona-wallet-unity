@@ -9,7 +9,6 @@ namespace Monaverse.Modal.UI.Views
     public class CollectibleDetailsView : MonaModalView
     {
         [Header("Scene References")]
-        [SerializeField] private MonaWalletInfo _walletInfo;
         [SerializeField] private Image _collectibleImage;
         [SerializeField] private TMP_Text _titleLabel;
         [SerializeField] private TMP_Text _descriptionLabel;
@@ -98,8 +97,6 @@ namespace Monaverse.Modal.UI.Views
                 parentModal.CloseView();
                 return;
             }
-            
-            _walletInfo.Show();
             
             var collectibleDetailsParams = (CollectibleDetailsParams) options;
             Initialize(collectibleDetailsParams);
