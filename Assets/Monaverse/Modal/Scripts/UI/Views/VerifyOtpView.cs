@@ -30,6 +30,7 @@ namespace Monaverse.Modal.UI.Views
             
             _verifyOtpButton.interactable = true;
             _emailAddress = (string) options;
+            _otpInputField.text = string.Empty;
         }
 
         private async void OnVerifyOtpButtonClicked()

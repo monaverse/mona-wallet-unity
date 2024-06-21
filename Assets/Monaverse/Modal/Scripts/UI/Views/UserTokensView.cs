@@ -9,6 +9,7 @@ using Monaverse.Modal.UI.Components;
 using Monaverse.Redcode.Awaiting;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Monaverse.Modal.UI.Views
@@ -28,7 +29,8 @@ namespace Monaverse.Modal.UI.Views
         [SerializeField] private ScrollRect _scrollRect;
         [SerializeField] private List<MonaListItem> _cardsPool = new();
         [SerializeField] private GameObject _noItemsFound;
-        [SerializeField] private CollectibleDetailsView _collectiblesDetailsView;
+        [FormerlySerializedAs("_collectiblesDetailsView")]
+        [SerializeField] private TokenDetailsView _tokensDetailsView;
         [SerializeField] private GameObject _loadingAnimator;
         [SerializeField] private Button _logoutButton;
 
@@ -164,7 +166,7 @@ namespace Monaverse.Modal.UI.Views
                 var canBeImported = true; // token.CanBeImported();
 
                 //configure details view
-                var collectibleDetailsParams = new CollectibleDetailsView.CollectibleDetailsParams
+                var collectibleDetailsParams = new TokenDetailsView.CollectibleDetailsParams
                 {
                     title = token.Name,
                     imageUrl = token.Image,
@@ -192,7 +194,7 @@ namespace Monaverse.Modal.UI.Views
                     onClick = () =>
                     {
                         // MonaverseModal.TriggerCollectibleSelected(token);
-                        parentModal.OpenView(_collectiblesDetailsView, parameters: collectibleDetailsParams);
+                        parentModal.OpenView(_tokensDetailsView, parameters: collectibleDetailsParams);
                     },
                     isInstalled = false,
                     isSupported = canBeImported
@@ -290,7 +292,7 @@ namespace Monaverse.Modal.UI.Views
                     return result.Data;
                 }
 
-                parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Success, "Tokens pulled!");
+                parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Success, "Tokens updated");
                 return result.Data;
             }
             catch (Exception exception)

@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace Monaverse.Modal.UI.Views
 {
-    public class CollectibleDetailsView : MonaModalView
+    public class TokenDetailsView : MonaModalView
     {
         [Header("Scene References")]
         [SerializeField] private Image _collectibleImage;
