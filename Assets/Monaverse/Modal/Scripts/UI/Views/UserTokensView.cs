@@ -151,7 +151,7 @@ namespace Monaverse.Modal.UI.Views
         private async Task RefreshView(IReadOnlyList<TokenDto> tokens)
         {
             var chain = _chainsDropdown.options[_chainsDropdown.value].text;
-            parentModal.Header.Title = $"Your {chain} Tokens ({_tokensCache?.Count})";
+            parentModal.Header.Title = $"Your {chain} Tokens ({tokens?.Count})";
 
             if (tokens.Count > _cardsPool.Count - _usedCardsCount)
                 await IncreaseCardsPoolSize(tokens.Count + _usedCardsCount);
