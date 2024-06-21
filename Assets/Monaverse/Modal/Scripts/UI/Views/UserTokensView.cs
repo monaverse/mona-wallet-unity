@@ -62,6 +62,10 @@ namespace Monaverse.Modal.UI.Views
             _logoutButton.onClick.AddListener(OnLogoutClicked);
             _marketplaceButton.onClick.AddListener(OnMarketplaceClicked);
             
+            //Disable for iOS
+            if(Application.platform == RuntimePlatform.IPhonePlayer)
+                _marketplaceButton.gameObject.SetActive(false);
+            
             MonaverseManager.Instance.SDK.LoggedOut += OnLoggedOut;
         }
 
