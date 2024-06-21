@@ -13,7 +13,6 @@ namespace Monaverse.Core
         
         public HashSet<string> Wallets { get; set; }
         
-        public bool IsWalletConnected => !string.IsNullOrEmpty(WalletAddress);
         public bool IsAuthenticated => !string.IsNullOrEmpty(AccessToken);
 
         internal MonaverseSession(string accessToken, string refreshToken)
@@ -28,11 +27,6 @@ namespace Monaverse.Core
             WalletAddress = PlayerPrefs.GetString(MonaConstants.Session.SessionWalletAddressKey);
         }
 
-        internal void SaveLegacySession(string accessToken)
-        {
-            AccessToken = accessToken;
-        }
-        
         internal void SaveSession(string accessToken, string refreshToken, string emailAddress)
         {
             AccessToken = accessToken;
@@ -43,7 +37,7 @@ namespace Monaverse.Core
         internal string SaveSessionEmail(string emailAddress)
             => EmailAddress = emailAddress.UpdatePlayerPrefs(MonaConstants.Session.SessionEmailKey);
         
-        internal string SaveWalletAddress(string walletAddress)
+        public string SaveWalletAddress(string walletAddress)
             => WalletAddress = walletAddress.UpdatePlayerPrefs(MonaConstants.Session.SessionWalletAddressKey);
 
         internal void Clear()

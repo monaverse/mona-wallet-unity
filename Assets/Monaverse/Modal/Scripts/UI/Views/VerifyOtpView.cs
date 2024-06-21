@@ -11,6 +11,7 @@ namespace Monaverse.Modal.UI.Views
     {
         [SerializeField] private MonaModalView _getTokensView;
         [SerializeField] private TMP_InputField _otpInputField;
+        [SerializeField] private TMP_Text _emailText;
         [SerializeField] private Button _verifyOtpButton;
 
         private string _emailAddress;
@@ -30,6 +31,7 @@ namespace Monaverse.Modal.UI.Views
             
             _verifyOtpButton.interactable = true;
             _emailAddress = (string) options;
+            _emailText.text = _emailAddress;
             _otpInputField.text = string.Empty;
         }
 

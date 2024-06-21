@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Monaverse.Api.Modules.User.Dtos;
 using Monaverse.Api.Modules.User.Responses;
 using Monaverse.Core;
 using Monaverse.Core.Utils;
 using Monaverse.Modal.UI.Components;
+using Monaverse.Modal.UI.Extensions;
 using Monaverse.Redcode.Awaiting;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Monaverse.Modal.UI.Views
@@ -29,15 +30,13 @@ namespace Monaverse.Modal.UI.Views
         [SerializeField] private ScrollRect _scrollRect;
         [SerializeField] private List<MonaListItem> _cardsPool = new();
         [SerializeField] private GameObject _noItemsFound;
-        [FormerlySerializedAs("_collectiblesDetailsView")]
         [SerializeField] private TokenDetailsView _tokensDetailsView;
         [SerializeField] private GameObject _loadingAnimator;
         [SerializeField] private Button _logoutButton;
+        [SerializeField] private Button _marketplaceButton;
 
         [Header("Asset References")] [SerializeField]
         private MonaListItem _cardPrefab;
-
-        [SerializeField] private int _countPerPage = 12;
 
         [SerializeField, Range(0.01f, 0.9f)]
         private float _loadThreshold = 0.5f;
@@ -54,21 +53,22 @@ namespace Monaverse.Modal.UI.Views
         private void Start()
         {
             _chainsDropdown.options.Clear();
-            foreach (var chain in ChainHelper.SupportedChains())
-                _chainsDropdown.options.Add(new TMP_Dropdown.OptionData(ChainHelper.GetChainName(chain)));
+            foreach (var chain in MonaverseManager.Instance.SDK.GetSupportedChainIds())
+                _chainsDropdown.options.Add(
+                    new TMP_Dropdown.OptionData(MonaverseManager.Instance.SDK.GetChainName(chain)));
 
             _walletsDropdown.onValueChanged.AddListener(OnWalletsDropdownChanged);
             _chainsDropdown.onValueChanged.AddListener(OnChainsDropdownChanged);
             _logoutButton.onClick.AddListener(OnLogoutClicked);
+            _marketplaceButton.onClick.AddListener(OnMarketplaceClicked);
             
             MonaverseManager.Instance.SDK.LoggedOut += OnLoggedOut;
         }
 
-        
-
         protected override async void OnOpened(object options = null)
         {
             base.OnOpened(options);
+            parentModal.Header.EnableBackButton(false);
             await GetUser();
         }
 
@@ -125,18 +125,19 @@ namespace Monaverse.Modal.UI.Views
 
             if (getUserTokensResponse == null)
                 return;
+            
+            _noItemsFound.SetActive(getUserTokensResponse.Tokens.Count == 0);
 
             _continuationToken = getUserTokensResponse.Continuation;
-            var tokensCount = getUserTokensResponse.Tokens.Count;
 
             var tokens = getUserTokensResponse.Tokens;
             await RefreshView(tokens);
 
             //Filter using the CollectibleFilter
-            // MonaverseModal.TriggerCollectiblesLoaded(tokens.GetFilteredCollectibles());
+            MonaverseModal.TriggerTokensLoaded(tokens.GetFilteredTokens());
 
             _tokensCache = tokens;
-            _usedCardsCount += tokensCount;
+            _usedCardsCount += getUserTokensResponse.Tokens.Count;
 
             _isPageLoading = false;
 
@@ -149,21 +150,22 @@ namespace Monaverse.Modal.UI.Views
 
         private async Task RefreshView(IReadOnlyList<TokenDto> tokens)
         {
-            parentModal.Header.Title = $"Tokens ({_tokensCache?.Count})";
+            var chain = _chainsDropdown.options[_chainsDropdown.value].text;
+            parentModal.Header.Title = $"Your {chain} Tokens ({_tokensCache?.Count})";
 
             if (tokens.Count > _cardsPool.Count - _usedCardsCount)
                 await IncreaseCardsPoolSize(tokens.Count + _usedCardsCount);
 
-            //Sort using the CollectibleFilter if any
-            // if (MonaverseModal.Instance.CollectibleFilter != null)
-            //     tokens = tokens.OrderBy(i => i.CanBeImported() ? 0 : 1).ToList();
+            //Sort using the TokenFilter if any
+            if (MonaverseModal.Instance.TokenFilter != null)
+                tokens = tokens.OrderBy(i => i.CanBeImported() ? 0 : 1).ToList();
 
             for (var i = 0; i < tokens.Count; i++)
             {
                 var token = tokens[i];
                 var monaListItem = _cardsPool[i + _usedCardsCount];
                 var sprite = GetSprite(token.ImageSmall);
-                var canBeImported = true; // token.CanBeImported();
+                var canBeImported = token.CanBeImported();
 
                 //configure details view
                 var collectibleDetailsParams = new TokenDetailsView.CollectibleDetailsParams
@@ -180,9 +182,9 @@ namespace Monaverse.Modal.UI.Views
                     onImportClick = () =>
                     {
                         parentModal.CloseModal();
-                        // MonaverseModal.TriggerImportCollectibleClicked(token);
+                        MonaverseModal.TriggerImportTokenClicked(token);
                     },
-                    // onPreviewClick = () => { MonaverseModal.TriggerPreviewCollectibleClicked(token); },
+                    onPreviewClick = () => { MonaverseModal.TriggerPreviewCollectibleClicked(token); },
                     canImport = canBeImported
                 };
 
@@ -193,7 +195,7 @@ namespace Monaverse.Modal.UI.Views
                     remoteSprite = sprite,
                     onClick = () =>
                     {
-                        // MonaverseModal.TriggerCollectibleSelected(token);
+                        MonaverseModal.TriggerTokenSelected(token);
                         parentModal.OpenView(_tokensDetailsView, parameters: collectibleDetailsParams);
                     },
                     isInstalled = false,
@@ -292,7 +294,13 @@ namespace Monaverse.Modal.UI.Views
                     return result.Data;
                 }
 
-                parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Success, "Tokens updated");
+                if (result.Data.Tokens.Count == 0)
+                {
+                    parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Info, "No tokens found");
+                    return result.Data;
+                }
+
+                parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Success, $"{result.Data.Tokens.Count} tokens found");
                 return result.Data;
             }
             catch (Exception exception)
@@ -318,6 +326,11 @@ namespace Monaverse.Modal.UI.Views
         private void OnLogoutClicked()
         {
             MonaverseManager.Instance.SDK.Logout();
+        }
+        
+        private void OnMarketplaceClicked()
+        {
+            Application.OpenURL(MonaConstants.MonaversePages.Marketplace);
         }
         
         private void OnLoggedOut(object sender, EventArgs e)

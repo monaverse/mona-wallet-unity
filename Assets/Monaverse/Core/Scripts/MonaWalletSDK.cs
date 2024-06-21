@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using Monaverse.Api.Modules.Auth.Requests;
 using Monaverse.Api.Modules.Common;
 using Monaverse.Api.Modules.User.Responses;
 using Monaverse.Api.Options;
+using Monaverse.Core.Utils;
 
 namespace Monaverse.Core
 {
@@ -78,6 +80,12 @@ namespace Monaverse.Core
             UnitySyncContext = currentSyncContext;
         }
 
+        /// <summary>
+        /// Generates a one time password and sends it to the provided email
+        /// If the user is not registered, an email asking for registration will be sent
+        /// </summary>
+        /// <param name="email"> The email to send the one time password to </param>
+        /// <returns> true if the operation was successful </returns>
         public async Task<bool> GenerateOneTimePassword(string email)
         {
             try
@@ -97,6 +105,14 @@ namespace Monaverse.Core
             }
         }
         
+        /// <summary>
+        /// Verifies a one time password
+        /// if successful, the user will be logged in and the session will be saved
+        /// Once the session is saved, the Authenticated event will be raised
+        /// </summary>
+        /// <param name="email"> The registered email </param>
+        /// <param name="otp"> The one time password to verify </param>
+        /// <returns> true if the operation was successful </returns>
         public async Task<bool> VerifyOneTimePassword(string email, string otp)
         {
             try
@@ -130,6 +146,11 @@ namespace Monaverse.Core
             }
         }
 
+        /// <summary>
+        /// Gets the currently logged-in user
+        /// If the user is not authenticated, an error will be raised
+        /// </summary>
+        /// <returns> The user response object </returns>
         public async Task<ApiResult<GetUserResponse>> GetUser()
         {
             try
@@ -154,6 +175,14 @@ namespace Monaverse.Core
             }
         }
         
+        /// <summary>
+        /// Gets the user's tokens from the Monaverse API for a specific chain and wallet address
+        /// The wallet address supplied must be owned by the user
+        /// You can link your wallet address to your account in https://marketplace.monaverse.com/
+        /// </summary>
+        /// <param name="chainId"> The id of the chain to get the tokens for</param>
+        /// <param name="address"> The wallet address to get the tokens for</param>
+        /// <returns> The user's tokens for the specified chain and wallet address </returns>
         public async Task<ApiResult<GetUserTokensResponse>> GetUserTokens(int chainId, string address)
         {
             try
@@ -175,6 +204,7 @@ namespace Monaverse.Core
                 return ApiResult<GetUserTokensResponse>.Failed(exception.Message);
             }
         }
+
 
         /// <summary>
         /// Logs the user out of the Monaverse API
@@ -199,6 +229,29 @@ namespace Monaverse.Core
             return Session.IsAuthenticated;
         }
 
+        #region Helpers
+
+        /// <summary>
+        /// Returns a list of supported chain ids by the Monaverse API
+        /// </summary>
+        /// <returns></returns>
+        public HashSet<int> GetSupportedChainIds()
+        {
+            return ChainHelper.SupportedChains();
+        }
+        
+        /// <summary>
+        /// Returns the name of the chain with the specified chain id
+        /// </summary>
+        /// <param name="chainId"></param>
+        /// <returns></returns>
+        public string GetChainName(int chainId)
+        {
+            return ChainHelper.GetChainName(chainId);
+        }
+
+        #endregion
+        
         #region Events Handlers
 
         private void OnAuthenticated()
