@@ -11,9 +11,6 @@ namespace Monaverse.Core
         [Tooltip(" Monaverse Application ID.")]
         public string monaApplicationId = null;
 
-        [Tooltip("WalletConnect Project ID (https://cloud.walletconnect.com/app)")]
-        public string walletConnectProjectId = null;
-        
         [Tooltip("The Monaverse API environment to use")]
         public ApiEnvironment apiEnvironment = ApiEnvironment.Staging;
         
@@ -61,7 +58,6 @@ namespace Monaverse.Core
             var sdkOptions = new MonaWalletSDK.SDKOptions
             {
                 applicationId = Instance.monaApplicationId,
-                walletConnectProjectId = Instance.walletConnectProjectId,
                 apiEnvironment = Instance.apiEnvironment,
                 showDebugLogs = Instance.showDebugLogs
             };

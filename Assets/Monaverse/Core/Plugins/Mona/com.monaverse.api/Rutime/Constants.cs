@@ -11,7 +11,7 @@ namespace Monaverse.Api
         public const string BaseUrlProductionLegacy = "https://api-wallet-sdk.helios.monaverse.com";
         
         public const string ApiDomainLocal = "http://localhost:8000";
-        public const string ApiDomainStaging = "https://api-staging.monaverse.com";
+        public const string ApiDomainStaging = " https://api-mp-staging.monaverse.com";
         public const string ApiDomainProduction = "https://api.monaverse.com";
         
         public const string ApplicationIdHeader = "X-Mona-Application-Id";

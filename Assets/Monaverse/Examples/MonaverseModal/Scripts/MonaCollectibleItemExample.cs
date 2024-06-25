@@ -1,6 +1,5 @@
 using System;
-using Monaverse.Api.Modules.Collectibles.Dtos;
-using Monaverse.Core.Utils;
+using Monaverse.Api.Modules.User.Dtos;
 using Monaverse.Modal.UI.Components;
 using TMPro;
 using UnityEngine;
@@ -28,14 +27,14 @@ namespace Monaverse.Examples
             _onClick?.Invoke();
         }
 
-        public void SetCollectible(CollectibleDto collectible, Action onClick = null)
+        public void SetCollectible(TokenDto collectible, Action onClick = null)
         {
             _onClick = onClick;
             _remoteSprite?.UnsubscribeImage(_image);
             
-            _remoteSprite = MonaRemoteSpriteFactory.GetRemoteSprite(collectible.GetImageUrl());
+            _remoteSprite = MonaRemoteSpriteFactory.GetRemoteSprite(collectible.Image);
             _remoteSprite.SubscribeImage(_image);
-            _title.text = collectible.Title;
+            _title.text = collectible.Name;
         }
     }
 }

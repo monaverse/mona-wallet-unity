@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Monaverse.Api.Modules.Collectibles.Dtos;
+using Monaverse.Api.Modules.User.Dtos;
 using Monaverse.Modal;
 using UnityEngine;
 
@@ -11,8 +12,8 @@ namespace Monaverse.Examples
         [SerializeField] private MonaCollectibleItemExample _importedItem;
         private void Start()
         {
-            MonaverseModal.ImportCollectibleClicked += OnImportCollectibleClicked;
-            MonaverseModal.CollectiblesLoaded += OnCollectiblesLoaded;
+            MonaverseModal.ImportTokenClicked += OnImportTokenClicked;
+            MonaverseModal.TokensLoaded += OnTokensLoaded;
         }
 
         /// <summary>
@@ -20,7 +21,7 @@ namespace Monaverse.Examples
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="loadedCollectibles">A list of loaded collectibles</param>
-        private async void OnCollectiblesLoaded(object sender, List<CollectibleDto> loadedCollectibles)
+        private async void OnTokensLoaded(object sender, List<TokenDto> loadedCollectibles)
         {
             Debug.Log("[MonaverseModalExample.OnCollectiblesLoaded] loaded " + loadedCollectibles.Count + " collectibles");
             await _compatibleItems.SetCollectibles(loadedCollectibles);
@@ -31,9 +32,9 @@ namespace Monaverse.Examples
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="collectible">The collectible selected for import</param>
-        private void OnImportCollectibleClicked(object sender, CollectibleDto collectible)
+        private void OnImportTokenClicked(object sender, TokenDto collectible)
         {
-            Debug.Log("[MonaverseModalExample.OnImportCollectibleClicked] " + collectible.Title);
+            Debug.Log("[MonaverseModalExample.OnImportCollectibleClicked] " + collectible.Name);
             _importedItem.SetCollectible(collectible);
         }
         

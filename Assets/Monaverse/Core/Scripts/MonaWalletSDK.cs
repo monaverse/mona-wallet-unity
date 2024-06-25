@@ -1,14 +1,16 @@
 using System;
-using System.Numerics;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Monaverse.Api;
 using Monaverse.Api.Configuration;
 using Monaverse.Api.Logging;
-using Monaverse.Api.Modules.Auth.Responses;
+using Monaverse.Api.Modules.Auth.Requests;
+using Monaverse.Api.Modules.Common;
+using Monaverse.Api.Modules.User.Responses;
 using Monaverse.Api.Options;
-using Monaverse.Wallets;
-using UnityEngine;
+using Monaverse.Core.Utils;
 
 namespace Monaverse.Core
 {
@@ -23,10 +25,6 @@ namespace Monaverse.Core
             /// Monaverse Application ID.
             /// </summary>
             public string applicationId;
-            /// <summary>
-            /// WalletConnect Project ID (https://cloud.walletconnect.com/app).
-            /// </summary>
-            public string walletConnectProjectId;
             
             /// <summary>
             /// The Monaverse API environment to use.
@@ -39,60 +37,28 @@ namespace Monaverse.Core
             public bool showDebugLogs;
         }
         
-        public enum AuthorizationResult
-        {
-            WalletNotConnected,
-            FailedValidatingWallet,
-            UserNotRegistered,
-            FailedSigningMessage,
-            FailedAuthorizing,
-            Authorized,
-            Error
-        }
-        
         public SDKOptions Options { get; private set; }
-        public BigInteger ChainId { get; private set; }
-        public IMonaWallet ActiveWallet { get; private set; }
         public IMonaApiClient ApiClient { get; internal set; }
         public MonaverseSession Session { get; private set; }
         
         public static SynchronizationContext UnitySyncContext { get; private set; }
         
-        
         /// <summary>
-        ///  Event raised when the user's wallet is connected
-        ///  The wallet address is passed as a parameter
+        /// Event raised when the user is logged out
         /// </summary>
-        public event EventHandler<string> Connected;
-        
+        public event EventHandler LoggedOut;
+
         /// <summary>
-        /// Event raised when there is an error while connecting the user's wallet
-        /// An exception is passed as a parameter
+        /// Event raised when the user is authenticated with the Monaverse API
         /// </summary>
-        public event EventHandler<Exception> ConnectionErrored;
-        
-        /// <summary>
-        /// Event raised when the user's wallet is disconnected
-        /// </summary>
-        public event EventHandler Disconnected;
-        
-        /// <summary>
-        /// Event raised when the user's wallet is authorized
-        /// </summary>
-        public event EventHandler Authorized;
+        public event EventHandler Authenticated;
         
         /// <summary>
         /// Event raised when the user's wallet is not authorized
         /// An authorization result is passed as a parameter
         /// </summary>
-        public event EventHandler<AuthorizationResult> AuthorizationFailed;
-        
-        /// <summary>
-        /// Event raised when there is an error while signing a message with the user's wallet
-        /// An exception is passed as a parameter
-        /// </summary>
-        public event EventHandler<Exception> SignMessageErrored;
-        
+        public event EventHandler<string> AuthenticationFailed;
+
         
         public MonaWalletSDK(SDKOptions options)
         {
@@ -104,7 +70,7 @@ namespace Monaverse.Core
                 LogLevel = options.showDebugLogs? ApiLogLevel.Info : ApiLogLevel.Off
             });
             
-            Session = new MonaverseSession(ApiClient.Session.LegacyAccessToken);
+            Session = new MonaverseSession(ApiClient.Session.AccessToken, ApiClient.Session.RefreshToken);
             Session.Load();
             
             var currentSyncContext = SynchronizationContext.Current;
@@ -113,243 +79,202 @@ namespace Monaverse.Core
                     $"[Monaverse] SynchronizationContext is not of type UnityEngine.UnitySynchronizationContext. Current type is <i>{currentSyncContext.GetType().FullName}</i>. Make sure to initialize the Monaverse SDK from the main thread.");
             UnitySyncContext = currentSyncContext;
         }
-        
+
         /// <summary>
-        /// Connects a user's Web3 wallet via WalletConnect.
-        /// This will open the WalletConnect UI modal and let the user connect their Web3 wallet
+        /// Generates a one time password and sends it to the provided email
+        /// If the user is not registered, an email asking for registration will be sent
         /// </summary>
-        /// <returns> A task that completes when the wallet connection is complete.
-        /// If successful, the task returns the address of the connected wallet.</returns>
-        public Task<string> ConnectWallet()
+        /// <param name="email"> The email to send the one time password to </param>
+        /// <returns> true if the operation was successful </returns>
+        public async Task<bool> GenerateOneTimePassword(string email)
         {
-            return ConnectWallet(new MonaWalletConnection
+            try
             {
-                ChainId = 1,
-                MonaWalletProvider = MonaWalletProvider.WalletConnect
-            });
-        }
-        
-        /// <summary>
-        /// Connects a user's Web3 wallet via a given wallet provider.
-        /// </summary>
-        /// <param name="monaWalletConnection">The wallet provider and optional parameters.</param>
-        /// <returns>A task that completes when the wallet connection is complete.
-        /// If successful, the task returns the address of the connected wallet.</returns>
-        /// <exception cref="UnityException">Thrown if the wallet provider is not supported on this platform.</exception>
-        public async Task<string> ConnectWallet(MonaWalletConnection monaWalletConnection)
-        {
-            ChainId = monaWalletConnection.ChainId;
-            
-            switch(monaWalletConnection.MonaWalletProvider) 
-            {
-                case MonaWalletProvider.LocalWallet:
-                    ActiveWallet = new MonaLocalWallet();
-                    break;
-                case MonaWalletProvider.WalletConnect:
-                    if (string.IsNullOrEmpty(Options.walletConnectProjectId))
-                        throw new UnityException("Wallet connect project id is required for wallet connect connection method!");
-                    ActiveWallet = new MonaWalletConnect(Options.walletConnectProjectId);
-                    break;
-                default: throw new UnityException($"{monaWalletConnection.MonaWalletProvider} not supported on this platform");
+                var result = await ApiClient.Auth
+                    .GenerateOtp(new GenerateOtpRequest
+                    {
+                        Email = email
+                    });
+                
+                return result.IsSuccess;
             }
-            
-            ActiveWallet.Connected += OnConnected;
-            ActiveWallet.ConnectionErrored += OnConnectionErrored;
-            ActiveWallet.Disconnected += OnDisconnected;
-            ActiveWallet.SignMessageErrored += OnSignMessageErrored;
-            
-            var walletAddress = await ActiveWallet.Connect(monaWalletConnection);
-            Session.SaveWalletAddress(walletAddress);
-            
-            MonaDebug.Log($"Connected wallet {monaWalletConnection.MonaWalletProvider} with address {Session.WalletAddress} on chain {ChainId}");
+            catch (Exception exception)
+            {
+                MonaDebug.LogException(exception);
+                return false;
+            }
+        }
+        
+        /// <summary>
+        /// Verifies a one time password
+        /// if successful, the user will be logged in and the session will be saved
+        /// Once the session is saved, the Authenticated event will be raised
+        /// </summary>
+        /// <param name="email"> The registered email </param>
+        /// <param name="otp"> The one time password to verify </param>
+        /// <returns> true if the operation was successful </returns>
+        public async Task<bool> VerifyOneTimePassword(string email, string otp)
+        {
+            try
+            {
+                var result = await ApiClient.Auth
+                    .VerifyOtp(new VerifyOtpRequest
+                    {
+                        Email = email,
+                        Otp = otp
+                    });
 
-            return Session.WalletAddress;
+                if (!result.IsSuccess)
+                {
+                    OnAuthenticationFailed(result.Message);
+                    return false;
+                }
+                
+                Session.SaveSession(accessToken: result.Data.Access, 
+                    refreshToken: result.Data.Refresh,
+                    emailAddress: email);
+                
+                OnAuthenticated();
+                
+                return true;
+            }
+            catch (Exception exception)
+            {
+                MonaDebug.LogException(exception);
+                OnAuthenticationFailed(exception.Message);
+                return false;
+            }
         }
 
         /// <summary>
-        /// Disconnects the user's wallet and clears any active authorization
+        /// Gets the currently logged-in user
+        /// If the user is not authenticated, an error will be raised
         /// </summary>
-        public async Task Disconnect()
+        /// <returns> The user response object </returns>
+        public async Task<ApiResult<GetUserResponse>> GetUser()
+        {
+            try
+            {
+                if (!IsAuthenticated())
+                    return ApiResult<GetUserResponse>.Failed("Not authenticated");   
+                
+                var result = await ApiClient.User
+                    .GetUser();
+
+                if (!result.IsSuccess) return result;
+                
+                Session.Wallets = result.Data.Wallets.ToHashSet();
+                Session.SaveSessionEmail(result.Data.Email);
+
+                return result;
+            }
+            catch (Exception exception)
+            {
+                MonaDebug.LogException(exception);
+                return ApiResult<GetUserResponse>.Failed(exception.Message);
+            }
+        }
+        
+        /// <summary>
+        /// Gets the user's tokens from the Monaverse API for a specific chain and wallet address
+        /// The wallet address supplied must be owned by the user
+        /// You can link your wallet address to your account in https://marketplace.monaverse.com/
+        /// </summary>
+        /// <param name="chainId"> The id of the chain to get the tokens for</param>
+        /// <param name="address"> The wallet address to get the tokens for</param>
+        /// <returns> The user's tokens for the specified chain and wallet address </returns>
+        public async Task<ApiResult<GetUserTokensResponse>> GetUserTokens(int chainId, string address)
+        {
+            try
+            {
+                if (!IsAuthenticated())
+                    return ApiResult<GetUserTokensResponse>.Failed("Not authenticated");                    
+                
+                var result = await ApiClient.User
+                    .GetUserTokens(chainId: chainId,
+                        address: address);
+
+               //TODO: Do some caching here
+                
+                return result;
+            }
+            catch (Exception exception)
+            {
+                MonaDebug.LogException(exception);
+                return ApiResult<GetUserTokensResponse>.Failed(exception.Message);
+            }
+        }
+
+
+        /// <summary>
+        /// Logs the user out of the Monaverse API
+        /// It clears any stored credentials
+        /// </summary>
+        public void Logout()
         {
             //Clear session
             ApiClient.Session.ClearSession();
             Session.Clear();
-
-            if (ActiveWallet == null)
-            {
-                OnDisconnected(this, EventArgs.Empty);
-                return;
-            }
-
-            //Disconnect wallet
-            await ActiveWallet.Disconnect();
-        }
-
-        /// <summary>
-        /// Checks if a wallet is connected.
-        /// This must be true before calling AuthorizeWallet
-        /// </summary>
-        /// <returns>True if a wallet is connected, false otherwise.</returns>
-        public async Task<bool> IsWalletConnected()
-        {
-            if (ActiveWallet == null)
-                return false;
             
-            try
-            {
-                return await ActiveWallet.IsConnected();
-            }
-            catch
-            {
-                return false;
-            }
+            OnLoggedOut();
         }
         
         /// <summary>
         /// Returns true if the there is an active session with the Monaverse API.
-        /// If true, you don't need to call ConnectWallet
-        /// The session will remain authorized for 24 hours since the last time the user authorized their wallet.
-        /// The session can be cleared using the Disconnect method
-        /// The session can be cleared using the ApiClient.ClearSession method
-        /// This must be true before you can call any authorized API endpoints
+        /// This must be true before you can call any authenticated API endpoints
         /// </summary>
-        /// <returns>True if the session is authorized, false otherwise.</returns>
-        public bool IsWalletAuthorized()
+        /// <returns></returns>
+        public bool IsAuthenticated()
         {
-            return Session.IsWalletAuthorized;
+            return Session.IsAuthenticated;
         }
+
+        #region Helpers
 
         /// <summary>
-        /// This will authorize the user's wallet with the Monaverse platform.
-        /// Before calling this, make sure:
-        /// - The user is registered at Monaverse.com. You can validate if the user is registered using the ValidateWallet API endpoint.
-        /// - The user has connected their wallet.
+        /// Returns a list of supported chain ids by the Monaverse API
         /// </summary>
-        /// <returns>AuthorizationResult enum with the following values:
-        /// <see cref="AuthorizationResult"/>
-        /// - WalletNotConnected: The user's wallet is not connected
-        /// - FailedValidatingWallet: Failed validating the user's wallet
-        /// - UserNotRegistered: The user is not registered
-        /// - FailedSigningMessage: Failed signing the SIWE message
-        /// - FailedAuthorizing: Failed authorizing the user's wallet with the Monaverse API
-        /// - Authorized: The user's wallet is authorized and ready to use
-        /// - Error: An unknown error occurred
-        /// </returns>
-        /// <exception cref="UnityException"></exception>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public async Task<AuthorizationResult> AuthorizeWallet()
+        /// <returns></returns>
+        public HashSet<int> GetSupportedChainIds()
         {
-            try
-            {
-                //Check if wallet is connected
-                if (!await IsWalletConnected())
-                {
-                    MonaDebug.LogError("Wallet is not connected");
-                    OnAuthorizationFailed(AuthorizationResult.WalletNotConnected);
-                    return AuthorizationResult.WalletNotConnected;
-                }
-                
-                //Get wallet address
-                var address = await ActiveWallet.GetAddress();
-                
-                var validateWalletResponse = await ApiClient.Auth.ValidateWallet(address);
-                if (!validateWalletResponse.IsSuccess)
-                {
-                    MonaDebug.LogError("Failed validating wallet: " + validateWalletResponse.Message);
-
-                    
-                    var result = validateWalletResponse.Data.Result switch
-                    {
-                        ValidateWalletResult.FailedGeneratingNonce => AuthorizationResult.FailedValidatingWallet,
-                        ValidateWalletResult.WalletIsNotRegistered => AuthorizationResult.UserNotRegistered,
-                        ValidateWalletResult.Error => AuthorizationResult.Error,
-                        ValidateWalletResult.WalletIsValid => throw new UnityException("Unexpected ValidateWalletResult: WalletIsValid"),
-                        _ => throw new ArgumentOutOfRangeException(" Unexpected ValidateWalletResult: " + validateWalletResponse.Data.Result)
-                    };
-
-                    OnAuthorizationFailed(result);
-                    return result;
-                }
-                
-                //Sign message with the user's active wallet provider
-                var signature = await ActiveWallet.SignMessage(validateWalletResponse.Data.SiweMessage);
-                if (string.IsNullOrEmpty(signature))
-                {
-                    MonaDebug.LogError($"Failed signing message with {ActiveWallet.GetProvider().ToString()}");
-                    OnAuthorizationFailed(AuthorizationResult.FailedSigningMessage);
-                    return AuthorizationResult.FailedSigningMessage;
-                }
-                
-                //Authorize wallet
-                var authorizationResult = await ApiClient.Auth.Authorize(signature, validateWalletResponse.Data.SiweMessage);
-                if (!authorizationResult.IsSuccess)
-                {
-                    MonaDebug.LogError($"Failed authorizing wallet {authorizationResult.Message}");
-                    OnAuthorizationFailed(AuthorizationResult.FailedAuthorizing);
-                    return AuthorizationResult.FailedAuthorizing;
-                }
-
-                Session.SaveAccessToken(ApiClient.Session.LegacyAccessToken);
-                
-                OnAuthorized();
-                
-                return AuthorizationResult.Authorized;
-            }
-            catch (Exception exception)
-            {
-               MonaDebug.LogException(exception);
-               OnAuthorizationFailed(AuthorizationResult.Error);
-               return AuthorizationResult.Error;
-            }
+            return ChainHelper.SupportedChains();
+        }
+        
+        /// <summary>
+        /// Returns the name of the chain with the specified chain id
+        /// </summary>
+        /// <param name="chainId"></param>
+        /// <returns></returns>
+        public string GetChainName(int chainId)
+        {
+            return ChainHelper.GetChainName(chainId);
         }
 
+        #endregion
+        
         #region Events Handlers
 
-        private void OnConnected(object sender, string connectedEvent)
+        private void OnAuthenticated()
         {
             UnitySyncContext.Post(_ =>
             {
-                Connected?.Invoke(this, connectedEvent);
+                Authenticated?.Invoke(this, EventArgs.Empty);
             }, null);
         }
         
-        private void OnDisconnected(object sender, EventArgs e)
+        private void OnLoggedOut()
         {
             UnitySyncContext.Post(_ =>
             {
-                Disconnected?.Invoke(this, e);
-            }, null);
-        }
-        
-        private void OnAuthorized()
-        {
-            UnitySyncContext.Post(_ =>
-            {
-                Authorized?.Invoke(this, EventArgs.Empty);
+                LoggedOut?.Invoke(this, EventArgs.Empty);
             }, null);
         }
 
-        private void OnAuthorizationFailed(AuthorizationResult authorizationResult)
+        private void OnAuthenticationFailed(string errorMessage)
         {
             UnitySyncContext.Post(_ =>
             {
-                AuthorizationFailed?.Invoke(this, authorizationResult);
-            }, null);
-        }
-        
-        private void OnSignMessageErrored(object sender, Exception exception)
-        {
-            UnitySyncContext.Post(_ =>
-            {
-                SignMessageErrored?.Invoke(this, exception);
-            }, null);
-        }
-
-        private void OnConnectionErrored(object sender, Exception exception)
-        {
-            UnitySyncContext.Post(_ =>
-            {
-                ConnectionErrored?.Invoke(this, exception);
+                AuthenticationFailed?.Invoke(this, errorMessage);
             }, null);
         }
 

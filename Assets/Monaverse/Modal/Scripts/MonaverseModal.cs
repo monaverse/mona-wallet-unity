@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using Monaverse.Api.Modules.Collectibles.Dtos;
+using Monaverse.Api.Modules.User.Dtos;
+using Monaverse.Core.Scripts.Utils;
 using Monaverse.Core.Utils;
 using Monaverse.Modal.UI.Components;
+using Monaverse.Modal.UI.Views;
 using UnityEngine;
 
 namespace Monaverse.Modal
@@ -15,7 +18,8 @@ namespace Monaverse.Modal
 
         [field: SerializeField, Space] private MonaModal Modal { get; set; }
 
-        [field: SerializeField] private List<ViewConfiguration> _views;
+        private List<MonaModalView> _views;
+        private MonaModalView _defaultView;
         
         internal static MonaverseModal Instance { get; private set; }
         
@@ -47,12 +51,13 @@ namespace Monaverse.Modal
         /// By default, all collectibles are importable
         /// For custom compatibility, pass an optional filter function in the Open method
         /// </summary>
-        public static event EventHandler<CollectibleDto> ImportCollectibleClicked;
+        public static event EventHandler<TokenDto> ImportTokenClicked;
         
+        /// <summary>
         /// This will override the default behavior of the preview button
         /// By default, it will open the respective URL in the browser
         /// </summary>
-        public static event EventHandler<CollectibleDto> PreviewCollectibleClicked;
+        public static event EventHandler<TokenDto> PreviewTokenClicked;
         
         /// <summary>
         /// Called when a set of collectibles are loaded in the MonaverseModal Collectibles view
@@ -60,7 +65,7 @@ namespace Monaverse.Modal
         /// By default, all collectibles are loaded
         /// For custom compatibility, pass an optional filter function in the Open method 
         /// </summary>
-        public static event EventHandler<List<CollectibleDto>> CollectiblesLoaded;
+        public static event EventHandler<List<TokenDto>> TokensLoaded;
         
         /// <summary>
         /// Called when a collectible is selected in the Collectibles view
@@ -68,9 +73,9 @@ namespace Monaverse.Modal
         /// Essentially, this is called when a collectible item is clicked on the Collectible view
         /// and before the Collectible details view is opened
         /// </summary>
-        public static event EventHandler<CollectibleDto> CollectibleSelected;
+        public static event EventHandler<TokenDto> TokenSelected;
         
-        public Func<CollectibleDto, bool> CollectibleFilter { get; private set; }
+        public Func<TokenDto, bool> TokenFilter { get; private set; }
         
         private void Awake()
         {
@@ -87,7 +92,7 @@ namespace Monaverse.Modal
         /// An instance of the MonaverseModal must exist in the scene
         /// </summary>
         /// <param name="collectibleFilter">Optional filter for collectibles. This will determine which collectibles are compatible with your application</param>
-        public static void Open(Func<CollectibleDto, bool> collectibleFilter = null)
+        public static void Open(Func<TokenDto, bool> collectibleFilter = null)
         {
             if (!IsReady)
             {
@@ -101,17 +106,17 @@ namespace Monaverse.Modal
                 return;
             }
             
-            
-            const ViewType defaultView = ViewType.SelectWallet;
-            var viewConfiguration = Instance._views.Find(x => x.viewType == defaultView);
-            if (viewConfiguration == null)
+            if(Instance._defaultView == null)
+                Instance._defaultView = Instance._views.Find(x => x is GenerateOtpView);
+           
+            if (Instance._defaultView == null)
             {
-                Debug.LogError($"[MonaverseModal] No view found for {defaultView}");
+                Debug.LogError($"[MonaverseModal] No view found for {nameof(GenerateOtpView)}");
                 return;
             }
             
-            Instance.CollectibleFilter = collectibleFilter;
-            Instance.Modal.OpenView(viewConfiguration.view);
+            Instance.TokenFilter = collectibleFilter;
+            Instance.Modal.OpenView(Instance._defaultView);
         }
         
         /// <summary>
@@ -139,6 +144,15 @@ namespace Monaverse.Modal
             Instance.Modal.Opened += (_, _) => ModalOpened?.Invoke(Instance, EventArgs.Empty);
             Instance.Modal.Closed += (_, _) => ModalClosed?.Invoke(Instance, EventArgs.Empty);
             
+            //Find and reference all existing modal views in children
+            Instance._views = new List<MonaModalView>();
+            foreach (Transform child in Instance.Modal.transform)
+            {
+                var view = child.GetComponent<MonaModalView>();
+                if (view != null)
+                    Instance._views.Add(view);
+            }
+            
             IsReady = true;
             Ready?.Invoke(Instance, EventArgs.Empty);
         }
@@ -157,46 +171,30 @@ namespace Monaverse.Modal
             return false;
         }
         
-        internal static void TriggerImportCollectibleClicked(CollectibleDto collectibleDto)
+        internal static void TriggerImportTokenClicked(TokenDto collectibleDto)
         {
-            ImportCollectibleClicked?.Invoke(Instance, collectibleDto);
+            ImportTokenClicked?.Invoke(Instance, collectibleDto);
         }
         
-        internal static void TriggerPreviewCollectibleClicked(CollectibleDto collectibleDto)
+        internal static void TriggerPreviewCollectibleClicked(TokenDto tokenDto)
         {
-            if (PreviewCollectibleClicked == null)
+            if (PreviewTokenClicked == null)
             {
-                Application.OpenURL(collectibleDto.GetMarketplaceUrl());
+                Application.OpenURL(tokenDto.GetMarketplaceUrl());
                 return;
             }
             
-            PreviewCollectibleClicked.Invoke(Instance, collectibleDto);
+            PreviewTokenClicked.Invoke(Instance, tokenDto);
         }
         
-        internal static void TriggerCollectiblesLoaded(List<CollectibleDto> collectibles)
+        internal static void TriggerTokensLoaded(List<TokenDto> collectibles)
         {
-            CollectiblesLoaded?.Invoke(Instance, collectibles);
+            TokensLoaded?.Invoke(Instance, collectibles);
         }
         
-        internal static void TriggerCollectibleSelected(CollectibleDto collectibleDto)
+        internal static void TriggerTokenSelected(TokenDto collectibleDto)
         {
-            CollectibleSelected?.Invoke(Instance, collectibleDto);
-        }
-        
-        [Serializable]
-        public class ViewConfiguration
-        {
-            public MonaModalView view;
-            public ViewType viewType;
-        }
-        
-        public enum ViewType
-        {
-            SelectWallet = 1,
-            ConnectingWallet = 2,
-            Authorize = 3,
-            Collectibles = 4,
-            CollectiblesDetail = 5
+            TokenSelected?.Invoke(Instance, collectibleDto);
         }
     }
 }

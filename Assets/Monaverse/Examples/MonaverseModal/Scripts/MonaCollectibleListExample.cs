@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Monaverse.Api.Modules.Collectibles.Dtos;
+using Monaverse.Api.Modules.User.Dtos;
 using Monaverse.Redcode.Awaiting;
 using UnityEngine;
 
@@ -14,7 +14,7 @@ namespace Monaverse.Examples
         [SerializeField] private List<MonaCollectibleItemExample> _itemsPool = new();
         [SerializeField] private MonaCollectibleItemExample _selectedItem;
 
-        public async Task SetCollectibles(List<CollectibleDto> collectibles)
+        public async Task SetCollectibles(List<TokenDto> collectibles)
         {
             if (collectibles.Count > _itemsPool.Count)
                 await IncreaseCardsPoolSize(collectibles.Count);
