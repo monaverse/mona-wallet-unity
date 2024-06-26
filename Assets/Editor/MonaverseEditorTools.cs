@@ -20,8 +20,7 @@ namespace Monaverse.Editor
             var baseFolders = new[]
             {
                 "Assets/Monaverse",
-                "Assets/TextMesh Pro",
-                "Assets/WalletConnectUnity",
+                "Assets/TextMesh Pro"
             };
 
             // Sub-folders to exclude
@@ -41,7 +40,6 @@ namespace Monaverse.Editor
             var baseFolders = new[]
             {
                 "Assets/Monaverse/Core/Plugins/Mona/com.monaverse.api",
-                "Assets/Monaverse/Core/Plugins/Nethereum",
                 "Assets/Monaverse/Core/Plugins/Newtonsoft 3.0.2",
             };
 

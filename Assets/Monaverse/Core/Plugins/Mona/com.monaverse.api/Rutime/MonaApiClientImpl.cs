@@ -5,7 +5,6 @@ using Monaverse.Api.Extensions;
 using Monaverse.Api.Logging;
 using Monaverse.Api.Modules.Auth;
 using Monaverse.Api.Modules.Auth.Requests;
-using Monaverse.Api.Modules.Collectibles;
 using Monaverse.Api.Modules.User;
 using Monaverse.Api.MonaHttpClient;
 using Monaverse.Api.MonaHttpClient.Request;
@@ -22,7 +21,6 @@ namespace Monaverse.Api
         private readonly IMonaHttpClient _monaHttpClient;
 
         public IAuthApiModule Auth { get; private set; }
-        public ICollectiblesApiModule Collectibles { get; private set; }
         public IUserApiModule User { get; private set; }
         
         public IMonaApiSession Session { get; }
@@ -38,7 +36,6 @@ namespace Monaverse.Api
 
             //Configure API modules
             Auth = new AuthApiModule(this, monaApiLogger);
-            Collectibles = new CollectiblesApiModule(this);
             User = new UserApiModule(this);
         }
 

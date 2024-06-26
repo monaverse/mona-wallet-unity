@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Monaverse.Api.Modules.Collectibles.Dtos;
 using Monaverse.Api.Modules.User.Dtos;
 using Monaverse.Modal;
 using UnityEngine;

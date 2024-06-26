@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Monaverse.Api.Modules.Collectibles.Dtos;
 using Monaverse.Api.Modules.User.Dtos;
 using Monaverse.Core.Scripts.Utils;
-using Monaverse.Core.Utils;
 using Monaverse.Modal.UI.Components;
 using Monaverse.Modal.UI.Views;
 using UnityEngine;

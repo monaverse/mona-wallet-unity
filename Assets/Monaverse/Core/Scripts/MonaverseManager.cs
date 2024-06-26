@@ -17,8 +17,6 @@ namespace Monaverse.Core
         [Tooltip("Whether to show the sdk debug logs")]
         public bool showDebugLogs;
 
-        [Tooltip("Instantiates the WalletConnect SDK for Native platforms.")]
-        public GameObject WalletConnectPrefab;
         public static MonaverseManager Instance { get; private set; }
         public MonaWalletSDK SDK { get; private set; }
 
