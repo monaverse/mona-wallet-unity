@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using Monaverse.Api.Modules.Auth;
-using Monaverse.Api.Modules.Collectibles;
 using Monaverse.Api.Modules.User;
 using Monaverse.Api.MonaHttpClient.Request;
 using Monaverse.Api.MonaHttpClient.Response;
@@ -11,7 +10,6 @@ namespace Monaverse.Api
     public interface IMonaApiClient
     {
         IAuthApiModule Auth { get; }
-        ICollectiblesApiModule Collectibles { get; }
         IUserApiModule User { get; }
         IMonaApiSession Session { get; }
         bool IsAuthorized();

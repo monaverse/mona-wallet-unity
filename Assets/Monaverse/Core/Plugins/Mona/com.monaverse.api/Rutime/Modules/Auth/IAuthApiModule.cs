@@ -10,13 +10,5 @@ namespace Monaverse.Api.Modules.Auth
         Task<ApiResult> GenerateOtp(GenerateOtpRequest request);
         Task<ApiResult<VerifyOtpResponse>> VerifyOtp(VerifyOtpRequest request);
         Task<ApiResult<RefreshTokenResponse>> RefreshToken(RefreshTokenRequest request);
-        
-        #region Legacy API
-
-        Task<ApiResult<PostNonceResponse>> PostNonce(string walletAddress);
-        Task<ApiResult<ValidateWalletResponse>> ValidateWallet(string walletAddress);
-        Task<ApiResult> Authorize(string signature, string siweMessage);
-
-        #endregion
     }
 }
