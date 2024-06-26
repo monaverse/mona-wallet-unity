@@ -58,10 +58,6 @@ jobs:
         with:
           dry_run: ${{ inputs.dryRun }}
           tag_format: ${version}
-          branches: |
-            [
-              'main', 
-            ]
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
