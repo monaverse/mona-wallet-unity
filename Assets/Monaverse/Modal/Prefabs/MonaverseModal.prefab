@@ -1331,7 +1331,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: b183a8ca011494e0083fc8e156baa9c3, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bb0f708ad86f942518dd9224accc8c08, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -5261,7 +5261,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: b183a8ca011494e0083fc8e156baa9c3, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bb0f708ad86f942518dd9224accc8c08, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -9099,7 +9099,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 4045e16f7550e41ad968b635bc035e07, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 72304b0c14f1d49e29e5a4301a669453, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -10511,8 +10511,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Address Copied
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: fe6bcbc91def342f5b3dddbac60a3637, type: 2}
-  m_sharedMaterial: {fileID: 936904452157767263, guid: fe6bcbc91def342f5b3dddbac60a3637, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -10531,18 +10531,18 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 11400000, guid: 33af0fd62ad8b49c2b94935b777da58a, type: 2}
-  m_TextStyleHashCode: -1685900286
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0
-  m_fontSizeBase: 0
+  m_fontSize: 14
+  m_fontSizeBase: 14
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
