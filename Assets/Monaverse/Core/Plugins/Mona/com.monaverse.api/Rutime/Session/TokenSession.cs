@@ -1,3 +1,5 @@
+using System;
+
 namespace Monaverse.Api.Session
 {
     internal class TokenSession : IMonaApiSession
@@ -5,6 +7,7 @@ namespace Monaverse.Api.Session
         public string AccessToken { get; private set; }
         public string RefreshToken { get; private set; }
         public string LegacyAccessToken { get; private set; }
+        public Action OnClearSession { get; set; }
 
         public TokenSession()
         {
@@ -50,6 +53,9 @@ namespace Monaverse.Api.Session
             AccessToken = null;
             RefreshToken = null;
             LegacyAccessToken = null;
+            
+            OnClearSession?.Invoke();
         }
+
     }
 }

@@ -60,6 +60,8 @@ namespace Monaverse.Api.Modules.Auth
             
             if(result.IsSuccess)
                 _monaApiClient.Session.SaveSession(result.Data.Access, result.Data.Refresh);
+            else
+                _monaApiClient.Session.ClearSession();
 
             return result;
         }
