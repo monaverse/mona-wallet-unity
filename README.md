@@ -34,10 +34,8 @@ If there are no compiler errors in the console, you are all set!
 
 **Important Notes:**
 
-- If you have an existing Web3 integration in your project such as `Thirdweb`, `WalletConnect`, etc. Please try using our [API-only](https://github.com/monaverse/mona-wallet-unity/tree/main/Assets/Monaverse/Core/Plugins/Mona/com.monaverse.api) package instead.
 - The SDK has been tested using Unity 2022 LTS. We highly recommend using 2022 LTS.
-- The Newtonsoft and Nethereums DLLs are included as part of the Unity Package, feel free to deselect/remove them if you already have them installed as a dependency to avoid conflicts.
-
+- The Newtonsoft DLLs are included as part of the Unity Package, feel free to deselect/remove them if you already have them installed as a dependency to avoid conflicts.
 
 ## Monaverse Modal
 
@@ -45,8 +43,6 @@ It's the simplest and most minimal way to interact with the 3D collectibles from
 
 ### Usage
 1. Install the SDK following the steps described above.
-2. Add a WalletConnect ProjectId to the `MonaverseManager` component. 
-   3. If you don't have a WalletConnect ProjectID, you can create one in [WalletConnect Cloud](https://cloud.walletconnect.com/).
 3. Drag and drop the [MonaverseModal](https://github.com/monaverse/mona-wallet-unity/tree/main/Assets/Monaverse/Modal/Prefabs) prefab to the first scene in your game.
 4. Open the modal at any time after `Awake`
 
@@ -60,38 +56,37 @@ MonaverseModal.Open();
 You may pass an optional filter function used to determine compatibility with your game.
 
 ```c#
-//Example: Filter collectibles by artist
-MonaverseModal.Open(collectible => collectible.Artist == "<insert artist here>");
+//Example: Filter tokens by kind
+MonaverseModal.Open(token => token.Kind == "erc1155");
 ```
 
 ### Modal Flow
-The `MonaverseModal` will take the user through various views in order to connect and authorize their wallet with the Monaverse platform.
-Once authorization is granted, the user will have access to their collectibles and be able to interact with them from your application.
+The `MonaverseModal` will take the user through various views in order to authenticate with the Monaverse platform.
+Once authentication is granted, the user will have access to their tokens and be able to interact with them from your application.
 
-#### Connect Your Wallet
-The user may select the wallet provider of their choice via Wallet Connect
-![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/b71ce3ef-2259-48f0-a03d-317a9c7aa832)
+#### Generate One-Time Password (OTP)
+To generate an OTP, users must provide their email address. The process varies based on their registration status:
+- Registered Users: An OTP will be sent to their email.
+- Unregistered Users: Registration instructions will be sent to their email.
+![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/adbd547b-efc5-429e-9163-c499685a9dee)
 
-![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/d7d308eb-ffd4-47c8-be7d-f741bd9d1b75)
 
-#### Authorize Your Wallet
-Once connected, the SDK will try to authorize the user's wallet with the Monaverse platform.
-Note: The user must be registered at [Monaverse.com](https://monaverse.com)
+#### Verify One-Time Password (OTP)
+Users must enter the OTP sent to their email in the previous step. Upon successful entry, the authentication process is completed, granting access to all authenticated APIs. The next screen, the Tokens View, will then be loaded.
+![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/e2198a5a-6152-49d3-915d-3210b15b4000)
 
-![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/b3b802a7-009a-4b36-81a4-18bccc2f8c6f)
 
-![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/3cb757fc-2047-47b3-819c-5e9e7e6dbcdf)
+#### Tokens View
+From this view, the user can browse through their tokens.
+As a developer, you may signal the SDK on how to identify which tokens are compatible with your application (See the `filter function` in the `Open Modal` section). Compatible items will have a checkmark on their left hand side.
 
-#### Collectibles View
-From this view, the user can browse through their collectibles.
-As a developer, you may signal the SDK on how to identify which collectibles are compatible with your application (See the `filter function` in the `Open Modal` section). Compatible items will have a checkmark on their left hand side.
+![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/91cc440c-c824-458b-8693-3e47c2b7ae80)
 
-![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/1eedee72-1d62-4333-8a89-4a9499207e8f)
 
-#### Collectible Detail View
-Displays details of a selected collectible with `Preview` and `Import` actions available.
+#### Token Detail View
+Displays details of a selected token with `Preview` and `Import` actions available.
 You must tell the SDK how to handle the `Import` action via events.
-By default, the `Preview` action will open the respective webpage to a collectible's details page in the `Monaverse.com` marketplace
+By default, the `Preview` action will open the respective webpage to a token's details page in the `Monaverse.com` marketplace
 
 ![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/286e6ce3-49d3-4159-9c92-62f3db1c636d)
 
@@ -102,10 +97,10 @@ The `MonaverseModal` class exposes a set of events for you to handle optionally 
 - [Ready](https://github.com/monaverse/mona-wallet-unity/blob/545dacf71152f1ff4a399bd7143323263b025661/Assets/Monaverse/Modal/Scripts/MonaverseModal.cs#L32)
 - [ModalOpened](https://github.com/monaverse/mona-wallet-unity/blob/545dacf71152f1ff4a399bd7143323263b025661/Assets/Monaverse/Modal/Scripts/MonaverseModal.cs#L37)
 - [ModalClosed](https://github.com/monaverse/mona-wallet-unity/blob/545dacf71152f1ff4a399bd7143323263b025661/Assets/Monaverse/Modal/Scripts/MonaverseModal.cs#L42)
-- [ImportCollectibleClicked](https://github.com/monaverse/mona-wallet-unity/blob/545dacf71152f1ff4a399bd7143323263b025661/Assets/Monaverse/Modal/Scripts/MonaverseModal.cs#L50)
-- [PreviewCollectibleClicked](https://github.com/monaverse/mona-wallet-unity/blob/545dacf71152f1ff4a399bd7143323263b025661/Assets/Monaverse/Modal/Scripts/MonaverseModal.cs#L55)
-- [CollectiblesLoaded](https://github.com/monaverse/mona-wallet-unity/blob/545dacf71152f1ff4a399bd7143323263b025661/Assets/Monaverse/Modal/Scripts/MonaverseModal.cs#L63)
-- [CollectibleSelected](https://github.com/monaverse/mona-wallet-unity/blob/545dacf71152f1ff4a399bd7143323263b025661/Assets/Monaverse/Modal/Scripts/MonaverseModal.cs#L71)
+- [ImportTokenClicked](https://github.com/monaverse/mona-wallet-unity/blob/a460ed5147230c99b4418ef866e4e07c915f8a46/Assets/Monaverse/Modal/Scripts/MonaverseModal.cs#L54)
+- [PreviewTokenClicked](https://github.com/monaverse/mona-wallet-unity/blob/a460ed5147230c99b4418ef866e4e07c915f8a46/Assets/Monaverse/Modal/Scripts/MonaverseModal.cs#L60)
+- [TokensLoaded](https://github.com/monaverse/mona-wallet-unity/blob/a460ed5147230c99b4418ef866e4e07c915f8a46/Assets/Monaverse/Modal/Scripts/MonaverseModal.cs#L68)
+- [TokenSelected](https://github.com/monaverse/mona-wallet-unity/blob/a460ed5147230c99b4418ef866e4e07c915f8a46/Assets/Monaverse/Modal/Scripts/MonaverseModal.cs#L76)
 
 
 
