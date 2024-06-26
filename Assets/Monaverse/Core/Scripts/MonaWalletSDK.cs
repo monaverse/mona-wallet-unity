@@ -73,6 +73,12 @@ namespace Monaverse.Core
             Session = new MonaverseSession(ApiClient.Session.AccessToken, ApiClient.Session.RefreshToken);
             Session.Load();
             
+            ApiClient.Session.OnClearSession += ()=>
+            {
+                Session.Clear();
+                OnLoggedOut();
+            };
+            
             var currentSyncContext = SynchronizationContext.Current;
             if (currentSyncContext.GetType().FullName != "UnityEngine.UnitySynchronizationContext")
                 throw new Exception(
@@ -214,9 +220,7 @@ namespace Monaverse.Core
         {
             //Clear session
             ApiClient.Session.ClearSession();
-            Session.Clear();
-            
-            OnLoggedOut();
+
         }
         
         /// <summary>

@@ -1,3 +1,5 @@
+using System;
+
 namespace Monaverse.Api.Session
 {
     public interface IMonaApiSession
@@ -8,5 +10,6 @@ namespace Monaverse.Api.Session
         string LegacyAccessToken { get; }
         string AccessToken { get; }
         string RefreshToken { get; }
+        Action OnClearSession { get; set; }
     }
 }

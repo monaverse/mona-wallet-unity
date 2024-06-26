@@ -263,8 +263,6 @@ namespace Monaverse.Modal.UI.Views
             }
             catch (Exception exception)
             {
-                //Force logout if getting user fails
-                MonaverseManager.Instance.SDK.Logout();
                 parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Error, "Error getting user");
                 MonaDebug.LogException(exception);
             }
