@@ -104,9 +104,9 @@ The `MonaverseModal` class exposes a set of events for you to handle optionally 
 
 ## Modal Example
 This is a sample WebGL application demonstrating how to use the SDK and the `Modal` prefab to quickly connect users to their Monaverse account and Tokens. 
+[Demo App](https://monaverse.github.io/mona-wallet-unity)
 
-The source code for this example is included in the SDK and can be found at: [MonaverseModalExample](https://github.com/monaverse/mona-wallet-unity/blob/1f2737da2ac75743e00a3a5349077f738f876aaa/Assets/Monaverse/Examples/MonaverseModal/Scripts/MonaverseModalExample.cs#L8).
-
+The [Source Code](https://github.com/monaverse/mona-wallet-unity/blob/1f2737da2ac75743e00a3a5349077f738f876aaa/Assets/Monaverse/Examples/MonaverseModal/Scripts/MonaverseModalExample.cs#L8) for this example is included in the SDK.
 
 ![image](https://github.com/monaverse/mona-wallet-unity/assets/708754/1688eaf3-e81a-4e85-adaf-8005f89e4e5d)
 
