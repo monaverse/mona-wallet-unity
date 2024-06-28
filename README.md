@@ -24,7 +24,7 @@ The Mona Wallet Unity SDK is distributed as a [Unity Package](https://docs.unity
 
 You can download the latest official `.unitypackage` from the [Releases](https://github.com/monaverse/mona-wallet-unity/releases) page.
 
-Alternatively, you can download the latest generated package from [Build Packages](https://github.com/monaverse/mona-wallet-unity/actions/workflows/build-sdk-package.yml?query=branch%3Amain) workflow page. The file is available at the bottom of each workflow run as `monaverse-sdk-package`. Please note that this version may not be stable.
+Alternatively, you can download the latest generated package from [Main Workflow](https://github.com/monaverse/mona-wallet-unity/actions/workflows/main.workflow.yml?query=branch%3Amain) workflow page. The file is available at the bottom of each workflow run as `monaverse-sdk-package`. Please note that this version may not be stable.
 
 ### Install package
 
@@ -39,7 +39,7 @@ If there are no compiler errors in the console, you are all set!
 
 ## Monaverse Modal
 
-It's the simplest and most minimal way to interact with the 3D collectibles from your wallet, enabled the Monaverse platform.
+It's the simplest and most minimal way to interact with the 3D tokens from your wallets, enabled by the Monaverse platform.
 
 ### Usage
 1. Install the SDK following the steps described above.
