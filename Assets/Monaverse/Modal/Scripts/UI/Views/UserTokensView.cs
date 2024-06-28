@@ -168,7 +168,7 @@ namespace Monaverse.Modal.UI.Views
             {
                 var token = tokens[i];
                 var monaListItem = _cardsPool[i + _usedCardsCount];
-                var sprite = GetSprite(token.ImageSmall);
+                var sprite = token.GetImageRemoteSprite();
                 var canBeImported = token.CanBeImported();
 
                 //configure details view
@@ -225,16 +225,6 @@ namespace Monaverse.Modal.UI.Views
                 if ((i - oldSize + 1) % 3 == 0)
                     await new WaitForEndOfFrame();
             }
-        }
-
-        private MonaRemoteSprite GetSprite(string collectibleImageUrl)
-        {
-            if (_sprites.TryGetValue(collectibleImageUrl, out var sprite))
-                return sprite;
-
-            sprite = MonaRemoteSpriteFactory.GetRemoteSprite(collectibleImageUrl);
-            _sprites.Add(collectibleImageUrl, sprite);
-            return sprite;
         }
 
         private async Task GetUser()
