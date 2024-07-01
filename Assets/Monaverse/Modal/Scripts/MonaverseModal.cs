@@ -89,8 +89,8 @@ namespace Monaverse.Modal
         /// You may also listen to the Ready event before calling this
         /// An instance of the MonaverseModal must exist in the scene
         /// </summary>
-        /// <param name="collectibleFilter">Optional filter for collectibles. This will determine which collectibles are compatible with your application</param>
-        public static void Open(Func<TokenDto, bool> collectibleFilter = null)
+        /// <param name="tokenFilter">Optional filter for tokens. This will determine which tokens are compatible with your application</param>
+        public static void Open(Func<TokenDto, bool> tokenFilter = null)
         {
             if (!IsReady)
             {
@@ -113,7 +113,7 @@ namespace Monaverse.Modal
                 return;
             }
             
-            Instance.TokenFilter = collectibleFilter;
+            Instance.TokenFilter = tokenFilter;
             Instance.Modal.OpenView(Instance._defaultView);
         }
         
