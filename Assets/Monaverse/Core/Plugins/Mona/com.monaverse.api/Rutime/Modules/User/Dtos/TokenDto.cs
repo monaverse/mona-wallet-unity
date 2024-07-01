@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Numerics;
+using Monaverse.Api.Modules.Common.Dtos;
 
 namespace Monaverse.Api.Modules.User.Dtos
 {
@@ -22,5 +23,6 @@ namespace Monaverse.Api.Modules.User.Dtos
         public CollectionDto Collection { get; set; } = new();
         public List<TokenAttributeDto> Attributes { get; set; } = new();
         public List<TokenFileDto> Files { get; set; } = new();
+        public OrderDto FloorAsk { get; set; }
     }
 }
