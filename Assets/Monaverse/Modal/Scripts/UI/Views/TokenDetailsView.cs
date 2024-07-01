@@ -37,6 +37,7 @@ namespace Monaverse.Modal.UI.Views
             public int tokenId;
             public bool minted;
             public float price;
+            public string priceCurrency;
             public string description;
             public Action onImportClick;
             public Action onPreviewClick;
@@ -68,7 +69,7 @@ namespace Monaverse.Modal.UI.Views
             //Set details
             _titleLabel.text = parameters.title;
             _descriptionLabel.text = parameters.description;
-            _priceLabel.text = $"{parameters.price} ETH";
+            _priceLabel.text = $"{parameters.price} {parameters.priceCurrency}";
             _typeLabel.text = parameters.typeText;
             _artistLabel.text = parameters.artist;
             _networkLabel.text = parameters.network;

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Monaverse.Api.Modules.User.Dtos;
 using Monaverse.Api.Modules.User.Responses;
 using Monaverse.Core;
+using Monaverse.Core.Scripts.Utils;
 using Monaverse.Core.Utils;
 using Monaverse.Modal.UI.Components;
 using Monaverse.Modal.UI.Extensions;
@@ -182,7 +183,8 @@ namespace Monaverse.Modal.UI.Views
                     artist = token.Collection.Name,
                     minted = true,
                     network = ChainHelper.GetChainName((int)token.ChainId),
-                    price = 0f, //TODO: add price to API
+                    price = (float)token.GetNativePrice(),
+                    priceCurrency = token.GetCurrency(),
                     onImportClick = () =>
                     {
                         parentModal.CloseModal();
