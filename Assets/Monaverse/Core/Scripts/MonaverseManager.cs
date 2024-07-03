@@ -16,6 +16,9 @@ namespace Monaverse.Core
         
         [Tooltip("Whether to show the sdk debug logs")]
         public bool showDebugLogs;
+        
+        [Tooltip("The default chain to use")]
+        public MonaWalletSDK.SupportedChainId defaultChain = MonaWalletSDK.SupportedChainId.Ethereum;
 
         public static MonaverseManager Instance { get; private set; }
         public MonaWalletSDK SDK { get; private set; }
@@ -57,7 +60,8 @@ namespace Monaverse.Core
             {
                 applicationId = Instance.monaApplicationId,
                 apiEnvironment = Instance.apiEnvironment,
-                showDebugLogs = Instance.showDebugLogs
+                showDebugLogs = Instance.showDebugLogs,
+                defaultChain = Instance.defaultChain
             };
 
             MonaDebug.IsEnabled = Instance.showDebugLogs;

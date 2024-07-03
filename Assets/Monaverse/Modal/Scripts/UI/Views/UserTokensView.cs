@@ -58,6 +58,17 @@ namespace Monaverse.Modal.UI.Views
                 _chainsDropdown.options.Add(
                     new TMP_Dropdown.OptionData(MonaverseManager.Instance.SDK.GetChainName(chain)));
 
+            var defaultChainId = MonaverseManager.Instance.SDK.Session.DefaultChainId;
+            if (defaultChainId > 0)
+            {
+                var defaultChainIndex = _chainsDropdown.options
+                    .FindIndex(x => 
+                        x.text == MonaverseManager.Instance.SDK.GetChainName(defaultChainId));
+                
+                if(defaultChainId != -1)
+                    _chainsDropdown.value = defaultChainIndex;
+            }
+            
             _walletsDropdown.onValueChanged.AddListener(OnWalletsDropdownChanged);
             _chainsDropdown.onValueChanged.AddListener(OnChainsDropdownChanged);
             _logoutButton.onClick.AddListener(OnLogoutClicked);

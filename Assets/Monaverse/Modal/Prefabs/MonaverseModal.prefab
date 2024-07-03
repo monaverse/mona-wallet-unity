@@ -12211,7 +12211,7 @@ MonoBehaviour:
   monaApplicationId: 
   apiEnvironment: 0
   showDebugLogs: 1
-  WalletConnectPrefab: {fileID: 7460216263507741112, guid: 348a888aa81464d59b5b4a88649f4612, type: 3}
+  defaultChain: 1
 --- !u!1 &8351409207785546021
 GameObject:
   m_ObjectHideFlags: 0
