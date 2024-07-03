@@ -35,6 +35,20 @@ namespace Monaverse.Core
             /// Whether to show the sdk debug logs
             /// </summary>
             public bool showDebugLogs;
+            
+            /// <summary>
+            /// 
+            /// </summary>
+            public SupportedChainId defaultChain;
+        }
+        
+        public enum SupportedChainId
+        {
+            Ethereum = 1,
+            Polygon = 137,
+            Arbitrum = 42161,
+            Optimism = 10,
+            Base = 8453
         }
         
         public SDKOptions Options { get; private set; }
@@ -72,6 +86,8 @@ namespace Monaverse.Core
             
             Session = new MonaverseSession(ApiClient.Session.AccessToken, ApiClient.Session.RefreshToken);
             Session.Load();
+
+            Session.SaveDefaultChainId((int)options.defaultChain);
             
             ApiClient.Session.OnClearSession += ()=>
             {
@@ -210,7 +226,6 @@ namespace Monaverse.Core
                 return ApiResult<GetUserTokensResponse>.Failed(exception.Message);
             }
         }
-
 
         /// <summary>
         /// Logs the user out of the Monaverse API

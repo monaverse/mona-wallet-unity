@@ -16,7 +16,11 @@ namespace Monaverse.Core.Utils
 
         public static int UpdatePlayerPrefs(this int value, string key)
         {
-            PlayerPrefs.SetInt(key, value);
+            if(value <= 0)
+                PlayerPrefs.DeleteKey(key);
+            else
+                PlayerPrefs.SetInt(key, value);
+            
             return value;
         }
     }

@@ -11,6 +11,8 @@ namespace Monaverse.Core
         public string EmailAddress { get; private set; }
         public string WalletAddress { get; private set; }
         
+        public int DefaultChainId { get; set; }
+        
         public HashSet<string> Wallets { get; set; }
         
         public bool IsAuthenticated => !string.IsNullOrEmpty(AccessToken);
@@ -25,6 +27,7 @@ namespace Monaverse.Core
         {
             EmailAddress = PlayerPrefs.GetString(MonaConstants.Session.SessionEmailKey);
             WalletAddress = PlayerPrefs.GetString(MonaConstants.Session.SessionWalletAddressKey);
+            DefaultChainId = PlayerPrefs.GetInt(MonaConstants.Session.SessionWalletAddressKey, 1);
         }
 
         internal void SaveSession(string accessToken, string refreshToken, string emailAddress)
@@ -40,10 +43,14 @@ namespace Monaverse.Core
         public string SaveWalletAddress(string walletAddress)
             => WalletAddress = walletAddress.UpdatePlayerPrefs(MonaConstants.Session.SessionWalletAddressKey);
 
+        public int SaveDefaultChainId(int chainId)
+            => DefaultChainId = chainId.UpdatePlayerPrefs(MonaConstants.Session.SessionWalletAddressKey);
+        
         internal void Clear()
         {
             WalletAddress = SaveWalletAddress(null);
             EmailAddress = SaveSessionEmail(null);
+            DefaultChainId = SaveDefaultChainId(1);
             AccessToken = null;
             RefreshToken = null;
         }
