@@ -6,6 +6,8 @@ namespace Monaverse.Api.MonaHttpClient
         public const string DefaultCharSet = "charset=utf-8" ;
         public const string DefaultContentType = "application/octet-stream" ;
         public const string JsonContentType = "application/json" ;
+        public const string TextContentType = "text/plain";
+        public const string HtmlContentType = "text/html";
         public const string AnyImageContentType = "image/*" ;
         
         public const string AcceptHeader = "Accept" ;

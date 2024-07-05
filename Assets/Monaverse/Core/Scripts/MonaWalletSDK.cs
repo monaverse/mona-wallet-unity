@@ -76,7 +76,11 @@ namespace Monaverse.Core
         
         public MonaWalletSDK(SDKOptions options)
         {
+            if(string.IsNullOrEmpty(options.applicationId))
+                MonaDebug.LogError("You must provide a Mona Application Id. Please visit https://studio.monaverse.com to get one.");
+            
             Options = options;
+            
             ApiClient = MonaApi.Init(new DefaultApiOptions
             {
                 ApplicationId = options.applicationId,
