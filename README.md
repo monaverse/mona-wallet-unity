@@ -43,7 +43,8 @@ It's the simplest and most minimal way to interact with the 3D tokens from your 
 
 ### Usage
 1. Install the SDK following the steps described above.
-3. Drag and drop the [MonaverseModal](https://github.com/monaverse/mona-wallet-unity/tree/main/Assets/Monaverse/Modal/Prefabs) prefab to the first scene in your game.
+2. Drag and drop the [MonaverseModal](https://github.com/monaverse/mona-wallet-unity/tree/main/Assets/Monaverse/Modal/Prefabs) prefab to the first scene in your game.
+3. Enter your `monaApplicationId` in the `MonaverseManager` inspector. You can get on at [MonaStudio](https://studio.monaverse.com/)
 4. Open the modal at any time after `Awake`
 
 ### Open Modal
