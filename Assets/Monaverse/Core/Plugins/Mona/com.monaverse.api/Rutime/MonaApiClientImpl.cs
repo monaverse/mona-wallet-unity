@@ -5,6 +5,7 @@ using Monaverse.Api.Extensions;
 using Monaverse.Api.Logging;
 using Monaverse.Api.Modules.Auth;
 using Monaverse.Api.Modules.Auth.Requests;
+using Monaverse.Api.Modules.Token;
 using Monaverse.Api.Modules.User;
 using Monaverse.Api.MonaHttpClient;
 using Monaverse.Api.MonaHttpClient.Request;
@@ -22,6 +23,7 @@ namespace Monaverse.Api
 
         public IAuthApiModule Auth { get; private set; }
         public IUserApiModule User { get; private set; }
+        public ITokenApiModule Token { get; private set; }
         
         public IMonaApiSession Session { get; }
 
@@ -37,6 +39,7 @@ namespace Monaverse.Api
             //Configure API modules
             Auth = new AuthApiModule(this, monaApiLogger);
             User = new UserApiModule(this);
+            Token = new TokenApiModule(this);
         }
 
         public bool IsAuthorized()

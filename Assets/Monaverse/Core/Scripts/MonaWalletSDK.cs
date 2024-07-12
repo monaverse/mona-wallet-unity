@@ -8,6 +8,8 @@ using Monaverse.Api.Configuration;
 using Monaverse.Api.Logging;
 using Monaverse.Api.Modules.Auth.Requests;
 using Monaverse.Api.Modules.Common;
+using Monaverse.Api.Modules.Token.Responses;
+using Monaverse.Api.Modules.User.Dtos;
 using Monaverse.Api.Modules.User.Responses;
 using Monaverse.Api.Options;
 using Monaverse.Core.Utils;
@@ -228,6 +230,35 @@ namespace Monaverse.Core
             {
                 MonaDebug.LogException(exception);
                 return ApiResult<GetUserTokensResponse>.Failed(exception.Message);
+            }
+        }
+        
+        /// <summary>
+        /// Gets the animation file for the specified token
+        /// </summary>
+        /// <param name="token"> The token to get the animation for. You can get this from the GetUserTokensResponse </param>
+        /// <returns> The animation file information </returns>
+        public async Task<ApiResult<GetTokenAnimationResponse>> GetTokenAnimation(TokenDto token)
+        {
+            try
+            {
+                if (!IsAuthenticated())
+                    return ApiResult<GetTokenAnimationResponse>.Failed("Not authenticated");
+                
+                if (token == null) 
+                    return ApiResult<GetTokenAnimationResponse>.Failed("Token cannot be null");
+                
+                var result = await ApiClient.Token
+                    .GetTokenAnimation(chainId: token.ChainId,
+                        contract: token.Contract,
+                        tokenId: token.TokenId);
+                
+                return result;
+            }
+            catch (Exception exception)
+            {
+                MonaDebug.LogException(exception);
+                return ApiResult<GetTokenAnimationResponse>.Failed(exception.Message);
             }
         }
 
