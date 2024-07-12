@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Monaverse.Api.Modules.Auth;
+using Monaverse.Api.Modules.Token;
 using Monaverse.Api.Modules.User;
 using Monaverse.Api.MonaHttpClient.Request;
 using Monaverse.Api.MonaHttpClient.Response;
@@ -11,6 +12,7 @@ namespace Monaverse.Api
     {
         IAuthApiModule Auth { get; }
         IUserApiModule User { get; }
+        ITokenApiModule Token { get; }
         IMonaApiSession Session { get; }
         bool IsAuthorized();
         

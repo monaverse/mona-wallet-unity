@@ -1,3 +1,5 @@
+using System.Numerics;
+
 namespace Monaverse.Api
 {
     internal static class Constants
@@ -37,6 +39,12 @@ namespace Monaverse.Api
             {
                 public const string GetUser = "public/user";
                 public static string GetUserTokens(int chainId, string address) => $"public/user/{chainId}/{address}/tokens";
+            }
+            
+            public static class Token
+            {
+                public static string GetTokenAnimation(BigInteger chainId, string contract, string tokenId) 
+                    => $"public/tokens/{chainId}/{contract}/{tokenId}/animation";
             }
         }
     }
