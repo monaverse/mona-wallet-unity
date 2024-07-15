@@ -206,7 +206,7 @@ namespace Monaverse.Core
         /// <summary>
         /// Gets the user's tokens from the Monaverse API for a specific chain and wallet address
         /// The wallet address supplied must be owned by the user
-        /// You can link your wallet address to your account in https://marketplace.monaverse.com/
+        /// You can link your wallet address to your account in https://monaverse.com/
         /// </summary>
         /// <param name="chainId"> The id of the chain to get the tokens for</param>
         /// <param name="address"> The wallet address to get the tokens for</param>

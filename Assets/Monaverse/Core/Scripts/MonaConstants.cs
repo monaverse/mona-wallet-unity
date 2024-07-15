@@ -19,7 +19,7 @@ namespace Monaverse.Core
 
         public class MonaversePages
         {
-            public const string Marketplace = "https://marketplace.monaverse.com";
+            public const string Marketplace = "https://monaverse.com";
         }
     }
 }
