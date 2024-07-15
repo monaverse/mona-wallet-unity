@@ -8,6 +8,8 @@ namespace Monaverse.Api.Session
         public string RefreshToken { get; private set; }
         public string LegacyAccessToken { get; private set; }
         public Action OnClearSession { get; set; }
+        
+        private const int RefreshTokenTtl = 2592000;
 
         public TokenSession()
         {
@@ -40,8 +42,9 @@ namespace Monaverse.Api.Session
 
             AccessToken = accessToken;
             RefreshToken = refreshToken;
+            
             PlayerPrefsObfuscator.Save(Constants.AccessKey, accessToken);
-            PlayerPrefsObfuscator.Save(Constants.RefreshKey, refreshToken);
+            PlayerPrefsObfuscator.Save(Constants.RefreshKey, refreshToken, RefreshTokenTtl);
         }
         
         public void ClearSession()
