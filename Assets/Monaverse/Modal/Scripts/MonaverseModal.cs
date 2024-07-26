@@ -58,12 +58,20 @@ namespace Monaverse.Modal
         public static event EventHandler<TokenDto> PreviewTokenClicked;
         
         /// <summary>
-        /// Called when a set of collectibles are loaded in the MonaverseModal Collectibles view
-        /// Only collectibles compatible with your application will be passed in this event
-        /// By default, all collectibles are loaded
+        /// Called when a set of tokens are loaded or updated from the Monaverse API
+        /// Only tokens compatible with your application will be passed in this event
+        /// By default, all tokens are loaded
         /// For custom compatibility, pass an optional filter function in the Open method 
         /// </summary>
         public static event EventHandler<List<TokenDto>> TokensLoaded;
+        
+        /// <summary>
+        /// Called when the MonaverseModal Tokens view is opened
+        /// This is a UI only event.
+        /// By default, all tokens are loaded
+        /// For custom compatibility, pass an optional filter function in the Open method 
+        /// </summary>
+        public static event EventHandler<List<TokenDto>> TokensViewOpened;
         
         /// <summary>
         /// Called when a collectible is selected in the Collectibles view
@@ -169,9 +177,9 @@ namespace Monaverse.Modal
             return false;
         }
         
-        internal static void TriggerImportTokenClicked(TokenDto collectibleDto)
+        internal static void TriggerImportTokenClicked(TokenDto tokenDto)
         {
-            ImportTokenClicked?.Invoke(Instance, collectibleDto);
+            ImportTokenClicked?.Invoke(Instance, tokenDto);
         }
         
         internal static void TriggerPreviewCollectibleClicked(TokenDto tokenDto)
@@ -185,14 +193,19 @@ namespace Monaverse.Modal
             PreviewTokenClicked.Invoke(Instance, tokenDto);
         }
         
-        internal static void TriggerTokensLoaded(List<TokenDto> collectibles)
+        internal static void TriggerTokensLoaded(List<TokenDto> tokens)
         {
-            TokensLoaded?.Invoke(Instance, collectibles);
+            TokensLoaded?.Invoke(Instance, tokens);
         }
         
-        internal static void TriggerTokenSelected(TokenDto collectibleDto)
+        internal static void TriggerTokensViewOpened(List<TokenDto> tokens)
         {
-            TokenSelected?.Invoke(Instance, collectibleDto);
+            TokensViewOpened?.Invoke(Instance, tokens);
+        }
+        
+        internal static void TriggerTokenSelected(TokenDto tokenDto)
+        {
+            TokenSelected?.Invoke(Instance, tokenDto);
         }
     }
 }

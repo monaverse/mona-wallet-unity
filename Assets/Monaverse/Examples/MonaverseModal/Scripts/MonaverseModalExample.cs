@@ -13,28 +13,34 @@ namespace Monaverse.Examples
         {
             MonaverseModal.ImportTokenClicked += OnImportTokenClicked;
             MonaverseModal.TokensLoaded += OnTokensLoaded;
+            MonaverseModal.TokensViewOpened += OnTokensViewOpened;
+        }
+
+        private void OnTokensViewOpened(object sender, List<TokenDto> tokens)
+        {
+            Debug.Log("[MonaverseModalExample.OnTokensViewOpened] loaded " + tokens.Count + " tokens");
         }
 
         /// <summary>
-        /// Called when a collectibles are loaded in the Monaverse Modal
+        /// Called when tokens are loaded from the Monaverse API
         /// </summary>
         /// <param name="sender"></param>
-        /// <param name="loadedCollectibles">A list of loaded collectibles</param>
-        private async void OnTokensLoaded(object sender, List<TokenDto> loadedCollectibles)
+        /// <param name="loadedTokens">A list of loaded tokens</param>
+        private async void OnTokensLoaded(object sender, List<TokenDto> loadedTokens)
         {
-            Debug.Log("[MonaverseModalExample.OnCollectiblesLoaded] loaded " + loadedCollectibles.Count + " collectibles");
-            await _compatibleItems.SetCollectibles(loadedCollectibles);
+            Debug.Log("[MonaverseModalExample.OnTokensLoaded] loaded " + loadedTokens.Count + " tokens");
+            await _compatibleItems.SetCollectibles(loadedTokens);
         }
 
         /// <summary>
-        /// Called when the import button is clicked in a collectible details view
+        /// Called when the import button is clicked in a token details view
         /// </summary>
         /// <param name="sender"></param>
-        /// <param name="collectible">The collectible selected for import</param>
-        private void OnImportTokenClicked(object sender, TokenDto collectible)
+        /// <param name="token">The token selected for import</param>
+        private void OnImportTokenClicked(object sender, TokenDto token)
         {
-            Debug.Log("[MonaverseModalExample.OnImportCollectibleClicked] " + collectible.Name);
-            _importedItem.SetCollectible(collectible);
+            Debug.Log("[MonaverseModalExample.OnImportTokenClicked] " + token.Name);
+            _importedItem.SetCollectible(token);
         }
         
         /// <summary>

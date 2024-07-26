@@ -62,22 +62,22 @@ namespace Monaverse.Modal.UI.Views
             if (defaultChainId > 0)
             {
                 var defaultChainIndex = _chainsDropdown.options
-                    .FindIndex(x => 
+                    .FindIndex(x =>
                         x.text == MonaverseManager.Instance.SDK.GetChainName(defaultChainId));
-                
-                if(defaultChainId != -1)
+
+                if (defaultChainId != -1)
                     _chainsDropdown.value = defaultChainIndex;
             }
-            
+
             _walletsDropdown.onValueChanged.AddListener(OnWalletsDropdownChanged);
             _chainsDropdown.onValueChanged.AddListener(OnChainsDropdownChanged);
             _logoutButton.onClick.AddListener(OnLogoutClicked);
             _marketplaceButton.onClick.AddListener(OnMarketplaceClicked);
-            
+
             //Disable for iOS
-            if(Application.platform == RuntimePlatform.IPhonePlayer)
+            if (Application.platform == RuntimePlatform.IPhonePlayer)
                 _marketplaceButton.gameObject.SetActive(false);
-            
+
             MonaverseManager.Instance.SDK.LoggedOut += OnLoggedOut;
         }
 
@@ -85,18 +85,23 @@ namespace Monaverse.Modal.UI.Views
         {
             base.OnOpened(options);
             parentModal.Header.EnableBackButton(false);
+            
             await GetUser();
+            UpdateHeader();
+            MonaverseModal.TriggerTokensViewOpened(_tokensCache.GetFilteredTokens());
         }
 
         public override void Hide()
         {
             base.Hide();
             StopAllCoroutines();
-            ResetCards();
         }
 
         private void ResetCards(bool flushCache = false)
         {
+            if(_cardsPool.Count == 0)
+                return;
+            
             for (var i = _cardsPool.Count - 1; i >= 0; i--)
             {
                 var card = _cardsPool[i];
@@ -141,7 +146,7 @@ namespace Monaverse.Modal.UI.Views
 
             if (getUserTokensResponse == null)
                 return;
-            
+
             _noItemsFound.SetActive(getUserTokensResponse.Tokens.Count == 0);
 
             _continuationToken = getUserTokensResponse.Continuation;
@@ -156,6 +161,8 @@ namespace Monaverse.Modal.UI.Views
             _usedCardsCount += getUserTokensResponse.Tokens.Count;
 
             _isPageLoading = false;
+            
+            UpdateHeader();
 
             if (_closeOnLoaded)
             {
@@ -166,8 +173,7 @@ namespace Monaverse.Modal.UI.Views
 
         private async Task RefreshView(IReadOnlyList<TokenDto> tokens)
         {
-            var chain = _chainsDropdown.options[_chainsDropdown.value].text;
-            parentModal.Header.Title = $"Your {chain} Tokens ({tokens?.Count})";
+            
 
             if (tokens.Count > _cardsPool.Count - _usedCardsCount)
                 await IncreaseCardsPoolSize(tokens.Count + _usedCardsCount);
@@ -242,6 +248,10 @@ namespace Monaverse.Modal.UI.Views
 
         private async Task GetUser()
         {
+            // Don't get user if we already have one
+            if(_user != null)
+                return;
+            
             try
             {
                 var result = await MonaverseManager.Instance.SDK.GetUser();
@@ -259,10 +269,7 @@ namespace Monaverse.Modal.UI.Views
                 _walletsDropdown.ClearOptions();
                 _walletsDropdown.AddOptions(_user.Wallets);
 
-                if (_tokensCache is { Count: > 0 })
-                    await RefreshView(_tokensCache);
-                else
-                    await LoadPage();
+                await LoadPage();
             }
             catch (Exception exception)
             {
@@ -318,6 +325,12 @@ namespace Monaverse.Modal.UI.Views
             }
         }
 
+        private void UpdateHeader()
+        {
+            var chain = _chainsDropdown.options[_chainsDropdown.value].text;
+            parentModal.Header.Title = $"Your {chain} Tokens ({_tokensCache?.Count})";
+        }
+
         private async void OnChainsDropdownChanged(int chainIndex)
         {
             ResetCards(true);
@@ -334,19 +347,20 @@ namespace Monaverse.Modal.UI.Views
         {
             MonaverseManager.Instance.SDK.Logout();
         }
-        
+
         private void OnMarketplaceClicked()
         {
             Application.OpenURL(MonaConstants.MonaversePages.Marketplace);
         }
-        
+
         private void OnLoggedOut(object sender, EventArgs e)
         {
-            _tokensCache.Clear();
-            
-            if(!IsActive)
+            _user = null;
+            ResetCards(true);
+
+            if (!IsActive)
                 return;
-            
+
             parentModal.CloseView();
             parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Error, "Logged Out");
         }
