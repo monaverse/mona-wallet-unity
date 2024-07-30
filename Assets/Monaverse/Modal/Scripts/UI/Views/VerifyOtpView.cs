@@ -19,8 +19,14 @@ namespace Monaverse.Modal.UI.Views
         private void Start()
         {
             _verifyOtpButton.onClick.AddListener(OnVerifyOtpButtonClicked);
+            _otpInputField.onValueChanged.AddListener(OnOtpInputValueChanged);
         }
-        
+
+        private void OnOtpInputValueChanged(string otpInput)
+        {
+            _verifyOtpButton.interactable = !string.IsNullOrEmpty(otpInput);
+        }
+
         protected override void OnOpened(object options = null)
         {
             if (options == null)
@@ -29,7 +35,7 @@ namespace Monaverse.Modal.UI.Views
                 return;
             }
             
-            _verifyOtpButton.interactable = true;
+            _verifyOtpButton.interactable = false;
             _emailAddress = (string) options;
             _emailText.text = _emailAddress;
             _otpInputField.text = string.Empty;
