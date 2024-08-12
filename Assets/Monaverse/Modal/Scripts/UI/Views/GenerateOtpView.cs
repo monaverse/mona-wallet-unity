@@ -1,5 +1,6 @@
 using System;
 using Monaverse.Core;
+using Monaverse.Core.Scripts.Utils;
 using Monaverse.Modal.UI.Components;
 using TMPro;
 using UnityEngine;
@@ -17,6 +18,12 @@ namespace Monaverse.Modal.UI.Views
         private void Start()
         {
             _generateOtpButton.onClick.AddListener(OnGenerateOtpButtonClicked);
+            _emailInputField.onValueChanged.AddListener(OnEmailInputValueChanged);
+        }
+
+        private void OnEmailInputValueChanged(string email)
+        {
+            _generateOtpButton.interactable = email.IsEmailValid();
         }
 
         protected override void OnOpened(object options = null)
@@ -27,7 +34,7 @@ namespace Monaverse.Modal.UI.Views
                 return;
             }
             
-            _generateOtpButton.interactable = true;
+            _generateOtpButton.interactable = _emailInputField.text.IsEmailValid();
         }
 
         private async void OnGenerateOtpButtonClicked()
