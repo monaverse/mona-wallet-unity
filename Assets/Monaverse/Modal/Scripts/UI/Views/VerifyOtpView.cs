@@ -1,5 +1,6 @@
 using System;
 using Monaverse.Core;
+using Monaverse.Core.Scripts.Utils;
 using Monaverse.Modal.UI.Components;
 using TMPro;
 using UnityEngine;
@@ -24,7 +25,7 @@ namespace Monaverse.Modal.UI.Views
 
         private void OnOtpInputValueChanged(string otpInput)
         {
-            _verifyOtpButton.interactable = !string.IsNullOrEmpty(otpInput);
+            _verifyOtpButton.interactable = otpInput.IsOtpValid();
         }
 
         protected override void OnOpened(object options = null)
@@ -35,10 +36,10 @@ namespace Monaverse.Modal.UI.Views
                 return;
             }
             
-            _verifyOtpButton.interactable = false;
             _emailAddress = (string) options;
             _emailText.text = _emailAddress;
             _otpInputField.text = string.Empty;
+            _verifyOtpButton.interactable = false;
         }
 
         private async void OnVerifyOtpButtonClicked()
