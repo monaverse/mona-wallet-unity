@@ -18,9 +18,9 @@ namespace Monaverse.Modal
 
         private List<MonaModalView> _views;
         private MonaModalView _defaultView;
-        
+
         internal static MonaverseModal Instance { get; private set; }
-        
+
         /// <summary>
         /// Returns true if the MonaverseModal is ready
         /// </summary>
@@ -32,17 +32,17 @@ namespace Monaverse.Modal
         /// An instance of the MonaverseModal prefab must exist in the scene
         /// </summary>
         public static event EventHandler Ready;
-        
+
         /// <summary>
         /// Called when the MonaverseModal is opened
         /// </summary>
         public static event EventHandler ModalOpened;
-        
+
         /// <summary>
         /// Called when the MonaverseModal is closed
         /// </summary>
         public static event EventHandler ModalClosed;
-        
+
         /// <summary>
         /// Called when the import button is clicked in a collectible details view
         /// Only collectibles compatible with your application can be imported
@@ -50,13 +50,13 @@ namespace Monaverse.Modal
         /// For custom compatibility, pass an optional filter function in the Open method
         /// </summary>
         public static event EventHandler<TokenDto> ImportTokenClicked;
-        
+
         /// <summary>
         /// This will override the default behavior of the preview button
         /// By default, it will open the respective URL in the browser
         /// </summary>
         public static event EventHandler<TokenDto> PreviewTokenClicked;
-        
+
         /// <summary>
         /// Called when a set of tokens are loaded or updated from the Monaverse API
         /// Only tokens compatible with your application will be passed in this event
@@ -64,7 +64,7 @@ namespace Monaverse.Modal
         /// For custom compatibility, pass an optional filter function in the Open method 
         /// </summary>
         public static event EventHandler<List<TokenDto>> TokensLoaded;
-        
+
         /// <summary>
         /// Called when the MonaverseModal Tokens view is opened
         /// This is a UI only event.
@@ -72,7 +72,7 @@ namespace Monaverse.Modal
         /// For custom compatibility, pass an optional filter function in the Open method 
         /// </summary>
         public static event EventHandler<List<TokenDto>> TokensViewOpened;
-        
+
         /// <summary>
         /// Called when a collectible is selected in the Collectibles view
         /// This is a UI only event.
@@ -80,51 +80,68 @@ namespace Monaverse.Modal
         /// and before the Collectible details view is opened
         /// </summary>
         public static event EventHandler<TokenDto> TokenSelected;
-        
-        public Func<TokenDto, bool> TokenFilter { get; private set; }
-        
+
+        public ModalOptions Options { get; private set; }
+
+        public class ModalOptions
+        {
+            /// <summary>
+            /// Set to false if you don't want to load the tokens UI after authentication.
+            /// Defaults to true
+            /// </summary>
+            public bool LoadTokensView { get; set; } = true;
+
+            /// <summary>
+            /// Optional filter for tokens. This will determine which tokens are compatible with your application
+            /// </summary>
+            public Func<TokenDto, bool> TokenFilter { get; set; } = null;
+        }
+
         private void Awake()
         {
             if (!TryConfigureSingleton())
                 return;
-            
+
             Initialize();
         }
-        
+
         /// <summary>
         /// This is the entry point for the Monaverse Modal
         /// Call this only after MonaverseModal is ready (After Awake).
         /// You may also listen to the Ready event before calling this
         /// An instance of the MonaverseModal must exist in the scene
         /// </summary>
-        /// <param name="tokenFilter">Optional filter for tokens. This will determine which tokens are compatible with your application</param>
-        public static void Open(Func<TokenDto, bool> tokenFilter = null)
+        /// <param name="options"> Optional parameters for the Monaverse Modal</param>
+        public static void Open(Action<ModalOptions> options = null)
         {
             if (!IsReady)
             {
                 MonaDebug.LogError("[MonaverseModal] MonaverseModal is not ready yet.");
                 return;
             }
-            
+
             if (Instance.Modal.IsOpen)
             {
                 Debug.LogWarning("[MonaverseModal] MonaverseModal is already open.");
                 return;
             }
-            
-            if(Instance._defaultView == null)
+
+            if (Instance._defaultView == null)
                 Instance._defaultView = Instance._views.Find(x => x is GenerateOtpView);
-           
+
             if (Instance._defaultView == null)
             {
                 Debug.LogError($"[MonaverseModal] No view found for {nameof(GenerateOtpView)}");
                 return;
             }
+
+            //Apply options
+            Instance.Options = new ModalOptions();
+            options?.Invoke(Instance.Options);
             
-            Instance.TokenFilter = tokenFilter;
             Instance.Modal.OpenView(Instance._defaultView);
         }
-        
+
         /// <summary>
         /// Forcefully closes the Monaverse Modal
         /// </summary>
@@ -135,21 +152,21 @@ namespace Monaverse.Modal
                 MonaDebug.LogError("[MonaverseModal] MonaverseModal is not ready yet.");
                 return;
             }
-            
+
             if (!Instance.Modal.IsOpen)
             {
                 Debug.LogWarning("[MonaverseModal] MonaverseModal is already closed.");
                 return;
             }
-            
+
             Instance.Modal.CloseModal();
         }
-        
+
         private static void Initialize()
         {
             Instance.Modal.Opened += (_, _) => ModalOpened?.Invoke(Instance, EventArgs.Empty);
             Instance.Modal.Closed += (_, _) => ModalClosed?.Invoke(Instance, EventArgs.Empty);
-            
+
             //Find and reference all existing modal views in children
             Instance._views = new List<MonaModalView>();
             foreach (Transform child in Instance.Modal.transform)
@@ -158,11 +175,11 @@ namespace Monaverse.Modal
                 if (view != null)
                     Instance._views.Add(view);
             }
-            
+
             IsReady = true;
             Ready?.Invoke(Instance, EventArgs.Empty);
         }
-        
+
         private bool TryConfigureSingleton()
         {
             if (Instance == null)
@@ -176,12 +193,12 @@ namespace Monaverse.Modal
             Destroy(gameObject);
             return false;
         }
-        
+
         internal static void TriggerImportTokenClicked(TokenDto tokenDto)
         {
             ImportTokenClicked?.Invoke(Instance, tokenDto);
         }
-        
+
         internal static void TriggerPreviewCollectibleClicked(TokenDto tokenDto)
         {
             if (PreviewTokenClicked == null)
@@ -189,20 +206,20 @@ namespace Monaverse.Modal
                 Application.OpenURL(tokenDto.GetMarketplaceUrl());
                 return;
             }
-            
+
             PreviewTokenClicked.Invoke(Instance, tokenDto);
         }
-        
+
         internal static void TriggerTokensLoaded(List<TokenDto> tokens)
         {
             TokensLoaded?.Invoke(Instance, tokens);
         }
-        
+
         internal static void TriggerTokensViewOpened(List<TokenDto> tokens)
         {
             TokensViewOpened?.Invoke(Instance, tokens);
         }
-        
+
         internal static void TriggerTokenSelected(TokenDto tokenDto)
         {
             TokenSelected?.Invoke(Instance, tokenDto);

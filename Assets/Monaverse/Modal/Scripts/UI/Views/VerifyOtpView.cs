@@ -50,15 +50,20 @@ namespace Monaverse.Modal.UI.Views
                 var result = await MonaverseManager.Instance.SDK
                     .VerifyOneTimePassword(_emailAddress, _otpInputField.text);
                 
-                _verifyOtpButton.interactable = true;
                 
                 if (result)
                 {
                     parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Success, "Login Successful");
-                    parentModal.OpenView(_getTokensView);
+                    
+                    if(MonaverseModal.Instance.Options.LoadTokensView)
+                        parentModal.OpenView(_getTokensView);
+                    else
+                        await parentModal.CloseModalWithDelay(1f);
+                    
                     return;
                 }
 
+                _verifyOtpButton.interactable = true;
                 parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Error, "Failed signing in");
             }
             catch (Exception exception)
