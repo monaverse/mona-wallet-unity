@@ -179,7 +179,7 @@ namespace Monaverse.Modal.UI.Views
                 await IncreaseCardsPoolSize(tokens.Count + _usedCardsCount);
 
             //Sort using the TokenFilter if any
-            if (MonaverseModal.Instance.TokenFilter != null)
+            if (MonaverseModal.Instance.Options.TokenFilter != null)
                 tokens = tokens.OrderBy(i => i.CanBeImported() ? 0 : 1).ToList();
 
             for (var i = 0; i < tokens.Count; i++)

@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Monaverse.Redcode.Awaiting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -108,6 +110,12 @@ namespace Monaverse.Modal.UI.Components
             DisableModal();
 
             Closed?.Invoke(this, EventArgs.Empty);
+        }
+
+        public async Task CloseModalWithDelay(float delay)
+        {
+            await new WaitForSeconds(delay);
+            CloseModal();
         }
 
         public IEnumerator ResizeModalRoutine(float targetHeight)

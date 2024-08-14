@@ -9,16 +9,17 @@ namespace Monaverse.Modal.UI.Extensions
     public static class TokenExtensions
     {
         public static bool CanBeImported(this TokenDto token)
-            => MonaverseModal.Instance.TokenFilter == null || MonaverseModal.Instance.TokenFilter(token);
+            => MonaverseModal.Instance.Options.TokenFilter == null
+               || MonaverseModal.Instance.Options.TokenFilter(token);
 
         public static List<TokenDto> GetFilteredTokens(this List<TokenDto> tokens)
-            => MonaverseModal.Instance.TokenFilter == null
+            => MonaverseModal.Instance.Options.TokenFilter == null
                 ? tokens
                 : tokens.FindAll(i =>
                 {
                     try
                     {
-                        return MonaverseModal.Instance.TokenFilter(i);
+                        return MonaverseModal.Instance.Options.TokenFilter(i);
                     }
                     catch (Exception e)
                     {
