@@ -55,9 +55,7 @@ MonaverseModal.Open();
 ```
 
 #### Modal Options
-You can configure the behavior of the modal using optional parameters that control how the modal behaves when opened. 
-
-This is done by passing a lambda expression to the Open method, which allows you to set various options.
+You can configure the behavior of the modal using optional parameters that control how the modal behaves when opened. This is done by passing a lambda expression to the Open method, which allows you to set various options.
 
 - **LoadTokensView**: Set to false if you don't want to load the tokens UI after authentication.
 _Default: true_
