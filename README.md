@@ -54,11 +54,38 @@ From your code, use this to open the modal.
 MonaverseModal.Open();
 ```
 
-You may pass an optional filter function used to determine compatibility with your game.
+#### Modal Options
+You can configure the behavior of the modal using optional parameters that control how the modal behaves when opened. This is done by passing a lambda expression to the Open method, which allows you to set various options.
+
+- **LoadTokensView**: Set to false if you don't want to load the tokens UI after authentication.
+_Default: true_
+
+```csharp
+MonaverseModal.Open(options =>
+{
+    options.LoadTokensView = false;
+});
+```
+
+
+- **TokenFilter**: An optional filter function used to determine which tokens are compatible with your application.
+_Default: null (No filtering)_
+
 
 ```c#
-//Example: Filter tokens by kind
-MonaverseModal.Open(token => token.Kind == "erc1155");
+MonaverseModal.Open(options =>
+{
+    options.TokenFilter = token => token.Kind == "erc1155";
+});
+```
+
+You can combine multiple options to customize the behavior further:
+```csharp
+MonaverseModal.Open(options =>
+{
+    options.LoadTokensView = false;
+    options.TokenFilter = token => token.Kind == "erc1155";
+}); 
 ```
 
 ### Modal Flow
