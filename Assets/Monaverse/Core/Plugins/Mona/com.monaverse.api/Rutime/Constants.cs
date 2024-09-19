@@ -46,6 +46,11 @@ namespace Monaverse.Api
                 public static string GetTokenAnimation(BigInteger chainId, string contract, string tokenId) 
                     => $"public/tokens/{chainId}/{contract}/{tokenId}/animation";
             }
+            
+            public static class Leaderboard
+            { 
+                public const string PostScore = "public/leaderboards/sdk/score";
+            }
         }
     }
 }
