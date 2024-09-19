@@ -5,6 +5,7 @@ using Monaverse.Api.Extensions;
 using Monaverse.Api.Logging;
 using Monaverse.Api.Modules.Auth;
 using Monaverse.Api.Modules.Auth.Requests;
+using Monaverse.Api.Modules.Leaderboard;
 using Monaverse.Api.Modules.Token;
 using Monaverse.Api.Modules.User;
 using Monaverse.Api.MonaHttpClient;
@@ -24,6 +25,7 @@ namespace Monaverse.Api
         public IAuthApiModule Auth { get; private set; }
         public IUserApiModule User { get; private set; }
         public ITokenApiModule Token { get; private set; }
+        public ILeaderboardApiModule Leaderboard { get; private set; }
         
         public IMonaApiSession Session { get; }
 
@@ -40,6 +42,7 @@ namespace Monaverse.Api
             Auth = new AuthApiModule(this, monaApiLogger);
             User = new UserApiModule(this);
             Token = new TokenApiModule(this);
+            Leaderboard = new LeaderboardApiModule(this);
         }
 
         public bool IsAuthorized()

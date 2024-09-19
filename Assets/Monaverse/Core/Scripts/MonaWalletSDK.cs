@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,10 +9,12 @@ using Monaverse.Api.Configuration;
 using Monaverse.Api.Logging;
 using Monaverse.Api.Modules.Auth.Requests;
 using Monaverse.Api.Modules.Common;
+using Monaverse.Api.Modules.Leaderboard;
 using Monaverse.Api.Modules.Token.Responses;
 using Monaverse.Api.Modules.User.Dtos;
 using Monaverse.Api.Modules.User.Responses;
 using Monaverse.Api.Options;
+using Monaverse.Core.Scripts.Utils;
 using Monaverse.Core.Utils;
 
 namespace Monaverse.Core
@@ -27,7 +30,7 @@ namespace Monaverse.Core
             /// Monaverse Application ID.
             /// </summary>
             public string applicationId;
-            
+
             /// <summary>
             /// The Monaverse API environment to use.
             /// </summary>
@@ -37,13 +40,13 @@ namespace Monaverse.Core
             /// Whether to show the sdk debug logs
             /// </summary>
             public bool showDebugLogs;
-            
+
             /// <summary>
             /// 
             /// </summary>
             public SupportedChainId defaultChain;
         }
-        
+
         public enum SupportedChainId
         {
             Ethereum = 1,
@@ -52,13 +55,13 @@ namespace Monaverse.Core
             Optimism = 10,
             Base = 8453
         }
-        
+
         public SDKOptions Options { get; private set; }
         public IMonaApiClient ApiClient { get; internal set; }
         public MonaverseSession Session { get; private set; }
-        
+
         public static SynchronizationContext UnitySyncContext { get; private set; }
-        
+
         /// <summary>
         /// Event raised when the user is logged out
         /// </summary>
@@ -68,39 +71,40 @@ namespace Monaverse.Core
         /// Event raised when the user is authenticated with the Monaverse API
         /// </summary>
         public event EventHandler Authenticated;
-        
+
         /// <summary>
         /// Event raised when the user's wallet is not authorized
         /// An authorization result is passed as a parameter
         /// </summary>
         public event EventHandler<string> AuthenticationFailed;
 
-        
+        private string _secret;
+
         public MonaWalletSDK(SDKOptions options)
         {
-            if(string.IsNullOrEmpty(options.applicationId))
+            if (string.IsNullOrEmpty(options.applicationId))
                 MonaDebug.LogError("You must provide a Mona Application Id. Please visit https://studio.monaverse.com to get one.");
-            
+
             Options = options;
-            
+
             ApiClient = MonaApi.Init(new DefaultApiOptions
             {
                 ApplicationId = options.applicationId,
                 Environment = options.apiEnvironment,
-                LogLevel = options.showDebugLogs? ApiLogLevel.Info : ApiLogLevel.Off
+                LogLevel = options.showDebugLogs ? ApiLogLevel.Info : ApiLogLevel.Off
             });
-            
+
             Session = new MonaverseSession(ApiClient.Session.AccessToken, ApiClient.Session.RefreshToken);
             Session.Load();
 
             Session.SaveDefaultChainId((int)options.defaultChain);
-            
-            ApiClient.Session.OnClearSession += ()=>
+
+            ApiClient.Session.OnClearSession += () =>
             {
                 Session.Clear();
                 OnLoggedOut();
             };
-            
+
             var currentSyncContext = SynchronizationContext.Current;
             if (currentSyncContext.GetType().FullName != "UnityEngine.UnitySynchronizationContext")
                 throw new Exception(
@@ -123,7 +127,7 @@ namespace Monaverse.Core
                     {
                         Email = email
                     });
-                
+
                 return result.IsSuccess;
             }
             catch (Exception exception)
@@ -132,7 +136,7 @@ namespace Monaverse.Core
                 return false;
             }
         }
-        
+
         /// <summary>
         /// Verifies a one time password
         /// if successful, the user will be logged in and the session will be saved
@@ -157,13 +161,13 @@ namespace Monaverse.Core
                     OnAuthenticationFailed(result.Message);
                     return false;
                 }
-                
-                Session.SaveSession(accessToken: result.Data.Access, 
+
+                Session.SaveSession(accessToken: result.Data.Access,
                     refreshToken: result.Data.Refresh,
                     emailAddress: email);
-                
+
                 OnAuthenticated();
-                
+
                 return true;
             }
             catch (Exception exception)
@@ -184,13 +188,13 @@ namespace Monaverse.Core
             try
             {
                 if (!IsAuthenticated())
-                    return ApiResult<GetUserResponse>.Failed("Not authenticated");   
-                
+                    return ApiResult<GetUserResponse>.Failed("Not authenticated");
+
                 var result = await ApiClient.User
                     .GetUser();
 
                 if (!result.IsSuccess) return result;
-                
+
                 Session.Wallets = result.Data.Wallets.ToHashSet();
                 Session.SaveSessionEmail(result.Data.Email);
 
@@ -202,7 +206,7 @@ namespace Monaverse.Core
                 return ApiResult<GetUserResponse>.Failed(exception.Message);
             }
         }
-        
+
         /// <summary>
         /// Gets the user's tokens from the Monaverse API for a specific chain and wallet address
         /// The wallet address supplied must be owned by the user
@@ -216,14 +220,14 @@ namespace Monaverse.Core
             try
             {
                 if (!IsAuthenticated())
-                    return ApiResult<GetUserTokensResponse>.Failed("Not authenticated");                    
-                
+                    return ApiResult<GetUserTokensResponse>.Failed("Not authenticated");
+
                 var result = await ApiClient.User
                     .GetUserTokens(chainId: chainId,
                         address: address);
 
-               //TODO: Do some caching here
-                
+                //TODO: Do some caching here
+
                 return result;
             }
             catch (Exception exception)
@@ -232,7 +236,7 @@ namespace Monaverse.Core
                 return ApiResult<GetUserTokensResponse>.Failed(exception.Message);
             }
         }
-        
+
         /// <summary>
         /// Gets the animation file for the specified token
         /// </summary>
@@ -244,15 +248,15 @@ namespace Monaverse.Core
             {
                 if (!IsAuthenticated())
                     return ApiResult<GetTokenAnimationResponse>.Failed("Not authenticated");
-                
-                if (token == null) 
+
+                if (token == null)
                     return ApiResult<GetTokenAnimationResponse>.Failed("Token cannot be null");
-                
+
                 var result = await ApiClient.Token
                     .GetTokenAnimation(chainId: token.ChainId,
                         contract: token.Contract,
                         tokenId: token.TokenId);
-                
+
                 return result;
             }
             catch (Exception exception)
@@ -262,6 +266,60 @@ namespace Monaverse.Core
             }
         }
 
+
+        /// <summary>
+        /// Posts a score to the application leaderboard
+        /// </summary>
+        /// <param name="score">The score to post</param>
+        /// <param name="topic">The topic to post the score to (optional). i.e. "Level 1", "Halloween Special", etc.
+        /// Scores will be grouped by topic if provided. If not provided, the score will be posted with no topic </param>
+        /// <param name="sdkSecret"> (Optional) The SDK secret to use. Alternatively, use SetSecret()</param>
+        /// <returns> The result of the request </returns>
+        public async Task<ApiResult> PostScore(float score, string topic = null, string sdkSecret = null)
+        {
+            try
+            {
+                if (!IsAuthenticated())
+                    return ApiResult<GetTokenAnimationResponse>.Failed("Not authenticated");
+
+                if (!string.IsNullOrEmpty(sdkSecret))
+                    SetSecret(sdkSecret);
+
+                if (string.IsNullOrEmpty(_secret))
+                    return ApiResult<GetTokenAnimationResponse>.Failed("SDK Secret not set. Use SetSecret() to set it.");
+
+                var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                var formattedScore = score.ToString("F3", CultureInfo.InvariantCulture); // Fixed to 3 decimal places
+                var message = $"{formattedScore}:{timestamp}:{topic}";
+                var signature = message.GenerateHmac(_secret);
+
+                var result = await ApiClient.Leaderboard
+                    .PostScore(new PostScoreRequest
+                    {
+                        Score = score,
+                        Topic = topic,
+                        Timestamp = timestamp,
+                        Signature = signature
+                    });
+
+                return result;
+            }
+            catch (Exception exception)
+            {
+                MonaDebug.LogException(exception);
+                return ApiResult.Failed(exception.Message);
+            }
+        }
+
+        /// <summary>
+        /// Sets the SDK secret for the Monaverse API.
+        /// You can find your SDK Secret in the Monaverse Studio Dashboard
+        /// For security reasons, do not serialize this secret in your code (Component serialized fields) 
+        /// </summary>
+        /// <param name="sdkSecret"></param>
+        public void SetSecret(string sdkSecret)
+            => _secret = sdkSecret;
+
         /// <summary>
         /// Logs the user out of the Monaverse API
         /// It clears any stored credentials
@@ -270,9 +328,8 @@ namespace Monaverse.Core
         {
             //Clear session
             ApiClient.Session.ClearSession();
-
         }
-        
+
         /// <summary>
         /// Returns true if the there is an active session with the Monaverse API.
         /// This must be true before you can call any authenticated API endpoints
@@ -293,7 +350,7 @@ namespace Monaverse.Core
         {
             return ChainHelper.SupportedChains();
         }
-        
+
         /// <summary>
         /// Returns the name of the chain with the specified chain id
         /// </summary>
@@ -305,31 +362,22 @@ namespace Monaverse.Core
         }
 
         #endregion
-        
+
         #region Events Handlers
 
         private void OnAuthenticated()
         {
-            UnitySyncContext.Post(_ =>
-            {
-                Authenticated?.Invoke(this, EventArgs.Empty);
-            }, null);
+            UnitySyncContext.Post(_ => { Authenticated?.Invoke(this, EventArgs.Empty); }, null);
         }
-        
+
         private void OnLoggedOut()
         {
-            UnitySyncContext.Post(_ =>
-            {
-                LoggedOut?.Invoke(this, EventArgs.Empty);
-            }, null);
+            UnitySyncContext.Post(_ => { LoggedOut?.Invoke(this, EventArgs.Empty); }, null);
         }
 
         private void OnAuthenticationFailed(string errorMessage)
         {
-            UnitySyncContext.Post(_ =>
-            {
-                AuthenticationFailed?.Invoke(this, errorMessage);
-            }, null);
+            UnitySyncContext.Post(_ => { AuthenticationFailed?.Invoke(this, errorMessage); }, null);
         }
 
         #endregion
