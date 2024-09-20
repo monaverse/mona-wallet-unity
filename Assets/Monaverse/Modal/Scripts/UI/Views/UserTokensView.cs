@@ -289,6 +289,13 @@ namespace Monaverse.Modal.UI.Views
                     return null;
                 }
 
+                //Check if selected wallet exists in dropdown
+                if (_walletsDropdown.options.Count <= _walletsDropdown.value)
+                {
+                    parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Error, "No wallets linked");
+                    return null;
+                }
+                
                 var wallet = _walletsDropdown.options[_walletsDropdown.value].text;
 
                 if (string.IsNullOrEmpty(wallet))
