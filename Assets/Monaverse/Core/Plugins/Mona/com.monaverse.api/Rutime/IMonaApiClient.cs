@@ -16,6 +16,7 @@ namespace Monaverse.Api
         ITokenApiModule Token { get; }
         IMonaApiSession Session { get; }
         ILeaderboardApiModule Leaderboard { get; }
+        string ApplicationId { get; }
         bool IsAuthorized();
         
         string GetUrlWithPath(string path);

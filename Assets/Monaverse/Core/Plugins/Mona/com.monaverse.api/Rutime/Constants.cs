@@ -50,6 +50,8 @@ namespace Monaverse.Api
             public static class Leaderboard
             { 
                 public const string PostScore = "public/leaderboards/sdk/score";
+                public static string GetTopScores(string applicationId) 
+                    => $"public/leaderboards/{applicationId}/top-scores";
             }
         }
     }

@@ -28,6 +28,8 @@ namespace Monaverse.Api
         public ILeaderboardApiModule Leaderboard { get; private set; }
         
         public IMonaApiSession Session { get; }
+        
+        public string ApplicationId => _monaApiOptions.ApplicationId;
 
         public MonaApiClientImpl(IMonaApiOptions monaApiOptions,
             IMonaApiLogger monaApiLogger,
