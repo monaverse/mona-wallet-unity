@@ -319,7 +319,7 @@ namespace Monaverse.Core
         /// <param name="limit"> The maximum number of scores to return per page </param>
         /// <param name="offset"> The offset of the first score to return </param>
         /// <param name="featured"> If true, only returns featured topic scores and topic parameter is ignored </param>
-        /// <param name="sortingOrder"></param>
+        /// <param name="sortingOrder"> The sorting order to use i.e. "highest", "lowest" </param>
         /// <param name="topic"> The topic to get scores for i.e. "Level 1", "Halloween Special", etc.
         /// If featured is true, this parameter is ignored </param>
         /// <param name="period"> The period to get scores for i.e. "all_time", "daily", "weekly", "monthly" </param>
@@ -371,6 +371,64 @@ namespace Monaverse.Core
             {
                 MonaDebug.LogException(exception);
                 return ApiResult<GetTopScoresResponse>.Failed(exception.Message);
+            }
+        }
+
+        /// <summary>
+        /// Gets the user's rank in the leaderboard
+        /// </summary>
+        /// <param name="featured"> If true, only returns ranking for featured leaderboard and topic parameter is ignored </param>
+        /// <param name="sortingOrder"> The sorting order to use i.e. "highest", "lowest" </param>
+        /// <param name="topic"> The topic to get ranking for i.e. "Level 1", "Halloween Special", etc.
+        /// If featured is true, this parameter is ignored </param>
+        /// <param name="period"> The period to get ranking for i.e. "all_time", "daily", "weekly", "monthly" </param>
+        /// <param name="startTime"> Custom start time for ranking. If provided, end time must also be provided </param>
+        /// <param name="endTime"> Custom end time for ranking. If provided, start time must also be provided </param>
+        /// <param name="includeAllUserScores"> If true, includes all user scores for rank calculation </param>
+        /// <returns></returns>
+        public async Task<ApiResult<GetUserRankResponse>> GetUserRank(
+            bool featured = false,
+            string topic = null,
+            LeaderboardSortingOrder sortingOrder = LeaderboardSortingOrder.Highest,
+            LeaderboardPeriod period = LeaderboardPeriod.AllTime,
+            DateTime? startTime = null,
+            DateTime? endTime = null,
+            bool includeAllUserScores = false)
+        {
+            try
+            {
+                if (!IsAuthenticated())
+                    return ApiResult<GetUserRankResponse>.Failed("Not authenticated");
+
+                if(featured && !string.IsNullOrEmpty(topic))
+                    MonaDebug.LogWarning($"Topic {topic} parameter is ignored when featured is true");
+                
+                if(startTime != null && endTime == null)
+                    return ApiResult<GetUserRankResponse>.Failed("End time must be provided if start time is provided");
+                
+                if(endTime != null && startTime == null)
+                    return ApiResult<GetUserRankResponse>.Failed("Start time must be provided if end time is provided");
+                
+                //Check that start and end times are valid
+                if(startTime > endTime)
+                    return ApiResult<GetUserRankResponse>.Failed("Start time cannot be after end time");
+
+                var response = await ApiClient.Leaderboard
+                    .GetUserRank(
+                        featured: featured,
+                        topic: topic,
+                        sortingOrder: sortingOrder,
+                        period: period,
+                        startTime: startTime,
+                        endTime: endTime,
+                        includeAllUserScores: includeAllUserScores);
+                
+                return response;
+            }
+            catch (Exception exception)
+            {
+                MonaDebug.LogException(exception);
+                return ApiResult<GetUserRankResponse>.Failed(exception.Message);
             }
         }
 

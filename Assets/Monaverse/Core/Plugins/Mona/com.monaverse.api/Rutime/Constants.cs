@@ -52,6 +52,8 @@ namespace Monaverse.Api
                 public const string PostScore = "public/leaderboards/sdk/score";
                 public static string GetTopScores(string applicationId) 
                     => $"public/leaderboards/{applicationId}/top-scores";
+                
+                public const string GetUserRank = "public/leaderboards/rank";
             }
         }
     }

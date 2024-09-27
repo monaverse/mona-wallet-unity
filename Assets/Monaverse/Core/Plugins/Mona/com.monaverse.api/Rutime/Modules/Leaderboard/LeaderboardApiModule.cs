@@ -48,7 +48,34 @@ namespace Monaverse.Api.Modules.Leaderboard
             var response = await _monaApiClient.Send(monaHttpRequest);
             return response.ConvertTo<GetTopScoresResponse>();
         }
-        
+
+        public async Task<ApiResult<GetUserRankResponse>> GetUserRank(
+            bool featured = false,
+            string topic = null,
+            LeaderboardSortingOrder sortingOrder = LeaderboardSortingOrder.Highest,
+            LeaderboardPeriod period = LeaderboardPeriod.AllTime,
+            DateTime? startTime = null,
+            DateTime? endTime = null,
+            bool includeAllUserScores = false
+        )
+        {
+            var monaHttpRequest = new MonaHttpRequest(
+                url: _monaApiClient.GetUrlWithPath(Constants.Endpoints.Leaderboard.GetUserRank),
+                method: RequestMethod.Get);
+
+            monaHttpRequest
+                .WithQueryParam(nameof(featured), featured)
+                .WithQueryParam(nameof(topic), topic)
+                .WithQueryParam("sorting_order", sortingOrder.ConvertToString())
+                .WithQueryParam(nameof(period), period.ConvertToString())
+                .WithQueryParam("start_time", startTime?.ToString("O", CultureInfo.InvariantCulture))
+                .WithQueryParam("end_time", endTime?.ToString("O", CultureInfo.InvariantCulture))
+                .WithQueryParam("include_all_user_scores", includeAllUserScores);
+
+            var response = await _monaApiClient.SendAuthenticated(monaHttpRequest);
+            return response.ConvertTo<GetUserRankResponse>();
+        }
+
         public async Task<ApiResult> PostScore(PostScoreRequest request)
         {
             var monaHttpRequest = new MonaHttpRequest(
