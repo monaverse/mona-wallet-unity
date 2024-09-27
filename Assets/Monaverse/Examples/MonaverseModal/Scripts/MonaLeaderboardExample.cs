@@ -45,6 +45,19 @@ namespace Monaverse.Examples
                     includeAllUserScores: _includeAllUserScores);
             Debug.Log(result);
         }
+        
+        [ContextMenu("Get User Rank")]
+        public async void GetUserRank()
+        {
+            var result = await MonaverseManager.Instance.SDK
+                .GetUserRank(
+                    featured: _featured,
+                    topic: _topScoresTopic,
+                    sortingOrder: _sortingOrder,
+                    period: _period,
+                    includeAllUserScores: _includeAllUserScores);
+            Debug.Log(result);
+        }
 
         [ContextMenu("Post Score")]
         public async void PostScore()

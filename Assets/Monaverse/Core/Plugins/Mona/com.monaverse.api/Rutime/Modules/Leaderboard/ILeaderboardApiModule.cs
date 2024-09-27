@@ -19,6 +19,16 @@ namespace Monaverse.Api.Modules.Leaderboard
             DateTime? endTime = null,
             bool includeAllUserScores = false
         );
+
+        Task<ApiResult<GetUserRankResponse>> GetUserRank(
+            bool featured = false,
+            string topic = null,
+            LeaderboardSortingOrder sortingOrder = LeaderboardSortingOrder.Highest,
+            LeaderboardPeriod period = LeaderboardPeriod.AllTime,
+            DateTime? startTime = null,
+            DateTime? endTime = null,
+            bool includeAllUserScores = false
+        );
         
         Task<ApiResult> PostScore(PostScoreRequest request);
     }

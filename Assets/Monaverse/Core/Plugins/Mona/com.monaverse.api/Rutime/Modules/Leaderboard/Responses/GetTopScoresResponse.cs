@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Monaverse.Api.Modules.Leaderboard.Responses
 {
@@ -11,6 +12,7 @@ namespace Monaverse.Api.Modules.Leaderboard.Responses
             public TopScoreUser User { get; set; }
             public float Score { get; set; }
             public string Topic { get; set; }
+            [JsonProperty("created_at")]
             public DateTime CreatedAt { get; set; }
             public int Rank { get; set; }
         }
