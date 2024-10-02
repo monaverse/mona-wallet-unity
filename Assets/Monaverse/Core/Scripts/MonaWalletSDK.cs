@@ -217,7 +217,7 @@ namespace Monaverse.Core
         /// <param name="chainId"> The id of the chain to get the tokens for</param>
         /// <param name="address"> The wallet address to get the tokens for</param>
         /// <returns> The user's tokens for the specified chain and wallet address </returns>
-        public async Task<ApiResult<GetUserTokensResponse>> GetUserTokens(int chainId, string address)
+        public async Task<ApiResult<GetUserTokensResponse>> GetUserTokens(int chainId, string address, string continuation = null)
         {
             try
             {
@@ -226,7 +226,8 @@ namespace Monaverse.Core
 
                 var result = await ApiClient.User
                     .GetUserTokens(chainId: chainId,
-                        address: address);
+                        address: address,
+                        continuation: continuation);
 
                 //TODO: Do some caching here
 

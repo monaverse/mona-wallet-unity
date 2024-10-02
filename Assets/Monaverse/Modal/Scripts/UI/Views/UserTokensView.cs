@@ -40,7 +40,7 @@ namespace Monaverse.Modal.UI.Views
         private MonaListItem _cardPrefab;
 
         [SerializeField, Range(0.01f, 0.9f)]
-        private float _loadThreshold = 0.5f;
+        private float _loadThreshold = 0.2f;
 
         private readonly Dictionary<string, MonaRemoteSprite> _sprites = new();
 
@@ -157,7 +157,7 @@ namespace Monaverse.Modal.UI.Views
             //Filter using the CollectibleFilter
             MonaverseModal.TriggerTokensLoaded(tokens.GetFilteredTokens());
 
-            _tokensCache = tokens;
+            _tokensCache.AddRange(tokens);
             _usedCardsCount += getUserTokensResponse.Tokens.Count;
 
             _isPageLoading = false;
@@ -173,8 +173,6 @@ namespace Monaverse.Modal.UI.Views
 
         private async Task RefreshView(IReadOnlyList<TokenDto> tokens)
         {
-            
-
             if (tokens.Count > _cardsPool.Count - _usedCardsCount)
                 await IncreaseCardsPoolSize(tokens.Count + _usedCardsCount);
 
@@ -306,7 +304,8 @@ namespace Monaverse.Modal.UI.Views
 
                 var result = await MonaverseManager.Instance.SDK
                     .GetUserTokens(chainId: chainId,
-                        address: wallet);
+                        address: wallet,
+                        continuation: _continuationToken);
 
                 if (!result.IsSuccess)
                 {
