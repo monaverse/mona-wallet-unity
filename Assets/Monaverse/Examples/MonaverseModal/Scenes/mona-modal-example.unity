@@ -942,8 +942,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da99e7dd1a1041eeb45dd8f0b7c65784, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _limit: 20
+  _offset: 0
+  _featured: 0
+  _topScoresTopic: 
+  _sortingOrder: 0
+  _period: 3
+  _includeAllUserScores: 0
   _score: 25
-  _topic: 
+  _postScoreTopic: 
 --- !u!4 &1281417294
 Transform:
   m_ObjectHideFlags: 0
