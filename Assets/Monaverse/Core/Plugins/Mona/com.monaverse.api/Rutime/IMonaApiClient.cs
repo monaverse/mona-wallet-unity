@@ -20,10 +20,7 @@ namespace Monaverse.Api
         bool IsAuthorized();
         
         string GetUrlWithPath(string path);
-        string GetUrlWithPathLegacy(string path);
-
         Task<IMonaHttpResponse> Send(IMonaHttpRequest request);
-        Task<IMonaHttpResponse> SendLegacy(IMonaHttpRequest request);
         Task<IMonaHttpResponse> SendAuthenticated(IMonaHttpRequest request);
     }
 }

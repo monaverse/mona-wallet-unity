@@ -77,9 +77,6 @@ namespace Monaverse.Api
         public string GetUrlWithPath(string path)
             => _monaApiOptions.GetUrlWithPath(path);
 
-        public string GetUrlWithPathLegacy(string path)
-            => _monaApiOptions.GetUrlWithPathLegacy(path);
-
         public async Task<IMonaHttpResponse> Send(IMonaHttpRequest request)
         {
             // Add the application id to every request
@@ -125,18 +122,6 @@ namespace Monaverse.Api
             }
 
             return response;
-        }
-
-        public async Task<IMonaHttpResponse> SendLegacy(IMonaHttpRequest request)
-        {
-            // Add the application id to every request
-            request.WithHeader(Constants.ApplicationIdHeader, _monaApiOptions.ApplicationId);
-
-            // Add the access token if there is one
-            if (!string.IsNullOrEmpty(Session.LegacyAccessToken))
-                request.WithBearerToken(Session.LegacyAccessToken);
-
-            return await _monaHttpClient.SendAsync(request);
         }
     }
 }
