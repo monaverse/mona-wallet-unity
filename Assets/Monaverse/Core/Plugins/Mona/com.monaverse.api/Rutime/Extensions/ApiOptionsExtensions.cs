@@ -5,9 +5,6 @@ namespace Monaverse.Api.Extensions
 {
     public static class ApiOptionsExtensions
     {
-        public static string GetUrlWithPathLegacy(this IMonaApiOptions monaApiOptions, string path)
-            => new Uri(new Uri(monaApiOptions.Environment.ResolveLegacyHost()), path).AbsoluteUri;
-        
         public static string GetUrlWithPath(this IMonaApiOptions monaApiOptions, string path)
             => new Uri(new Uri(monaApiOptions.Environment.ResolveHost()), path).AbsoluteUri;
 
