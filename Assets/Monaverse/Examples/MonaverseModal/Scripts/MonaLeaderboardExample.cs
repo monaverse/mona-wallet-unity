@@ -1,4 +1,3 @@
-using System;
 using Monaverse.Api.Modules.Leaderboard.Enums;
 using Monaverse.Core;
 using UnityEngine;
@@ -56,6 +55,20 @@ namespace Monaverse.Examples
                     sortingOrder: _sortingOrder,
                     period: _period,
                     includeAllUserScores: _includeAllUserScores);
+            Debug.Log(result);
+        }
+        
+        [ContextMenu("Get Around Me Scores")]
+        public async void GetAroundMeScores()
+        {
+            var result = await MonaverseManager.Instance.SDK
+                .GetAroundMeScores(
+                    featured: _featured,
+                    topic: _topScoresTopic,
+                    sortingOrder: _sortingOrder,
+                    period: _period,
+                    includeAllUserScores: _includeAllUserScores,
+                    limit: _limit);
             Debug.Log(result);
         }
 

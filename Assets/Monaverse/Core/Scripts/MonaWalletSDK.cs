@@ -12,6 +12,7 @@ using Monaverse.Api.Modules.Common;
 using Monaverse.Api.Modules.Leaderboard;
 using Monaverse.Api.Modules.Leaderboard.Enums;
 using Monaverse.Api.Modules.Leaderboard.Responses;
+using Monaverse.Api.Modules.Leaderboard.Responses.Common;
 using Monaverse.Api.Modules.Token.Responses;
 using Monaverse.Api.Modules.User.Dtos;
 using Monaverse.Api.Modules.User.Responses;
@@ -430,6 +431,67 @@ namespace Monaverse.Core
             {
                 MonaDebug.LogException(exception);
                 return ApiResult<GetUserRankResponse>.Failed(exception.Message);
+            }
+        }
+
+        /// <summary>
+        /// Get scores around the user's rank (Above and below the user) 
+        /// </summary>
+        /// <param name="featured"> If true, only returns scores for featured leaderboard and topic parameter is ignored </param>
+        /// <param name="sortingOrder"> The sorting order to use i.e. "highest", "lowest" </param>
+        /// <param name="topic"> The topic to get scores for i.e. "Level 1", "Halloween Special", etc.
+        /// If featured is true, this parameter is ignored </param>
+        /// <param name="period"> The period to get scores for i.e. "all_time", "daily", "weekly", "monthly" </param>
+        /// <param name="startTime"> Custom start time for scores. If provided, end time must also be provided </param>
+        /// <param name="endTime"> Custom end time for scores. If provided, start time must also be provided </param>
+        /// <param name="includeAllUserScores"> If true, includes all user scores for rank calculation </param>
+        /// <param name="limit"> The number of rankings to return. If there are ties, there may be more than limit results </param>
+        /// <returns></returns>
+        public async Task<ApiResult<List<TopScore>>> GetAroundMeScores(
+            bool featured = false,
+            string topic = null,
+            LeaderboardSortingOrder sortingOrder = LeaderboardSortingOrder.Highest,
+            LeaderboardPeriod period = LeaderboardPeriod.AllTime,
+            DateTime? startTime = null,
+            DateTime? endTime = null,
+            bool includeAllUserScores = false,
+            int limit = 10)
+        {
+            try
+            {
+                if (!IsAuthenticated())
+                    return ApiResult<List<TopScore>>.Failed("Not authenticated");
+
+                if(featured && !string.IsNullOrEmpty(topic))
+                    MonaDebug.LogWarning($"Topic {topic} parameter is ignored when featured is true");
+                
+                if(startTime != null && endTime == null)
+                    return ApiResult<List<TopScore>>.Failed("End time must be provided if start time is provided");
+                
+                if(endTime != null && startTime == null)
+                    return ApiResult<List<TopScore>>.Failed("Start time must be provided if end time is provided");
+                
+                //Check that start and end times are valid
+                if(startTime > endTime)
+                    return ApiResult<List<TopScore>>.Failed("Start time cannot be after end time");
+
+                var response = await ApiClient.Leaderboard
+                    .GetAroundMeScores(
+                        featured: featured,
+                        topic: topic,
+                        sortingOrder: sortingOrder,
+                        period: period,
+                        startTime: startTime,
+                        endTime: endTime,
+                        includeAllUserScores: includeAllUserScores,
+                        limit: limit);
+                
+                return response;
+            }
+            catch (Exception exception)
+            {
+                MonaDebug.LogException(exception);
+                return ApiResult<List<TopScore>>.Failed(exception.Message);
             }
         }
 
