@@ -41,6 +41,7 @@ namespace Monaverse.Api
                     => $"public/leaderboards/{applicationId}/top-scores";
                 
                 public const string GetUserRank = "public/leaderboards/rank";
+                public const string GetAroundMeScores = "public/leaderboards/around-me";
             }
         }
     }
