@@ -164,7 +164,8 @@ Our SDK now supports leaderboards, allowing developers to integrate high-score t
                     topic: "Level 1",
                     sdkSecret: "YOUR_SDK_SECRET"); // Optional
       ```
-      
+      For security reasons, do not store the `SDK Secret` in serialized fields as it is less secure and can be compromised.
+
 **IMPORTANT: Please do **not** use the `API Secret` in Unity or any other client, as it is intended for server-to-server communication only.**
 
 ### Leaderboard APIs
