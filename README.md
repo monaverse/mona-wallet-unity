@@ -324,9 +324,7 @@ A **topic** is a label you can associate with each score submission. Topics allo
         .GetTopScores(topic: "Level 1");
     ```
 
-#### Dynamic Leaderboards with Topics
-
-By leveraging topics, you can create as many dynamic leaderboards as your game requires. Whether it’s for different levels, seasonal events, or special modes, simply passing a relevant topic when posting and retrieving scores allows you to effectively manage and retrieve high scores without needing to set up new leaderboards.
+By leveraging topics, you can create as many dynamic leaderboards as your game requires.
 
 For instance, if your game has thousands of levels, you can track high scores for each level individually by using topics like `"Level 1"`, `"Level 2"`, and so on. There’s no need to manually configure a new leaderboard for each level—topics provide the flexibility to create as many leaderboards as needed, on the fly.
 
