@@ -17,6 +17,7 @@ namespace Monaverse.Api
         {
             public static class Auth
             {
+                public const string SignUp = "public/auth/signup";
                 public const string GenerateOtp = "public/auth/otp/generate";
                 public const string VerifyOtp = "public/auth/otp/verify";
                 public const string RefreshToken = "public/auth/token/refresh";

@@ -7,6 +7,7 @@ namespace Monaverse.Api.Modules.Auth
 {
     public interface IAuthApiModule
     {
+        Task<ApiResult> SignUp(SignUpRequest request);
         Task<ApiResult> GenerateOtp(GenerateOtpRequest request);
         Task<ApiResult<VerifyOtpResponse>> VerifyOtp(VerifyOtpRequest request);
         Task<ApiResult<RefreshTokenResponse>> RefreshToken(RefreshTokenRequest request);

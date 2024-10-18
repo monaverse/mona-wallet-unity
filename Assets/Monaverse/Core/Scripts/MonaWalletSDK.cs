@@ -116,6 +116,37 @@ namespace Monaverse.Core
         }
 
         /// <summary>
+        /// Creates a new user with the provided email, username and name with the Monaverse platform
+        /// </summary>
+        /// <param name="email"> The email of the user. Must be unique </param>
+        /// <param name="username"> The username of the user. Must be unique</param>
+        /// <param name="name"> The name of the user. </param>
+        /// <returns> If successful, an account is created and a one-time password is sent to the provided email
+        /// Returns a 409 error if the username already exists
+        /// Returns a 409 error if the email already exists
+        /// </returns>
+        public async Task<ApiResult> SignUp(string email, string username, string name)
+        {
+            try
+            {
+                var result = await ApiClient.Auth
+                    .SignUp(new SignUpRequest
+                    {
+                        Email = email,
+                        Username = username,
+                        Name = name
+                    });
+
+                return result;
+            }
+            catch (Exception exception)
+            {
+                MonaDebug.LogException(exception);
+                return ApiResult.Failed(exception.Message);
+            }
+        }
+
+        /// <summary>
         /// Generates a one time password and sends it to the provided email
         /// If the user is not registered, an email asking for registration will be sent
         /// </summary>
