@@ -21,6 +21,18 @@ namespace Monaverse.Api.Modules.Auth
             _monaApiLogger = monaApiLogger;
         }
 
+
+        public async Task<ApiResult> SignUp(SignUpRequest request)
+        {
+            var monaHttpRequest = new MonaHttpRequest(
+                    url: _monaApiClient.GetUrlWithPath(Constants.Endpoints.Auth.SignUp),
+                    method: RequestMethod.Post)
+                .WithBody(request);
+            
+            var response = await _monaApiClient.Send(monaHttpRequest);
+            return response.ToApiResult();
+        }
+
         public async Task<ApiResult> GenerateOtp(GenerateOtpRequest request)
         {
             var monaHttpRequest = new MonaHttpRequest(
