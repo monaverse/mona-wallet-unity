@@ -12,13 +12,21 @@ namespace Monaverse.Modal.UI.Views
     {
         [SerializeField] private MonaModalView _verifyOtpView;
         [SerializeField] private MonaModalView _userTokensView;
+        [SerializeField] private MonaModalView _signupView;
         [SerializeField] private TMP_InputField _emailInputField;
         [SerializeField] private Button _generateOtpButton;
+        [SerializeField] private Button _createAccountButton;
 
         private void Start()
         {
             _generateOtpButton.onClick.AddListener(OnGenerateOtpButtonClicked);
+            _createAccountButton.onClick.AddListener(OnCreateAccountButtonClicked);
             _emailInputField.onValueChanged.AddListener(OnEmailInputValueChanged);
+        }
+
+        private void OnCreateAccountButtonClicked()
+        {
+            parentModal.OpenView(_signupView);
         }
 
         private void OnEmailInputValueChanged(string email)

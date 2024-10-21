@@ -56,17 +56,22 @@ namespace Monaverse.Modal.UI.Components
                 _rootCanvasScaler.scaleFactor = 1f;
         }
 
-        public void OpenView(MonaModalView view, MonaModal modal = null, object parameters = null)
+        public void OpenView(MonaModalView view, MonaModal modal = null, object parameters = null, bool removeSelf = false)
         {
             if (_viewsStack.Count == 0)
                 EnableModal();
 
             if (_viewsStack.Count > 0)
             {
+                if (removeSelf)
+                {
+                    var currentView = _viewsStack.Pop();
+                    currentView.Hide();
+                }
+                
                 //Loop through all views and hide them
                 foreach (var existingView in _viewsStack)
                     existingView.Hide();
-                // _viewsStack.Peek().Hide();
             }
 
             modal ??= this;
