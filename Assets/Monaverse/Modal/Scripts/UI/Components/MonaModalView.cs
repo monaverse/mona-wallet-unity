@@ -1,4 +1,5 @@
 using System.Collections;
+using Monaverse.Core;
 using UnityEngine;
 
 namespace Monaverse.Modal.UI.Components
@@ -11,6 +12,7 @@ namespace Monaverse.Modal.UI.Components
         [SerializeField] protected RectTransform rootTransform;
 
         protected MonaModal parentModal;
+        protected MonaverseManager Manager => MonaverseManager.Instance;
 
         public virtual string GetTitle() => _title;
         public bool IsActive => _canvas.enabled;

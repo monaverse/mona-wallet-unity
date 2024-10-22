@@ -33,7 +33,7 @@ namespace Monaverse.Api.MonaHttpClient.Extensions
 
         public static ApiResult ToApiResult(this IMonaHttpResponse response)
         {
-            return !response.IsSuccess ? ApiResult.Failed(response.Error) : ApiResult.Success();
+            return !response.IsSuccess ? ApiResult.Failed(response.Error, response.ResponseCode) : ApiResult.Success();
         }
 
         public static string ToLog(this IMonaHttpResponse httpResponse)
