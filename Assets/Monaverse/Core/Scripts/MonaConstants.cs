@@ -20,6 +20,7 @@ namespace Monaverse.Core
         public class MonaversePages
         {
             public const string Marketplace = "https://monaverse.com";
+            public static string ProfilePage(string username)=> $"{Marketplace}/user/{username}"; 
         }
     }
 }
