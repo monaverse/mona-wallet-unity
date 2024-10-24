@@ -26,15 +26,16 @@ namespace Monaverse.Modal.UI.Views
 
         [SerializeField] private TMP_Dropdown _chainsDropdown;
         [SerializeField] private TMP_Text _usernameText;
-        [SerializeField] private TMP_Text _emailText;
         [SerializeField] private RectTransform _parent;
         [SerializeField] private ScrollRect _scrollRect;
         [SerializeField] private List<MonaListItem> _cardsPool = new();
         [SerializeField] private GameObject _noItemsFound;
         [SerializeField] private TokenDetailsView _tokensDetailsView;
+        [SerializeField] private MonaModalView _userProfileView;
         [SerializeField] private GameObject _loadingAnimator;
         [SerializeField] private Button _logoutButton;
         [SerializeField] private Button _marketplaceButton;
+        [SerializeField] private Button _profileButton;
 
         [Header("Asset References")] [SerializeField]
         private MonaListItem _cardPrefab;
@@ -73,6 +74,7 @@ namespace Monaverse.Modal.UI.Views
             _chainsDropdown.onValueChanged.AddListener(OnChainsDropdownChanged);
             _logoutButton.onClick.AddListener(OnLogoutClicked);
             _marketplaceButton.onClick.AddListener(OnMarketplaceClicked);
+            _profileButton.onClick.AddListener(OnProfileClicked);
 
             //Disable for iOS
             if (Application.platform == RuntimePlatform.IPhonePlayer)
@@ -263,7 +265,6 @@ namespace Monaverse.Modal.UI.Views
 
                 _user = result.Data;
                 _usernameText.text = $"@{_user.Username}";
-                _emailText.text = _user.Email;
                 _walletsDropdown.ClearOptions();
                 _walletsDropdown.AddOptions(_user.Wallets);
 
@@ -357,6 +358,16 @@ namespace Monaverse.Modal.UI.Views
         private void OnMarketplaceClicked()
         {
             Application.OpenURL(MonaConstants.MonaversePages.Marketplace);
+        }
+        
+        private void OnProfileClicked()
+        {
+            parentModal.OpenView(_userProfileView, parameters: new UserProfileView.UserProfileParams
+            {
+                Email = _user.Email,
+                Name = _user.Name,
+                Username = _user.Username
+            });
         }
 
         private void OnLoggedOut(object sender, EventArgs e)
