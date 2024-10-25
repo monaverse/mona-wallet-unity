@@ -33,7 +33,6 @@ namespace Monaverse.Modal.UI.Views
         [SerializeField] private TokenDetailsView _tokensDetailsView;
         [SerializeField] private MonaModalView _userProfileView;
         [SerializeField] private GameObject _loadingAnimator;
-        [SerializeField] private Button _logoutButton;
         [SerializeField] private Button _marketplaceButton;
         [SerializeField] private Button _profileButton;
 
@@ -72,7 +71,6 @@ namespace Monaverse.Modal.UI.Views
 
             _walletsDropdown.onValueChanged.AddListener(OnWalletsDropdownChanged);
             _chainsDropdown.onValueChanged.AddListener(OnChainsDropdownChanged);
-            _logoutButton.onClick.AddListener(OnLogoutClicked);
             _marketplaceButton.onClick.AddListener(OnMarketplaceClicked);
             _profileButton.onClick.AddListener(OnProfileClicked);
 
@@ -348,11 +346,6 @@ namespace Monaverse.Modal.UI.Views
         {
             ResetCards(true);
             await LoadPage();
-        }
-
-        private void OnLogoutClicked()
-        {
-            MonaverseManager.Instance.SDK.Logout();
         }
 
         private void OnMarketplaceClicked()

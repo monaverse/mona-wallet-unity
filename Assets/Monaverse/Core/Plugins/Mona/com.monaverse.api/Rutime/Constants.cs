@@ -27,6 +27,7 @@ namespace Monaverse.Api
             {
                 public const string GetUser = "public/user";
                 public static string GetUserTokens(int chainId, string address) => $"public/user/{chainId}/{address}/tokens";
+                public const string DeleteAccount = "public/user/account/delete";
             }
             
             public static class Token

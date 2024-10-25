@@ -30,6 +30,7 @@ namespace Monaverse.Modal.UI.Components
         public event EventHandler Closed;
 
         private readonly Stack<MonaModalView> _viewsStack = new();
+        private MonaModalDialog _currentDialog;
         private bool _hasGlobalBackground;
         private bool _resizingModal;
 
@@ -75,12 +76,20 @@ namespace Monaverse.Modal.UI.Components
             }
 
             modal ??= this;
+            CloseDialog();
 
             var resizeCoroutine = ResizeModalRoutine(view.GetViewHeight());
             _viewsStack.Push(view);
             view.Show(modal, resizeCoroutine, parameters);
 
             Header.Title = view.GetTitle();
+        }
+
+        public void OpenDialog(MonaModalDialog view, MonaModal modal = null, object parameters = null)
+        {
+            modal ??= this;
+            view.Show(modal, parameters);
+            _currentDialog = view;
         }
 
         public void CloseView()
@@ -102,6 +111,8 @@ namespace Monaverse.Modal.UI.Components
                 DisableModal();
             }
         }
+        
+        public void CloseDialog() => _currentDialog?.Hide();
 
         public void CloseModal()
         {

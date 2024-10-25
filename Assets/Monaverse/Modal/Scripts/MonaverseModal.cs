@@ -17,7 +17,9 @@ namespace Monaverse.Modal
         [field: SerializeField, Space] private MonaModal Modal { get; set; }
 
         private List<MonaModalView> _views;
+        private List<MonaModalDialog> _dialogs;
         private MonaModalView _defaultView;
+        private MonaModalDialog _defaultDialogView;
 
         internal static MonaverseModal Instance { get; private set; }
 
@@ -128,6 +130,9 @@ namespace Monaverse.Modal
 
             if (Instance._defaultView == null)
                 Instance._defaultView = Instance._views.Find(x => x is GenerateOtpView);
+            
+            if (Instance._defaultDialogView == null)
+                Instance._defaultDialogView = Instance._dialogs.Find(x => x is DialogView);
 
             if (Instance._defaultView == null)
             {
@@ -167,13 +172,18 @@ namespace Monaverse.Modal
             Instance.Modal.Opened += (_, _) => ModalOpened?.Invoke(Instance, EventArgs.Empty);
             Instance.Modal.Closed += (_, _) => ModalClosed?.Invoke(Instance, EventArgs.Empty);
 
-            //Find and reference all existing modal views in children
+            //Find and reference all existing modal views and dialogs in children
             Instance._views = new List<MonaModalView>();
+            Instance._dialogs = new List<MonaModalDialog>();
             foreach (Transform child in Instance.Modal.transform)
             {
                 var view = child.GetComponent<MonaModalView>();
                 if (view != null)
                     Instance._views.Add(view);
+
+                var dialog = child.GetComponent<MonaModalDialog>();
+                if (dialog != null)
+                    Instance._dialogs.Add(dialog);
             }
 
             IsReady = true;
@@ -223,6 +233,24 @@ namespace Monaverse.Modal
         internal static void TriggerTokenSelected(TokenDto tokenDto)
         {
             TokenSelected?.Invoke(Instance, tokenDto);
+        }
+
+        internal static void ShowDialog(string title, 
+            string message, 
+            Action onConfirm = null, 
+            Action onCancel = null,
+            string confirmText = null,
+            string cancelText = null)
+        {
+            Instance.Modal.OpenDialog(Instance._defaultDialogView, parameters: new DialogView.DialogParams
+            {
+                Title = title,
+                Message = message,
+                ConfirmButtonTitle = confirmText,
+                CancelButtonTitle = cancelText,
+                OnConfirm = onConfirm,
+                OnCancel = onCancel
+            });
         }
     }
 }

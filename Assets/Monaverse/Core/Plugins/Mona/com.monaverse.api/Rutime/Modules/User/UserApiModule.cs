@@ -42,5 +42,15 @@ namespace Monaverse.Api.Modules.User
             var response = await _monaApiClient.SendAuthenticated(monaHttpRequest);
             return response.ConvertTo<GetUserTokensResponse>();
         }
+        
+        public async Task<ApiResult> DeleteAccount()
+        {
+            var monaHttpRequest = new MonaHttpRequest(
+                url: _monaApiClient.GetUrlWithPath(Constants.Endpoints.User.DeleteAccount),
+                method: RequestMethod.Post);
+
+            var response = await _monaApiClient.SendAuthenticated(monaHttpRequest);
+            return response.ToApiResult();
+        }
     }
 }
