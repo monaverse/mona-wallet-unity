@@ -46,8 +46,8 @@ namespace Monaverse.Modal.UI.Views
 
                 if (result.IsSuccess)
                 {
-                    ResetForm();
                     parentModal.OpenView(_verifyOtpView, parameters: _emailInputField.text, removeSelf: true);
+                    ResetForm();
                     return;
                 }
 

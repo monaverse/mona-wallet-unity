@@ -13,5 +13,7 @@ namespace Monaverse.Api.Modules.User
             string address,
             IEnumerable<KeyValuePair<string, object>> queryParams = null,
             string continuation = null);
+
+        Task<ApiResult> DeleteAccount();
     }
 }
