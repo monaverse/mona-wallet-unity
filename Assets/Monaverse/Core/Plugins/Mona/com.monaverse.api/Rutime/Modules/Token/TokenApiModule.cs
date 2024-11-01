@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
 using Monaverse.Api.Modules.Common;
@@ -25,6 +26,28 @@ namespace Monaverse.Api.Modules.Token
             
             var response = await _monaApiClient.SendAuthenticated(monaHttpRequest);
             return response.ConvertTo<GetTokenAnimationResponse>();
+        }
+        
+        public async Task<ApiResult<GetCommunityTokensResponse>> GetCommunityTokens(int chainId,
+            IEnumerable<KeyValuePair<string, object>> queryParams = null,
+            string continuation = null)
+        {
+            queryParams ??= new List<KeyValuePair<string, object>>();
+
+            var monaHttpRequest = new MonaHttpRequest(
+                    url: _monaApiClient.GetUrlWithPath(Constants.Endpoints.Token.GetCommunityTokens(chainId)),
+                    method: RequestMethod.Get)
+                .WithQueryParams(queryParams)
+                .WithQueryParam("continuation", continuation);
+
+            var response = await _monaApiClient.SendAuthenticated(monaHttpRequest);
+            var result = response.ConvertTo<GetCommunityTokensResponse>();
+
+            if (!result.IsSuccess) return result;
+            foreach (var token in result.Data.Tokens)
+                token.IsCommunityToken = true;
+
+            return result;
         }
     }
 }

@@ -32,6 +32,7 @@ namespace Monaverse.Api
             
             public static class Token
             {
+                public static string GetCommunityTokens(int chainId) => $"public/tokens/{chainId}/community";
                 public static string GetTokenAnimation(BigInteger chainId, string contract, string tokenId) 
                     => $"public/tokens/{chainId}/{contract}/{tokenId}/animation";
             }

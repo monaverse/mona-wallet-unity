@@ -15,12 +15,14 @@ namespace Monaverse.Modal.UI.Components
         [SerializeField] private Color _defaultBorderColor;
         [SerializeField] private TMP_Text _tagText;
         [SerializeField] private GameObject _supportedViewObject;
+        [SerializeField] private GameObject _communityTag;
+
+        public bool IsCommunityToken { get; set; }
         
         private MonaModalView _targetView;
         private object _targetViewParameters;
         private Action _onClick;
         private MonaRemoteSprite _remoteSprite;
-
         private bool _initialized;
 
         protected void Awake()
@@ -38,6 +40,8 @@ namespace Monaverse.Modal.UI.Components
             _title.text = parameters.title;
             _onClick = parameters.onClick;
             _remoteSprite = parameters.remoteSprite;
+            IsCommunityToken = parameters.IsCommunityToken;
+            _communityTag.SetActive(IsCommunityToken);
 
             _iconBorder.color = parameters.borderColor == default
                 ? _defaultBorderColor
@@ -99,6 +103,7 @@ namespace Monaverse.Modal.UI.Components
             public bool isInstalled;
             public bool isSupported;
             public string tagText;
+            public bool IsCommunityToken;
         }
     }
 }

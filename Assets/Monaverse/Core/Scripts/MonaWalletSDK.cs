@@ -301,6 +301,31 @@ namespace Monaverse.Core
             }
         }
 
+        /// <summary>
+        /// Gets the community tokens available for the specified chain
+        /// </summary>
+        /// <param name="chainId"> The id of the chain to get the tokens for</param>
+        /// <param name="continuation"> The continuation token to get the next set of tokens</param>
+        /// <returns></returns>
+        public async Task<ApiResult<GetCommunityTokensResponse>> GetCommunityTokens(int chainId, string continuation = null)
+        {
+            try
+            {
+                if (!IsAuthenticated())
+                    return ApiResult<GetCommunityTokensResponse>.Failed("Not authenticated");
+
+                var result = await ApiClient.Token
+                    .GetCommunityTokens(chainId: chainId,
+                        continuation: continuation);
+
+                return result;
+            }
+            catch (Exception exception)
+            {
+                MonaDebug.LogException(exception);
+                return ApiResult<GetCommunityTokensResponse>.Failed(exception.Message);
+            }
+        }
 
         /// <summary>
         /// Posts a score to the application leaderboard

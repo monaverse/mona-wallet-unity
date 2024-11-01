@@ -17,6 +17,7 @@ namespace Monaverse.Modal.UI.Views
         [SerializeField] private TMP_Text _artistLabel;
         [SerializeField] private TMP_Text _networkLabel;
         [SerializeField] private TMP_Text _tokenIdLabel;
+        [SerializeField] private GameObject _communityTag;
 
         [Header("Buttons")]
         [SerializeField] private Button _importButton;
@@ -42,6 +43,7 @@ namespace Monaverse.Modal.UI.Views
             public Action onImportClick;
             public Action onPreviewClick;
             public bool canImport;
+            public bool isCommunityToken;
         }
 
         private void Start()
@@ -74,6 +76,7 @@ namespace Monaverse.Modal.UI.Views
             _artistLabel.text = parameters.artist;
             _networkLabel.text = parameters.network;
             _tokenIdLabel.text = parameters.tokenId.ToString();
+            _communityTag.SetActive(parameters.isCommunityToken);
             
             //Set buttons
             _onImportClick = parameters.onImportClick;
