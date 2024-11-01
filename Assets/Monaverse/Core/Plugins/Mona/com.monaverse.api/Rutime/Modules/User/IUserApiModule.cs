@@ -15,5 +15,7 @@ namespace Monaverse.Api.Modules.User
             string continuation = null);
 
         Task<ApiResult> DeleteAccount();
+        
+        
     }
 }

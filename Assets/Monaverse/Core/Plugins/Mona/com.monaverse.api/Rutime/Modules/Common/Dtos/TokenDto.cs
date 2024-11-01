@@ -4,7 +4,7 @@ using Monaverse.Api.Modules.Common.Dtos;
 
 namespace Monaverse.Api.Modules.User.Dtos
 {
-    public record TokenDto
+    public class TokenDto
     {
         public BigInteger ChainId { get; set; }
         public string Contract { get; set; }
@@ -24,5 +24,6 @@ namespace Monaverse.Api.Modules.User.Dtos
         public List<TokenAttributeDto> Attributes { get; set; } = new();
         public List<TokenFileDto> Files { get; set; } = new();
         public OrderDto FloorAsk { get; set; }
+        public bool IsCommunityToken { get; set; }
     }
 }

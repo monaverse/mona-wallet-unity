@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Monaverse.Api.Modules.Token.Responses;
 using Monaverse.Api.Modules.User.Dtos;
 using Monaverse.Api.Modules.User.Responses;
 using Monaverse.Core;
@@ -35,6 +36,7 @@ namespace Monaverse.Modal.UI.Views
         [SerializeField] private GameObject _loadingAnimator;
         [SerializeField] private Button _marketplaceButton;
         [SerializeField] private Button _profileButton;
+        [SerializeField] private Toggle _communityTokensToggle;
 
         [Header("Asset References")] [SerializeField]
         private MonaListItem _cardPrefab;
@@ -44,8 +46,11 @@ namespace Monaverse.Modal.UI.Views
 
         private readonly Dictionary<string, MonaRemoteSprite> _sprites = new();
 
-        private List<TokenDto> _tokensCache = new();
+        private readonly List<TokenDto> _loadedTokensCache = new();
+        private readonly List<TokenDto> _userTokens = new();
+        private readonly List<TokenDto> _communityTokens = new();
         private string _continuationToken;
+        private string _communityContinuationToken;
         private bool _isPageLoading = false;
         private int _usedCardsCount = 0;
 
@@ -73,6 +78,7 @@ namespace Monaverse.Modal.UI.Views
             _chainsDropdown.onValueChanged.AddListener(OnChainsDropdownChanged);
             _marketplaceButton.onClick.AddListener(OnMarketplaceClicked);
             _profileButton.onClick.AddListener(OnProfileClicked);
+            _communityTokensToggle.onValueChanged.AddListener(OnCommunityTokensClicked);
 
             //Disable for iOS
             if (Application.platform == RuntimePlatform.IPhonePlayer)
@@ -85,10 +91,10 @@ namespace Monaverse.Modal.UI.Views
         {
             base.OnOpened(options);
             parentModal.Header.EnableBackButton(false);
-            
+
             await GetUser();
             UpdateHeader();
-            MonaverseModal.TriggerTokensViewOpened(_tokensCache.GetFilteredTokens());
+            MonaverseModal.TriggerTokensViewOpened(_loadedTokensCache.GetFilteredTokens());
         }
 
         public override void Hide()
@@ -99,9 +105,9 @@ namespace Monaverse.Modal.UI.Views
 
         private void ResetCards(bool flushCache = false)
         {
-            if(_cardsPool.Count == 0)
+            if (_cardsPool.Count == 0)
                 return;
-            
+
             for (var i = _cardsPool.Count - 1; i >= 0; i--)
             {
                 var card = _cardsPool[i];
@@ -121,7 +127,11 @@ namespace Monaverse.Modal.UI.Views
             _continuationToken = null;
 
             if (flushCache)
-                _tokensCache.Clear();
+            {
+                _loadedTokensCache.Clear();
+                _userTokens.Clear();
+                _communityTokens.Clear();
+            }
         }
 
         private void FixedUpdate()
@@ -130,15 +140,25 @@ namespace Monaverse.Modal.UI.Views
                 !_isPageLoading &&
                 !string.IsNullOrEmpty(_continuationToken) &&
                 _scrollRect.verticalNormalizedPosition < _loadThreshold)
-                _ = LoadPage();
+                _ = NextPage(false);
         }
 
-        private async Task LoadPage()
+        private async Task NextPage(bool isFirstLoad)
         {
             _isPageLoading = true;
             _loadingAnimator.SetActive(true);
+            _noItemsFound.SetActive(false);
 
+            var communityTokens = new List<TokenDto>();
+
+            if (isFirstLoad)
+            {
+                var getCommunityTokensResponse = await GetCommunityTokens();
+                communityTokens = getCommunityTokensResponse.Tokens ?? new List<TokenDto>();
+            }
+            
             var getUserTokensResponse = await GetUserTokens();
+            
             _loadingAnimator.SetActive(false);
 
             if (!IsActive)
@@ -147,23 +167,37 @@ namespace Monaverse.Modal.UI.Views
             if (getUserTokensResponse == null)
                 return;
 
-            _noItemsFound.SetActive(getUserTokensResponse.Tokens.Count == 0);
+            var tokensToLoad = new List<TokenDto>();
+            var userTokens = getUserTokensResponse.Tokens;
 
+            if (_communityTokensToggle.isOn)
+                tokensToLoad.AddRange(communityTokens);
+            
+            tokensToLoad.AddRange(getUserTokensResponse.Tokens);
+            
+            _communityTokens.AddRange(communityTokens);
+            _userTokens.AddRange(userTokens);
+            _loadedTokensCache.AddRange(tokensToLoad);
+
+            await ReloadView(tokensToLoad);
+            
             _continuationToken = getUserTokensResponse.Continuation;
+            _isPageLoading = false;
+        }
 
-            var tokens = getUserTokensResponse.Tokens;
-            await RefreshView(tokens);
-
+        private async Task ReloadView(List<TokenDto> tokens)
+        {
+            await LoadItems(tokens);
+            
+            _noItemsFound.SetActive(tokens.Count == 0);
+            
             //Filter using the CollectibleFilter
             MonaverseModal.TriggerTokensLoaded(tokens.GetFilteredTokens());
-
-            _tokensCache.AddRange(tokens);
-            _usedCardsCount += getUserTokensResponse.Tokens.Count;
-
-            _isPageLoading = false;
             
-            UpdateHeader();
+            _usedCardsCount += tokens.Count;
 
+            UpdateHeader();
+            
             if (_closeOnLoaded)
             {
                 await new WaitForSeconds(2f);
@@ -171,7 +205,7 @@ namespace Monaverse.Modal.UI.Views
             }
         }
 
-        private async Task RefreshView(IReadOnlyList<TokenDto> tokens)
+        private async Task LoadItems(IReadOnlyList<TokenDto> tokens)
         {
             if (tokens.Count > _cardsPool.Count - _usedCardsCount)
                 await IncreaseCardsPoolSize(tokens.Count + _usedCardsCount);
@@ -206,7 +240,8 @@ namespace Monaverse.Modal.UI.Views
                         MonaverseModal.TriggerImportTokenClicked(token);
                     },
                     onPreviewClick = () => { MonaverseModal.TriggerPreviewCollectibleClicked(token); },
-                    canImport = canBeImported
+                    canImport = canBeImported,
+                    isCommunityToken = token.IsCommunityToken
                 };
 
                 //configure list item
@@ -220,7 +255,8 @@ namespace Monaverse.Modal.UI.Views
                         parentModal.OpenView(_tokensDetailsView, parameters: collectibleDetailsParams);
                     },
                     isInstalled = false,
-                    isSupported = canBeImported
+                    isSupported = canBeImported,
+                    IsCommunityToken = token.IsCommunityToken
                 });
             }
         }
@@ -247,9 +283,9 @@ namespace Monaverse.Modal.UI.Views
         private async Task GetUser()
         {
             // Don't get user if we already have one
-            if(_user != null)
+            if (_user != null)
                 return;
-            
+
             try
             {
                 var result = await MonaverseManager.Instance.SDK.GetUser();
@@ -266,7 +302,7 @@ namespace Monaverse.Modal.UI.Views
                 _walletsDropdown.ClearOptions();
                 _walletsDropdown.AddOptions(_user.Wallets);
 
-                await LoadPage();
+                await NextPage(true);
             }
             catch (Exception exception)
             {
@@ -292,7 +328,7 @@ namespace Monaverse.Modal.UI.Views
                     parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Error, "No wallets linked");
                     return null;
                 }
-                
+
                 var wallet = _walletsDropdown.options[_walletsDropdown.value].text;
 
                 if (string.IsNullOrEmpty(wallet))
@@ -330,29 +366,62 @@ namespace Monaverse.Modal.UI.Views
             }
         }
 
+        private async Task<GetCommunityTokensResponse> GetCommunityTokens()
+        {
+            try
+            {
+                var chainId = ChainHelper.GetChainId(_chainsDropdown.options[_chainsDropdown.value].text);
+                if (chainId == 0)
+                {
+                    parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Error, "Chain not supported");
+                    return null;
+                }
+
+                var result = await MonaverseManager.Instance.SDK
+                    .GetCommunityTokens(chainId: chainId,
+                        continuation: _communityContinuationToken);
+
+                if (result.IsSuccess)
+                {
+                    _communityContinuationToken = result.Data.Continuation;
+                    return result.Data;
+                }
+
+                parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Error, "Failed getting community tokens");
+                MonaDebug.LogError("GetUserTokens Failed: " + result.Message);
+                return result.Data;
+            }
+            catch (Exception exception)
+            {
+                parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Error, "Error getting community tokens");
+                MonaDebug.LogException(exception);
+                return null;
+            }
+        }
+
         private void UpdateHeader()
         {
             var chain = _chainsDropdown.options[_chainsDropdown.value].text;
-            parentModal.Header.Title = $"Your {chain} Tokens ({_tokensCache?.Count})";
+            parentModal.Header.Title = $"Your {chain} Tokens ({_loadedTokensCache?.Count})";
         }
 
         private async void OnChainsDropdownChanged(int chainIndex)
         {
             ResetCards(true);
-            await LoadPage();
+            await NextPage(true);
         }
 
         private async void OnWalletsDropdownChanged(int walletIndex)
         {
             ResetCards(true);
-            await LoadPage();
+            await NextPage(true);
         }
 
         private void OnMarketplaceClicked()
         {
             Application.OpenURL(MonaConstants.MonaversePages.Marketplace);
         }
-        
+
         private void OnProfileClicked()
         {
             parentModal.OpenView(_userProfileView, parameters: new UserProfileView.UserProfileParams
@@ -361,6 +430,22 @@ namespace Monaverse.Modal.UI.Views
                 Name = _user.Name,
                 Username = _user.Username
             });
+        }
+
+        private async void OnCommunityTokensClicked(bool isOn)
+        {
+            var allTokens = new List<TokenDto>();
+            
+            if(isOn)
+                allTokens.AddRange(_communityTokens);
+            
+            allTokens.AddRange(_userTokens);
+            
+            _loadedTokensCache.Clear();
+            _usedCardsCount = 0;
+            _loadedTokensCache.AddRange(allTokens);
+
+            await ReloadView(allTokens);
         }
 
         private void OnLoggedOut(object sender, EventArgs e)
