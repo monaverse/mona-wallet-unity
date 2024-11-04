@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Monaverse.Api.Extensions;
 using Monaverse.Api.Modules.Common;
+using Monaverse.Api.Modules.Common.Dtos;
 using Monaverse.Api.Modules.User.Responses;
 using Monaverse.Api.MonaHttpClient.Extensions;
 using Monaverse.Api.MonaHttpClient.Request;
@@ -28,15 +30,15 @@ namespace Monaverse.Api.Modules.User
 
         public async Task<ApiResult<GetUserTokensResponse>> GetUserTokens(int chainId,
             string address,
-            IEnumerable<KeyValuePair<string, object>> queryParams = null,
+            TokenFiltersDto queryParams = null,
             string continuation = null)
         {
-            queryParams ??= new List<KeyValuePair<string, object>>();
+            queryParams ??= new TokenFiltersDto();
 
             var monaHttpRequest = new MonaHttpRequest(
                     url: _monaApiClient.GetUrlWithPath(Constants.Endpoints.User.GetUserTokens(chainId, address)),
                     method: RequestMethod.Get)
-                .WithQueryParams(queryParams)
+                .WithQueryParams(queryParams.ToPropertyDictionary())
                 .WithQueryParam("continuation", continuation);
 
             var response = await _monaApiClient.SendAuthenticated(monaHttpRequest);

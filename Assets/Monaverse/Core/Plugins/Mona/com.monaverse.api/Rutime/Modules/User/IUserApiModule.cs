@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Monaverse.Api.Modules.Common;
+using Monaverse.Api.Modules.Common.Dtos;
 using Monaverse.Api.Modules.User.Responses;
 
 namespace Monaverse.Api.Modules.User
@@ -11,7 +12,7 @@ namespace Monaverse.Api.Modules.User
 
         Task<ApiResult<GetUserTokensResponse>> GetUserTokens(int chainId,
             string address,
-            IEnumerable<KeyValuePair<string, object>> queryParams = null,
+            TokenFiltersDto queryParams = null,
             string continuation = null);
 
         Task<ApiResult> DeleteAccount();

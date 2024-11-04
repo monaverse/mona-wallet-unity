@@ -24,6 +24,7 @@ namespace Monaverse.Api.Modules.User.Dtos
         public List<TokenAttributeDto> Attributes { get; set; } = new();
         public List<TokenFileDto> Files { get; set; } = new();
         public OrderDto FloorAsk { get; set; }
+        public OrderDto TopBid { get; set; }
         public bool IsCommunityToken { get; set; }
     }
 }

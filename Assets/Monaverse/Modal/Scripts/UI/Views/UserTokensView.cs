@@ -220,6 +220,7 @@ namespace Monaverse.Modal.UI.Views
                 var monaListItem = _cardsPool[i + _usedCardsCount];
                 var sprite = token.GetImageRemoteSprite();
                 var canBeImported = token.CanBeImported();
+                var pricingData = token.GetNativePrice();
 
                 //configure details view
                 var collectibleDetailsParams = new TokenDetailsView.CollectibleDetailsParams
@@ -232,8 +233,8 @@ namespace Monaverse.Modal.UI.Views
                     artist = token.Collection.Name,
                     minted = true,
                     network = ChainHelper.GetChainName((int)token.ChainId),
-                    price = (float)token.GetNativePrice(),
-                    priceCurrency = token.GetCurrency(),
+                    price = pricingData.Price,
+                    priceCurrency = pricingData.Currency,
                     onImportClick = () =>
                     {
                         parentModal.CloseModal();
