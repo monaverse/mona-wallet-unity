@@ -11,15 +11,26 @@ namespace Monaverse.Core.Scripts.Utils
                 ? MonaConstants.MonaversePages.Marketplace
                 : $"{MonaConstants.MonaversePages.Marketplace}/collections/{tokenDto.ChainId}/{tokenDto.Contract}/{tokenDto.TokenId}";
         }
-        
+
         public static decimal GetUsdPrice(this TokenDto tokenDto)
         {
             return tokenDto?.FloorAsk?.Price?.Amount?.Usd ?? 0m;
         }
-        
-        public static decimal GetNativePrice(this TokenDto tokenDto, int precision = 6)
+
+        public static (decimal Price, string Currency) GetNativePrice(this TokenDto tokenDto, int precision = 6)
         {
-            return decimal.Round(tokenDto?.FloorAsk?.Price?.Amount?.Native ?? 0m, precision, MidpointRounding.AwayFromZero);
+            if (tokenDto == null)
+                return (0m, "ETH");
+
+            if (tokenDto.TopBid == null && tokenDto.FloorAsk == null)
+                return (0m, "ETH");
+
+            var floorAskPrice = decimal.Round(tokenDto.FloorAsk?.Price?.Amount?.Native ?? 0m, precision);
+            var floorCurrency = tokenDto.FloorAsk?.Price?.Currency?.Symbol ?? "ETH";
+            var topBidPrice = decimal.Round(tokenDto.TopBid?.Price?.Amount?.Native ?? 0m, precision);
+            var topBidCurrency = tokenDto.TopBid?.Price?.Currency?.Symbol ?? "ETH";
+
+            return topBidPrice > floorAskPrice ? (topBidPrice, topBidCurrency) : (floorAskPrice, floorCurrency);
         }
 
         public static string GetCurrency(this TokenDto tokenDto)

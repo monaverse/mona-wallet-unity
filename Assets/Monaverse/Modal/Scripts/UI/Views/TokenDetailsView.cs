@@ -1,5 +1,6 @@
 using System;
 using Monaverse.Modal.UI.Components;
+using Monaverse.Modal.UI.Extensions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -37,7 +38,7 @@ namespace Monaverse.Modal.UI.Views
             public string network;
             public int tokenId;
             public bool minted;
-            public float price;
+            public decimal price;
             public string priceCurrency;
             public string description;
             public Action onImportClick;
@@ -71,7 +72,7 @@ namespace Monaverse.Modal.UI.Views
             //Set details
             _titleLabel.text = parameters.title;
             _descriptionLabel.text = parameters.description;
-            _priceLabel.text = $"{parameters.price} {parameters.priceCurrency}";
+            _priceLabel.text = $"{parameters.price.GetFormattedNativePrice()} {parameters.priceCurrency}";
             _typeLabel.text = parameters.typeText;
             _artistLabel.text = parameters.artist;
             _networkLabel.text = parameters.network;
