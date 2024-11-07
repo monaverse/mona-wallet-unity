@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using Monaverse.Modal.UI.Components;
 using Monaverse.Modal.UI.Extensions;
+using Monaverse.Modal.UI.Views.Elements;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,6 +21,8 @@ namespace Monaverse.Modal.UI.Views
         [SerializeField] private TMP_Text _networkLabel;
         [SerializeField] private TMP_Text _tokenIdLabel;
         [SerializeField] private GameObject _communityTag;
+        [SerializeField] private TokenAttributeViewElement _attributeTemplate;
+        [SerializeField] private RectTransform _contentRectTransform;
 
         [Header("Buttons")]
         [SerializeField] private Button _importButton;
@@ -29,7 +33,9 @@ namespace Monaverse.Modal.UI.Views
         private Action _onImportClick;
         private Action _onPreviewClick;
         
-        public struct CollectibleDetailsParams
+        private List<TokenAttributeViewElement> _attributes = new();
+        
+        public class CollectibleDetailsParams
         {
             public string title;
             public string imageUrl;
@@ -45,6 +51,7 @@ namespace Monaverse.Modal.UI.Views
             public Action onPreviewClick;
             public bool canImport;
             public bool isCommunityToken;
+            public List<(string Key, string Value, string Rarity)> attributes = new();
         }
 
         private void Start()
@@ -85,6 +92,20 @@ namespace Monaverse.Modal.UI.Views
 
             //Determines compatibility with the application
             _importButton.interactable = parameters.canImport;
+
+            foreach (var attributeViewElement in _attributes)
+                Destroy(attributeViewElement.gameObject);
+            
+            _attributes.Clear();
+            
+            foreach (var attribute in parameters.attributes)
+            {
+                var attributeViewElement = Instantiate(_attributeTemplate, _attributeTemplate.transform.parent);
+                attributeViewElement.gameObject.SetActive(true);
+                attributeViewElement.Set(attribute.Key, attribute.Value, attribute.Rarity);
+                _attributes.Add(attributeViewElement);
+            }
+            LayoutRebuilder.ForceRebuildLayoutImmediate(_contentRectTransform);
         }
 
         public override void Hide()
