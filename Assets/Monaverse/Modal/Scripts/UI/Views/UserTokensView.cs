@@ -242,7 +242,11 @@ namespace Monaverse.Modal.UI.Views
                     },
                     onPreviewClick = () => { MonaverseModal.TriggerPreviewCollectibleClicked(token); },
                     canImport = canBeImported,
-                    isCommunityToken = token.IsCommunityToken
+                    isCommunityToken = token.IsCommunityToken,
+                    attributes = token.Attributes.ConvertAll(i=> (
+                        Key: i.Key, 
+                        Value: i.Value, 
+                        Rarity: $"{((float)i.TokenCount / token.Collection.TokenCount):P} ({i.TokenCount})"))
                 };
 
                 //configure list item
