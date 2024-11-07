@@ -164,16 +164,13 @@ namespace Monaverse.Modal.UI.Views
             if (!IsActive)
                 return;
 
-            if (getUserTokensResponse == null)
-                return;
-
             var tokensToLoad = new List<TokenDto>();
-            var userTokens = getUserTokensResponse.Tokens;
+            var userTokens = getUserTokensResponse?.Tokens ?? new List<TokenDto>();
 
             if (_communityTokensToggle.isOn)
                 tokensToLoad.AddRange(communityTokens);
             
-            tokensToLoad.AddRange(getUserTokensResponse.Tokens);
+            tokensToLoad.AddRange(userTokens);
             
             _communityTokens.AddRange(communityTokens);
             _userTokens.AddRange(userTokens);
@@ -181,7 +178,7 @@ namespace Monaverse.Modal.UI.Views
 
             await ReloadView(tokensToLoad);
             
-            _continuationToken = getUserTokensResponse.Continuation;
+            _continuationToken = getUserTokensResponse?.Continuation;
             _isPageLoading = false;
         }
 
@@ -306,6 +303,7 @@ namespace Monaverse.Modal.UI.Views
                 _usernameText.text = $"@{_user.Username}";
                 _walletsDropdown.ClearOptions();
                 _walletsDropdown.AddOptions(_user.Wallets);
+                _walletsDropdown.interactable = _user.Wallets.Count > 0;
 
                 await NextPage(true);
             }
