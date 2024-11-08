@@ -257,8 +257,8 @@ namespace Monaverse.Modal.UI.Views
                         parentModal.OpenView(_tokensDetailsView, parameters: collectibleDetailsParams);
                     },
                     isInstalled = false,
-                    isSupported = canBeImported,
-                    IsCommunityToken = token.IsCommunityToken
+                    IsCommunityToken = token.IsCommunityToken,
+                    price = $"{pricingData.Price} {pricingData.Currency}"
                 });
             }
         }
