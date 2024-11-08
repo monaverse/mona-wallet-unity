@@ -10,6 +10,7 @@ namespace Monaverse.Modal.UI.Components
         [SerializeField] private Button _defaultViewButton;
         [SerializeField] private TMP_Text _title;
         [SerializeField] private TMP_Text _price;
+        [SerializeField] private TMP_Text _supply;
         [SerializeField] private Image _icon;
         [SerializeField] private Image _iconBorder;
         [SerializeField] private GameObject _defaultViewObject;
@@ -38,6 +39,7 @@ namespace Monaverse.Modal.UI.Components
 
             _title.text = parameters.title;
             _price.text = parameters.price;
+            _supply.text = parameters.supply;
             _onClick = parameters.onClick;
             _remoteSprite = parameters.remoteSprite;
             IsCommunityToken = parameters.IsCommunityToken;
@@ -94,6 +96,7 @@ namespace Monaverse.Modal.UI.Components
             public bool isInstalled;
             public bool IsCommunityToken;
             public string price;
+            public string supply;
         }
     }
 }

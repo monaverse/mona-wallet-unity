@@ -18802,11 +18802,11 @@ MonoBehaviour:
     m_Right: 12
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 3
+  m_ChildAlignment: 4
   m_StartCorner: 0
   m_StartAxis: 0
   m_CellSize: {x: 164, y: 220}
-  m_Spacing: {x: 4, y: 16}
+  m_Spacing: {x: 15, y: 0}
   m_Constraint: 0
   m_ConstraintCount: 2
 --- !u!1 &8166872361944135232
