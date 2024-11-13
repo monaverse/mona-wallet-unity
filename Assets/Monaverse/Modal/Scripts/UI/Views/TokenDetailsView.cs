@@ -20,6 +20,7 @@ namespace Monaverse.Modal.UI.Views
         [SerializeField] private TMP_Text _artistLabel;
         [SerializeField] private TMP_Text _networkLabel;
         [SerializeField] private TMP_Text _tokenIdLabel;
+        [SerializeField] private TMP_Text _supplyLabel;
         [SerializeField] private GameObject _communityTag;
         [SerializeField] private TokenAttributeViewElement _attributeTemplate;
         [SerializeField] private RectTransform _contentRectTransform;
@@ -43,6 +44,7 @@ namespace Monaverse.Modal.UI.Views
             public string artist;
             public string network;
             public int tokenId;
+            public int supply;
             public bool minted;
             public decimal price;
             public string priceCurrency;
@@ -84,6 +86,7 @@ namespace Monaverse.Modal.UI.Views
             _artistLabel.text = parameters.artist;
             _networkLabel.text = parameters.network;
             _tokenIdLabel.text = parameters.tokenId.ToString();
+            _supplyLabel.text = parameters.supply.ToString();
             _communityTag.SetActive(parameters.isCommunityToken);
             
             //Set buttons

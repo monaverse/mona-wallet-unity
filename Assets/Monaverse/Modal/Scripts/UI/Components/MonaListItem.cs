@@ -9,12 +9,12 @@ namespace Monaverse.Modal.UI.Components
     {
         [SerializeField] private Button _defaultViewButton;
         [SerializeField] private TMP_Text _title;
+        [SerializeField] private TMP_Text _price;
+        [SerializeField] private TMP_Text _supply;
         [SerializeField] private Image _icon;
         [SerializeField] private Image _iconBorder;
         [SerializeField] private GameObject _defaultViewObject;
         [SerializeField] private Color _defaultBorderColor;
-        [SerializeField] private TMP_Text _tagText;
-        [SerializeField] private GameObject _supportedViewObject;
         [SerializeField] private GameObject _communityTag;
 
         public bool IsCommunityToken { get; set; }
@@ -38,6 +38,8 @@ namespace Monaverse.Modal.UI.Components
             }
 
             _title.text = parameters.title;
+            _price.text = parameters.price;
+            _supply.text = parameters.supply;
             _onClick = parameters.onClick;
             _remoteSprite = parameters.remoteSprite;
             IsCommunityToken = parameters.IsCommunityToken;
@@ -46,12 +48,6 @@ namespace Monaverse.Modal.UI.Components
             _iconBorder.color = parameters.borderColor == default
                 ? _defaultBorderColor
                 : parameters.borderColor;
-
-            if (!string.IsNullOrWhiteSpace(parameters.tagText))
-            {
-                _tagText.text = parameters.tagText;
-                _tagText.gameObject.SetActive(true);
-            }
 
             if (parameters.remoteSprite == null)
             {
@@ -69,8 +65,6 @@ namespace Monaverse.Modal.UI.Components
             if (parameters.isInstalled)
                 EnableDefaultView();
             
-            _supportedViewObject.SetActive(parameters.isSupported);
-
             _initialized = true;
         }
         
@@ -90,7 +84,6 @@ namespace Monaverse.Modal.UI.Components
             _icon.color = new Color(1, 1, 1, 0.1f);
             _title.text = string.Empty;
             _defaultViewObject.SetActive(false);
-            _tagText.gameObject.SetActive(false);
         }
         
         public struct ListItemParams
@@ -101,9 +94,9 @@ namespace Monaverse.Modal.UI.Components
             public Action onClick;
             public Color borderColor;
             public bool isInstalled;
-            public bool isSupported;
-            public string tagText;
             public bool IsCommunityToken;
+            public string price;
+            public string supply;
         }
     }
 }

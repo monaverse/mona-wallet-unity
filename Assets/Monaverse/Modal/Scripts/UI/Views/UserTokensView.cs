@@ -227,6 +227,7 @@ namespace Monaverse.Modal.UI.Views
                     typeText = token.Kind,
                     description = token.Description,
                     tokenId = int.TryParse(token.TokenId, out var tokenId) ? tokenId : 0,
+                    supply = token.Supply,
                     artist = token.Collection.Name,
                     minted = true,
                     network = ChainHelper.GetChainName((int)token.ChainId),
@@ -257,8 +258,9 @@ namespace Monaverse.Modal.UI.Views
                         parentModal.OpenView(_tokensDetailsView, parameters: collectibleDetailsParams);
                     },
                     isInstalled = false,
-                    isSupported = canBeImported,
-                    IsCommunityToken = token.IsCommunityToken
+                    IsCommunityToken = token.IsCommunityToken,
+                    price = $"{pricingData.Price} {pricingData.Currency}",
+                    supply = $"x{token.Supply}"
                 });
             }
         }
