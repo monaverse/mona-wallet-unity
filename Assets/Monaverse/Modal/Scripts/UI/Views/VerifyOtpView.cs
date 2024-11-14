@@ -49,7 +49,7 @@ namespace Monaverse.Modal.UI.Views
                 _verifyOtpButton.interactable = false;
                 var result = await MonaverseManager.Instance.SDK
                     .VerifyOneTimePassword(_emailAddress, _otpInputField.text);
-                
+                _verifyOtpButton.interactable = true;
                 
                 if (result)
                 {
@@ -63,7 +63,6 @@ namespace Monaverse.Modal.UI.Views
                     return;
                 }
 
-                _verifyOtpButton.interactable = true;
                 parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Error, "Failed signing in");
             }
             catch (Exception exception)
