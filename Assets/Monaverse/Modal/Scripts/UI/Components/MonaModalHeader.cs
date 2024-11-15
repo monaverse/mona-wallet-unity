@@ -40,12 +40,12 @@ namespace Monaverse.Modal.UI.Components
             _leftButtonDefaultSprite = LeftButtonImage.sprite;
         }
 
-        private void OnLeftButtonClicked()
+        public void OnLeftButtonClicked()
         {
             Modal.CloseView();
         }
 
-        private void OnRightButtonClicked()
+        public void OnRightButtonClicked()
         {
             Modal.CloseModal();
         }
