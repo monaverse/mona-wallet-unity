@@ -136,6 +136,7 @@ namespace Monaverse.Modal.UI.Components
 
         public IEnumerator ResizeModalRoutine(float targetHeight)
         {
+            yield break;
             if (_resizingModal) yield break;
             _resizingModal = true;
 

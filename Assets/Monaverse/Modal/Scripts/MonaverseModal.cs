@@ -177,7 +177,7 @@ namespace Monaverse.Modal
             Instance._dialogs = new List<MonaModalDialog>();
             foreach (Transform child in Instance.Modal.transform)
             {
-                var view = child.GetComponent<MonaModalView>();
+                var view = child.GetComponentInChildren<MonaModalView>();
                 if (view != null)
                     Instance._views.Add(view);
 

@@ -431,9 +431,9 @@ namespace Monaverse.Modal.UI.Views
         {
             parentModal.OpenView(_userProfileView, parameters: new UserProfileView.UserProfileParams
             {
-                Email = _user.Email,
-                Name = _user.Name,
-                Username = _user.Username
+                Email = _user?.Email,
+                Name = _user?.Name,
+                Username = _user?.Username
             });
         }
 
