@@ -103,6 +103,12 @@ namespace Monaverse.Modal.UI.Views
             StopAllCoroutines();
         }
 
+        public override void FlushCache()
+        {
+            _user = null;
+            ResetCards(true);
+        }
+
         private void ResetCards(bool flushCache = false)
         {
             if (_cardsPool.Count == 0)
