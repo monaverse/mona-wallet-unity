@@ -97,6 +97,12 @@ namespace Monaverse.Modal
             /// Optional filter for tokens. This will determine which tokens are compatible with your application
             /// </summary>
             public Func<TokenDto, bool> TokenFilter { get; set; } = null;
+
+            /// <summary>
+            /// If true, the cache will be flushed before opening the modal. Defaults to false.
+            /// This is useful if you want to force a refresh of the tokens loaded in the modal before calling Open
+            /// </summary>
+            public bool FlushCache { get; set; } = false;
         }
 
         private void Awake()
@@ -130,7 +136,7 @@ namespace Monaverse.Modal
 
             if (Instance._defaultView == null)
                 Instance._defaultView = Instance._views.Find(x => x is GenerateOtpView);
-            
+
             if (Instance._defaultDialogView == null)
                 Instance._defaultDialogView = Instance._dialogs.Find(x => x is DialogView);
 
@@ -143,7 +149,14 @@ namespace Monaverse.Modal
             //Apply options
             Instance.Options = new ModalOptions();
             options?.Invoke(Instance.Options);
-            
+
+            //Flush cache if requested
+            if (Instance.Options.FlushCache)
+            {
+                foreach (var view in Instance._views)
+                    view.FlushCache();
+            }
+
             Instance.Modal.OpenView(Instance._defaultView);
         }
 
@@ -177,13 +190,21 @@ namespace Monaverse.Modal
             Instance._dialogs = new List<MonaModalDialog>();
             foreach (Transform child in Instance.Modal.transform)
             {
-                var view = child.GetComponentInChildren<MonaModalView>();
-                if (view != null)
-                    Instance._views.Add(view);
+                var views = child.GetComponentsInChildren<MonaModalView>();
 
-                var dialog = child.GetComponent<MonaModalDialog>();
-                if (dialog != null)
+                foreach (var view in views)
+                {
+                    if (view == null) continue;
+                    Instance._views.Add(view);
+                }
+
+                var dialogs = child.GetComponentsInChildren<MonaModalDialog>();
+
+                foreach (var dialog in dialogs)
+                {
+                    if (dialog == null) continue;
                     Instance._dialogs.Add(dialog);
+                }
             }
 
             IsReady = true;
@@ -235,9 +256,9 @@ namespace Monaverse.Modal
             TokenSelected?.Invoke(Instance, tokenDto);
         }
 
-        internal static void ShowDialog(string title, 
-            string message, 
-            Action onConfirm = null, 
+        internal static void ShowDialog(string title,
+            string message,
+            Action onConfirm = null,
             Action onCancel = null,
             string confirmText = null,
             string cancelText = null)

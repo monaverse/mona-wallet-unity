@@ -25,6 +25,8 @@ namespace Monaverse.Modal.UI.Components
         }
         
         protected virtual void OnOpened(object options = null) {}
+        public virtual void OnModalClosed() {}
+        public virtual void FlushCache() {}
 
         public virtual void Hide()
         {

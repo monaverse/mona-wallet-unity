@@ -22,14 +22,12 @@ namespace Monaverse.Modal.UI.Components
         [SerializeField] private RectTransform _footerRectTransform;
         [field: SerializeField] public MonaModalHeader Header { get; private set; }
 
-        [Header("Settings")]
-        [SerializeField, Range(0, 1)] private float _mobileMaxHeightPercent = 0.8f;
-
         public bool IsOpen => _canvas.enabled;
         public event EventHandler Opened;
         public event EventHandler Closed;
 
         private readonly Stack<MonaModalView> _viewsStack = new();
+        private readonly HashSet<MonaModalView> _cachedViews = new();
         private MonaModalDialog _currentDialog;
         private bool _hasGlobalBackground;
         private bool _resizingModal;
@@ -81,10 +79,12 @@ namespace Monaverse.Modal.UI.Components
             var resizeCoroutine = ResizeModalRoutine(view.GetViewHeight());
             _viewsStack.Push(view);
             view.Show(modal, resizeCoroutine, parameters);
-
             Header.Title = view.GetTitle();
+            
+            //Cache all existing views
+            _cachedViews.Add(view);
         }
-
+        
         public void OpenDialog(MonaModalDialog view, MonaModal modal = null, object parameters = null)
         {
             modal ??= this;
@@ -122,6 +122,13 @@ namespace Monaverse.Modal.UI.Components
                 lastView.Hide();
             }
 
+            foreach (var cachedView in _cachedViews)
+            {
+                if(cachedView != null)
+                    cachedView.OnModalClosed();
+            }
+            
+            _cachedViews.Clear();
             _viewsStack.Clear();
             DisableModal();
 
@@ -134,35 +141,9 @@ namespace Monaverse.Modal.UI.Components
             CloseModal();
         }
 
-        public IEnumerator ResizeModalRoutine(float targetHeight)
+        private IEnumerator ResizeModalRoutine(float targetHeight)
         {
             yield break;
-            if (_resizingModal) yield break;
-            _resizingModal = true;
-
-            targetHeight = targetHeight + Header.Height + 12 + _footerRectTransform.rect.height;
-
-#if UNITY_ANDROID || UNITY_IOS
-            targetHeight += 8;
-#endif
-
-            var rootTransformSizeDelta = _rectTransform.sizeDelta;
-            var originalHeight = rootTransformSizeDelta.y;
-            var elapsedTime = 0f;
-            var duration = .25f; // TODO: serialize this
-
-            targetHeight = Mathf.Min(targetHeight, _rootRectTransform.sizeDelta.y * _mobileMaxHeightPercent);
-
-            while (elapsedTime < duration)
-            {
-                var lerp = Mathf.Lerp(originalHeight, targetHeight, elapsedTime / duration);
-                _rectTransform.sizeDelta = new Vector2(rootTransformSizeDelta.x, lerp);
-                elapsedTime += Time.deltaTime;
-                yield return null;
-            }
-
-            _rectTransform.sizeDelta = new Vector2(rootTransformSizeDelta.x, targetHeight);
-            _resizingModal = false;
         }
 
         private void EnableModal()
