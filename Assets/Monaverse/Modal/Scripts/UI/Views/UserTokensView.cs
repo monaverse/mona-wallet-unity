@@ -265,7 +265,8 @@ namespace Monaverse.Modal.UI.Views
                     isInstalled = false,
                     IsCommunityToken = token.IsCommunityToken,
                     price = $"{pricingData.Price} {pricingData.Currency}",
-                    supply = $"x{token.Supply}"
+                    supply = $"x{token.Supply}",
+                    IsInteractable = canBeImported
                 });
             }
         }
