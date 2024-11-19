@@ -44,6 +44,7 @@ namespace Monaverse.Modal.UI.Components
             _remoteSprite = parameters.remoteSprite;
             IsCommunityToken = parameters.IsCommunityToken;
             _communityTag.SetActive(IsCommunityToken);
+            _defaultViewButton.interactable = parameters.IsInteractable;
 
             _iconBorder.color = parameters.borderColor == default
                 ? _defaultBorderColor
@@ -97,6 +98,7 @@ namespace Monaverse.Modal.UI.Components
             public bool IsCommunityToken;
             public string price;
             public string supply;
+            public bool IsInteractable;
         }
     }
 }
