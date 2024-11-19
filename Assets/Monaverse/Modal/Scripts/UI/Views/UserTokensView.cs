@@ -33,7 +33,6 @@ namespace Monaverse.Modal.UI.Views
         [SerializeField] private GameObject _noItemsFound;
         [SerializeField] private TokenDetailsView _tokensDetailsView;
         [SerializeField] private MonaModalView _userProfileView;
-        [SerializeField] private GameObject _loadingAnimator;
         [SerializeField] private Button _marketplaceButton;
         [SerializeField] private Button _profileButton;
         [SerializeField] private Toggle _communityTokensToggle;
@@ -152,7 +151,7 @@ namespace Monaverse.Modal.UI.Views
         private async Task NextPage(bool isFirstLoad)
         {
             _isPageLoading = true;
-            _loadingAnimator.SetActive(true);
+            parentModal.LoadingIndicator.Play();
             _noItemsFound.SetActive(false);
 
             var communityTokens = new List<TokenDto>();
@@ -165,7 +164,7 @@ namespace Monaverse.Modal.UI.Views
             
             var getUserTokensResponse = await GetUserTokens();
             
-            _loadingAnimator.SetActive(false);
+            parentModal.LoadingIndicator.Pause();
 
             if (!IsActive)
                 return;
@@ -298,12 +297,14 @@ namespace Monaverse.Modal.UI.Views
 
             try
             {
+                parentModal.LoadingIndicator.Play();
                 var result = await MonaverseManager.Instance.SDK.GetUser();
 
                 if (!result.IsSuccess)
                 {
                     parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Error, "Failed getting user");
                     MonaDebug.LogError("GetUser Failed: " + result.Message);
+                    parentModal.LoadingIndicator.Pause();
                     return;
                 }
 
@@ -318,6 +319,7 @@ namespace Monaverse.Modal.UI.Views
             catch (Exception exception)
             {
                 parentModal.Header.Snackbar.Show(MonaSnackbar.Type.Error, "Error getting user");
+                parentModal.LoadingIndicator.Pause();
                 MonaDebug.LogException(exception);
             }
         }
