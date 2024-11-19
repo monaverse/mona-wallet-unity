@@ -37,6 +37,7 @@ namespace Monaverse.Modal.UI.Components
         {
             yield return StartCoroutine(effectCoroutine);
             _canvas.enabled = true;
+            parentModal.LoadingIndicator.Pause();
             OnOpened(options);
         }
 

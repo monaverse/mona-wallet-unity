@@ -36,7 +36,7 @@ namespace Monaverse.Modal.UI.Components
             }
 
             var rotationAmount = _rotationSpeed * Time.deltaTime;
-            transform.Rotate(0f, 0f, rotationAmount);
+            transform.Rotate(0f, 0f, -rotationAmount);
             
             // Automatically stop rotation if the button becomes interactable
             if (_linkedButton != null && _linkedButton.interactable && _isRotating)

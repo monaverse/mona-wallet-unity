@@ -21,6 +21,7 @@ namespace Monaverse.Modal.UI.Components
         [SerializeField] private Image _modalBorderImage;
         [SerializeField] private RectTransform _footerRectTransform;
         [field: SerializeField] public MonaModalHeader Header { get; private set; }
+        [field: SerializeField] public MonaLoadingIcon LoadingIndicator { get; private set; }
 
         public bool IsOpen => _canvas.enabled;
         public event EventHandler Opened;
