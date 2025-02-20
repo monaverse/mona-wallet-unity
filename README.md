@@ -333,5 +333,3 @@ For instance, if your game has thousands of levels, you can track high scores fo
 - If no topic is provided when posting a score, the score will not be grouped under any specific topic and will be considered part of the general leaderboard.
 
 By utilizing topics, you gain full control over how scores are organized, allowing your game to scale seamlessly without added complexity.
-
-Test
