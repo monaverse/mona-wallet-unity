@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Monaverse.Api.Modules.Ai;
 using Monaverse.Api.Modules.Auth;
 using Monaverse.Api.Modules.Leaderboard;
 using Monaverse.Api.Modules.Token;
@@ -16,6 +17,7 @@ namespace Monaverse.Api
         ITokenApiModule Token { get; }
         IMonaApiSession Session { get; }
         ILeaderboardApiModule Leaderboard { get; }
+        IAiApiModule Ai { get; }
         string ApplicationId { get; }
         bool IsAuthorized();
         

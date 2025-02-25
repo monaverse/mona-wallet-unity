@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using Monaverse.Api;
 using Monaverse.Api.Configuration;
 using Monaverse.Api.Logging;
+using Monaverse.Api.Modules.Ai.Enums;
+using Monaverse.Api.Modules.Ai.Requests;
+using Monaverse.Api.Modules.Ai.Responses;
 using Monaverse.Api.Modules.Auth.Requests;
 using Monaverse.Api.Modules.Common;
 using Monaverse.Api.Modules.Leaderboard;
@@ -548,6 +551,150 @@ namespace Monaverse.Core
             {
                 MonaDebug.LogException(exception);
                 return ApiResult<List<TopScore>>.Failed(exception.Message);
+            }
+        }
+
+        public async Task<ApiResult<GetGenerationRequestResponse>> GetGenerationRequest(string requestId)
+        {
+            try
+            {
+                if (!IsAuthenticated())
+                    return ApiResult<GetGenerationRequestResponse>.Failed("Not authenticated");
+
+                var result = await ApiClient.Ai.GetGenerationRequest(requestId);
+
+                return result;
+            }
+            catch (Exception exception)
+            {
+                MonaDebug.LogException(exception);
+                return ApiResult<GetGenerationRequestResponse>.Failed(exception.Message);
+            }
+        }
+
+        public async Task<ApiResult<GetAssetByIdResponse>> GetAssetById(string assetId)
+        {
+            try
+            {
+                if (!IsAuthenticated())
+                    return ApiResult<GetAssetByIdResponse>.Failed("Not authenticated");
+
+                var result = await ApiClient.Ai.GetAssetById(assetId);
+
+                return result;
+            }
+            catch (Exception exception)
+            {
+                MonaDebug.LogException(exception);
+                return ApiResult<GetAssetByIdResponse>.Failed(exception.Message);
+            }
+        }
+
+        public async Task<ApiResult<GetRequestsByUserResponse>> GetRequestsByUser(
+            StatusFilter? status = null,
+            StepTypeFilter? stepType = null,
+            AssetTypeFilter? desiredOutputType = null,
+            int limit = 100,
+            int offset = 0
+        )
+        {
+            try
+            {
+                if (!IsAuthenticated())
+                    return ApiResult<GetRequestsByUserResponse>.Failed("Not authenticated");
+
+                var result = await ApiClient.Ai.GetRequestsByUser(status, stepType, desiredOutputType, limit, offset);
+
+                return result;
+            }
+            catch (Exception exception)
+            {
+                MonaDebug.LogException(exception);
+                return ApiResult<GetRequestsByUserResponse>.Failed(exception.Message);
+            }
+        }
+
+        public async Task<ApiResult<GetAssetsByUserResponse>> GetAssetsByUser(
+            AssetTypeFilter? assetType = null,
+            int limit = 100,
+            int offset = 0    
+        )
+        {
+            try
+            {
+                if (!IsAuthenticated())
+                    return ApiResult<GetAssetsByUserResponse>.Failed("Not authenticated");
+
+                var result = await ApiClient.Ai.GetAssetsByUser(assetType, limit, offset);
+
+                return result;
+            }
+            catch (Exception exception)
+            {
+                MonaDebug.LogException(exception);
+                return ApiResult<GetAssetsByUserResponse>.Failed(exception.Message);
+            }
+        }
+
+        public async Task<ApiResult<CreateTextToImageRequestResponse>> CreateTextToImageRequest()
+        {
+            // TODO: dlong - build out request using inputs to this method to send to api
+            try
+            {
+                if (!IsAuthenticated())
+                    return ApiResult<CreateTextToImageRequestResponse>.Failed("Not authenticated");
+
+                var result = await ApiClient.Ai.CreateTextToImageRequest(new CreateTextToImageRequestRequest()
+                {
+                    
+                });
+
+                return result;
+            }
+            catch (Exception exception)
+            {
+                MonaDebug.LogException(exception);
+                return ApiResult<CreateTextToImageRequestResponse>.Failed(exception.Message);
+            }
+        }
+
+        public async Task<ApiResult<CreateImageTo3dRequestResponse>> CreateImageTo3dRequest()
+        {
+            // TODO: dlong - build out request using inputs to this method to send to api
+            try
+            {
+                if (!IsAuthenticated())
+                    return ApiResult<CreateImageTo3dRequestResponse>.Failed("Not authenticated");
+
+                var result = await ApiClient.Ai.CreateImageTo3dRequest(new CreateImageTo3dRequestRequest()
+                {
+                    
+                });
+
+                return result;
+            }
+            catch (Exception exception)
+            {
+                MonaDebug.LogException(exception);
+                return ApiResult<CreateImageTo3dRequestResponse>.Failed(exception.Message);
+            }
+        }
+
+        public async Task<ApiResult<GetUserQuotaResponse>> GetUserQuota()
+        {
+            try
+            {
+                if (!IsAuthenticated())
+                    return ApiResult<GetUserQuotaResponse>.Failed("Not authenticated");
+
+                var result = await ApiClient.Ai.GetUserQuota();
+
+                return result;
+            }
+            catch (Exception exception)
+            {
+                MonaDebug.LogException(exception);
+                return ApiResult<GetUserQuotaResponse>.Failed(exception.Message);
             }
         }
 
