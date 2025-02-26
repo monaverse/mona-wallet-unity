@@ -1,14 +1,23 @@
+using Newtonsoft.Json;
+using System.Collections.Generic;
+
 namespace Monaverse.Api.Modules.Ai.Requests
 {
     public record CreateTextToImageRequestRequest
     {
-        // TODO: dlong - implement
+        [JsonProperty("prompt")]
+        public string Prompt { get; set; }
+
+        [JsonProperty("parameters")]
+        public Dictionary<string, object> Parameters { get; set; } = new();
     }
     
-    /* JSON body
-        {
-        "prompt": "string",
-        "parameters": {}
-        }
-     */
+/* JSON PAYLOAD
+ 
+{
+    "prompt": "string",
+    "parameters": {}
+}
+
+ */
 }

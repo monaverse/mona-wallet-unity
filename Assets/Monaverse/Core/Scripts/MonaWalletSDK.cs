@@ -554,6 +554,18 @@ namespace Monaverse.Core
             }
         }
 
+        /// <summary>
+        /// Gets the status and details of a specific generation request
+        /// </summary>
+        /// <param name="requestId">The unique identifier of the generation request to retrieve</param>
+        /// <returns>
+        /// A result containing the generation request details including:
+        /// - Input and output assets
+        /// - Generation status
+        /// - Creation and completion timestamps
+        /// - Any error messages if the generation failed
+        /// Returns an error if not authenticated or if the request fails
+        /// </returns>
         public async Task<ApiResult<GetGenerationRequestResponse>> GetGenerationRequest(string requestId)
         {
             try
@@ -572,6 +584,17 @@ namespace Monaverse.Core
             }
         }
 
+        /// <summary>
+        /// Retrieves detailed information about a specific asset by its ID
+        /// </summary>
+        /// <param name="assetId">The unique identifier of the asset to retrieve</param>
+        /// <returns>
+        /// A result containing the asset details including:
+        /// - Creator information
+        /// - Source generation details
+        /// - Asset metadata (type, URL, creation time)
+        /// Returns an error if not authenticated or if the request fails
+        /// </returns>
         public async Task<ApiResult<GetAssetByIdResponse>> GetAssetById(string assetId)
         {
             try
@@ -590,6 +613,18 @@ namespace Monaverse.Core
             }
         }
 
+        /// <summary>
+        /// Retrieves a list of generation requests made by the authenticated user with optional filtering
+        /// </summary>
+        /// <param name="status">Filter requests by their status (e.g., Pending, Completed, Failed)</param>
+        /// <param name="stepType">Filter requests by the type of generation step</param>
+        /// <param name="desiredOutputType">Filter requests by the desired output asset type</param>
+        /// <param name="limit">Maximum number of requests to return (default: 100)</param>
+        /// <param name="offset">Number of requests to skip for pagination (default: 0)</param>
+        /// <returns>
+        /// A paginated result containing generation requests matching the specified filters
+        /// Returns an error if not authenticated or if the request fails
+        /// </returns>
         public async Task<ApiResult<GetRequestsByUserResponse>> GetRequestsByUser(
             StatusFilter? status = null,
             StepTypeFilter? stepType = null,
@@ -614,6 +649,16 @@ namespace Monaverse.Core
             }
         }
 
+        /// <summary>
+        /// Retrieves a list of assets owned by the authenticated user with optional filtering
+        /// </summary>
+        /// <param name="assetType">Filter assets by their type</param>
+        /// <param name="limit">Maximum number of assets to return (default: 100)</param>
+        /// <param name="offset">Number of assets to skip for pagination (default: 0)</param>
+        /// <returns>
+        /// A paginated result containing assets matching the specified filters
+        /// Returns an error if not authenticated or if the request fails
+        /// </returns>
         public async Task<ApiResult<GetAssetsByUserResponse>> GetAssetsByUser(
             AssetTypeFilter? assetType = null,
             int limit = 100,
@@ -636,17 +681,25 @@ namespace Monaverse.Core
             }
         }
 
-        public async Task<ApiResult<CreateTextToImageRequestResponse>> CreateTextToImageRequest()
+        /// <summary>
+        /// Creates a new text-to-image generation request
+        /// </summary>
+        /// <param name="prompt">The text description of the image to generate</param>
+        /// <returns>
+        /// A result containing the created generation request details
+        /// The generation will be processed asynchronously and can be monitored using GetGenerationRequest
+        /// Returns an error if not authenticated or if the request fails
+        /// </returns>
+        public async Task<ApiResult<CreateTextToImageRequestResponse>> CreateTextToImageRequest(string prompt)
         {
-            // TODO: dlong - build out request using inputs to this method to send to api
             try
             {
                 if (!IsAuthenticated())
                     return ApiResult<CreateTextToImageRequestResponse>.Failed("Not authenticated");
 
-                var result = await ApiClient.Ai.CreateTextToImageRequest(new CreateTextToImageRequestRequest()
+                var result = await ApiClient.Ai.CreateTextToImageRequest(new CreateTextToImageRequestRequest
                 {
-                    
+                    Prompt = prompt
                 });
 
                 return result;
@@ -658,17 +711,25 @@ namespace Monaverse.Core
             }
         }
 
-        public async Task<ApiResult<CreateImageTo3dRequestResponse>> CreateImageTo3dRequest()
+        /// <summary>
+        /// Creates a new image-to-3D generation request
+        /// </summary>
+        /// <param name="imageId">The ID of the source image to convert to 3D</param>
+        /// <returns>
+        /// A result containing the created generation request details
+        /// The generation will be processed asynchronously and can be monitored using GetGenerationRequest
+        /// Returns an error if not authenticated or if the request fails
+        /// </returns>
+        public async Task<ApiResult<CreateImageTo3dRequestResponse>> CreateImageTo3dRequest(string imageId)
         {
-            // TODO: dlong - build out request using inputs to this method to send to api
             try
             {
                 if (!IsAuthenticated())
                     return ApiResult<CreateImageTo3dRequestResponse>.Failed("Not authenticated");
 
-                var result = await ApiClient.Ai.CreateImageTo3dRequest(new CreateImageTo3dRequestRequest()
+                var result = await ApiClient.Ai.CreateImageTo3dRequest(new CreateImageTo3dRequestRequest
                 {
-                    
+                    ImageId = imageId
                 });
 
                 return result;
@@ -680,6 +741,17 @@ namespace Monaverse.Core
             }
         }
 
+        /// <summary>
+        /// Retrieves the current user's quota information for various generation types
+        /// </summary>
+        /// <returns>
+        /// A result containing quota information for each generation type including:
+        /// - Generation type and period
+        /// - Usage limits
+        /// - Current usage and remaining quota
+        /// - Custom quota status
+        /// Returns an error if not authenticated or if the request fails
+        /// </returns>
         public async Task<ApiResult<GetUserQuotaResponse>> GetUserQuota()
         {
             try
