@@ -1,0 +1,46 @@
+{
+  "outputAsset": null,
+  "inputAsset": {
+    "creator": {
+      "uuid": "S5t3WWQvLKTKk3ZNe7xtxt",
+      "username": "davemona"
+    },
+    "sourceGeneration": {
+      "inputAsset": null,
+      "uuid": "fQmyP9ZuboV7Qh2EhBP5wk",
+      "stepType": "text-to-image",
+      "desiredOutputType": "image",
+      "inputText": "a bright pink stuffed bunny rabbit",
+      "status": "completed",
+      "createdAt": "2025-02-26T19:30:01.167Z",
+      "completedAt": "2025-02-26T19:30:12.152Z"
+    },
+    "derivedGenerationRequests": [
+      {
+        "outputAsset": null,
+        "uuid": "khZPDhU3bwNbFq5ZW4A4ch",
+        "stepType": "image-to-3d",
+        "desiredOutputType": "glb",
+        "status": "pending",
+        "createdAt": "2025-02-26T19:32:42.377Z",
+        "completedAt": null
+      }
+    ],
+    "userCollectibles": [],
+    "uuid": "K2GTGmCHMXTqEf9MH48nk4",
+    "assetType": "image",
+    "url": "https://media.monaverse.com/media/ai/assets/fQmyP9ZuboV7Qh2EhBP5wk.png",
+    "createdAt": "2025-02-26T19:30:12.147Z",
+    "size": 494499
+  },
+  "uuid": "khZPDhU3bwNbFq5ZW4A4ch",
+  "desiredOutputType": "glb",
+  "createdAt": "2025-02-26T19:32:42.377Z",
+  "stepType": "image-to-3d",
+  "status": "pending",
+  "parameters": {},
+  "inputText": null,
+  "startedAt": null,
+  "completedAt": null,
+  "errorMessage": null
+}

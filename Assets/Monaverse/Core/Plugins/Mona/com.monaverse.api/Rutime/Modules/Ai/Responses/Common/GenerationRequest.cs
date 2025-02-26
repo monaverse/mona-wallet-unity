@@ -34,10 +34,10 @@ namespace Monaverse.Api.Modules.Ai.Responses.Common
         public string InputText { get; set; }
 
         [JsonProperty("startedAt")]
-        public DateTime StartedAt { get; set; }
+        public DateTime? StartedAt { get; set; }
 
         [JsonProperty("completedAt")]
-        public DateTime CompletedAt { get; set; }
+        public DateTime? CompletedAt { get; set; }
 
         [JsonProperty("errorMessage")]
         public string ErrorMessage { get; set; }

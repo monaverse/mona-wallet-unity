@@ -1,0 +1,76 @@
+{
+    "outputAsset": {
+      "creator": {
+        "uuid": "S5t3WWQvLKTKk3ZNe7xtxt",
+        "username": "davemona"
+      },
+      "sourceGeneration": {
+        "inputAsset": {
+          "uuid": "5qZ3UWBR3snmQJNZx2iWEh",
+          "url": "https://media.monaverse.com/media/ai/assets/bpcFY5mWfq6VWWE9UyXiqC.png",
+          "assetType": "image"
+        },
+        "uuid": "KVeXABd6E4wSNQihhDVCp3",
+        "stepType": "image-to-3d",
+        "desiredOutputType": "glb",
+        "inputText": null,
+        "status": "completed",
+        "createdAt": "2025-02-21T15:17:21.639Z",
+        "completedAt": "2025-02-21T15:17:48.716Z"
+      },
+      "derivedGenerationRequests": [],
+      "userCollectibles": [],
+      "uuid": "YBZEm4teSAxoyD7GwFPuUQ",
+      "assetType": "glb",
+      "url": "https://media.monaverse.com/media/ai/assets/KVeXABd6E4wSNQihhDVCp3.glb",
+      "createdAt": "2025-02-21T15:17:48.653Z",
+      "size": 1962524
+    },
+    "inputAsset": {
+      "creator": {
+        "uuid": "S5t3WWQvLKTKk3ZNe7xtxt",
+        "username": "davemona"
+      },
+      "sourceGeneration": {
+        "inputAsset": null,
+        "uuid": "bpcFY5mWfq6VWWE9UyXiqC",
+        "stepType": "text-to-image",
+        "desiredOutputType": "image",
+        "inputText": "celshaded  alien, cute, pixar, big eyes, quirky",
+        "status": "completed",
+        "createdAt": "2025-02-21T15:16:49.247Z",
+        "completedAt": "2025-02-21T15:17:15.852Z"
+      },
+      "derivedGenerationRequests": [
+        {
+          "outputAsset": {
+            "uuid": "YBZEm4teSAxoyD7GwFPuUQ",
+            "url": "https://media.monaverse.com/media/ai/assets/KVeXABd6E4wSNQihhDVCp3.glb",
+            "assetType": "glb"
+          },
+          "uuid": "KVeXABd6E4wSNQihhDVCp3",
+          "stepType": "image-to-3d",
+          "desiredOutputType": "glb",
+          "status": "completed",
+          "createdAt": "2025-02-21T15:17:21.639Z",
+          "completedAt": "2025-02-21T15:17:48.716Z"
+        }
+      ],
+      "userCollectibles": [],
+      "uuid": "5qZ3UWBR3snmQJNZx2iWEh",
+      "assetType": "image",
+      "url": "https://media.monaverse.com/media/ai/assets/bpcFY5mWfq6VWWE9UyXiqC.png",
+      "createdAt": "2025-02-21T15:17:15.848Z",
+      "size": 569791
+    },
+    "uuid": "KVeXABd6E4wSNQihhDVCp3",
+    "desiredOutputType": "glb",
+    "createdAt": "2025-02-21T15:17:21.639Z",
+    "stepType": "image-to-3d",
+    "status": "completed",
+    "parameters": null,
+    "inputText": null,
+    "startedAt": "2025-02-21T15:17:21.715Z",
+    "completedAt": "2025-02-21T15:17:48.716Z",
+    "errorMessage": null
+  }

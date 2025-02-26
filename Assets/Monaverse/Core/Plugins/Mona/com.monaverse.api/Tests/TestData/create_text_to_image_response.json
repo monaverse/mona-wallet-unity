@@ -1,0 +1,14 @@
+{
+  "outputAsset": null,
+  "inputAsset": null,
+  "uuid": "fQmyP9ZuboV7Qh2EhBP5wk",
+  "desiredOutputType": "image",
+  "createdAt": "2025-02-26T19:30:01.167Z",
+  "stepType": "text-to-image",
+  "status": "pending",
+  "parameters": {},
+  "inputText": "a bright pink stuffed bunny rabbit",
+  "startedAt": null,
+  "completedAt": null,
+  "errorMessage": null
+}
