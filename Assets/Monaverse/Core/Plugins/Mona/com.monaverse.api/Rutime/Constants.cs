@@ -51,13 +51,13 @@ namespace Monaverse.Api
             {
                 public static string GetGenerationRequest(string requestId)
                     => $"public/ai/requests/{requestId}";
-                public static string GetAssetById(string assetId)
+                public static string GetAsset(string assetId)
                     => $"public/ai/assets/{assetId}";
-                public const string GetRequestsByUser = "public/ai/requests";
-                public const string GetAssetsByUser = "public/ai/assets";
+                public const string GetGenerationRequests = "public/ai/requests";
+                public const string GetAssets = "public/ai/assets";
                 public const string CreateTextToImageRequest = "public/ai/text-to-image";
                 public const string CreateImageTo3dRequest = "public/ai/image-to-3d";
-                public const string GetUserQuota = "public/ai/quota";
+                public const string GetQuota = "public/ai/quota";
             }
         }
     }

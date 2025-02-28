@@ -595,21 +595,21 @@ namespace Monaverse.Core
         /// - Asset metadata (type, URL, creation time)
         /// Returns an error if not authenticated or if the request fails
         /// </returns>
-        public async Task<ApiResult<GetAssetByIdResponse>> GetAssetById(string assetId)
+        public async Task<ApiResult<GetAssetResponse>> GetAsset(string assetId)
         {
             try
             {
                 if (!IsAuthenticated())
-                    return ApiResult<GetAssetByIdResponse>.Failed("Not authenticated");
+                    return ApiResult<GetAssetResponse>.Failed("Not authenticated");
 
-                var result = await ApiClient.Ai.GetAssetById(assetId);
+                var result = await ApiClient.Ai.GetAsset(assetId);
 
                 return result;
             }
             catch (Exception exception)
             {
                 MonaDebug.LogException(exception);
-                return ApiResult<GetAssetByIdResponse>.Failed(exception.Message);
+                return ApiResult<GetAssetResponse>.Failed(exception.Message);
             }
         }
 
@@ -625,7 +625,7 @@ namespace Monaverse.Core
         /// A paginated result containing generation requests matching the specified filters
         /// Returns an error if not authenticated or if the request fails
         /// </returns>
-        public async Task<ApiResult<GetRequestsByUserResponse>> GetRequestsByUser(
+        public async Task<ApiResult<GetGenerationRequestsResponse>> GetGenerationRequests(
             StatusFilter? status = null,
             StepTypeFilter? stepType = null,
             AssetTypeFilter? desiredOutputType = null,
@@ -636,16 +636,16 @@ namespace Monaverse.Core
             try
             {
                 if (!IsAuthenticated())
-                    return ApiResult<GetRequestsByUserResponse>.Failed("Not authenticated");
+                    return ApiResult<GetGenerationRequestsResponse>.Failed("Not authenticated");
 
-                var result = await ApiClient.Ai.GetRequestsByUser(status, stepType, desiredOutputType, limit, offset);
+                var result = await ApiClient.Ai.GetGenerationRequests(status, stepType, desiredOutputType, limit, offset);
 
                 return result;
             }
             catch (Exception exception)
             {
                 MonaDebug.LogException(exception);
-                return ApiResult<GetRequestsByUserResponse>.Failed(exception.Message);
+                return ApiResult<GetGenerationRequestsResponse>.Failed(exception.Message);
             }
         }
 
@@ -659,7 +659,7 @@ namespace Monaverse.Core
         /// A paginated result containing assets matching the specified filters
         /// Returns an error if not authenticated or if the request fails
         /// </returns>
-        public async Task<ApiResult<GetAssetsByUserResponse>> GetAssetsByUser(
+        public async Task<ApiResult<GetAssetsResponse>> GetAssets(
             AssetTypeFilter? assetType = null,
             int limit = 100,
             int offset = 0    
@@ -668,16 +668,16 @@ namespace Monaverse.Core
             try
             {
                 if (!IsAuthenticated())
-                    return ApiResult<GetAssetsByUserResponse>.Failed("Not authenticated");
+                    return ApiResult<GetAssetsResponse>.Failed("Not authenticated");
 
-                var result = await ApiClient.Ai.GetAssetsByUser(assetType, limit, offset);
+                var result = await ApiClient.Ai.GetAssets(assetType, limit, offset);
 
                 return result;
             }
             catch (Exception exception)
             {
                 MonaDebug.LogException(exception);
-                return ApiResult<GetAssetsByUserResponse>.Failed(exception.Message);
+                return ApiResult<GetAssetsResponse>.Failed(exception.Message);
             }
         }
 
@@ -752,21 +752,21 @@ namespace Monaverse.Core
         /// - Custom quota status
         /// Returns an error if not authenticated or if the request fails
         /// </returns>
-        public async Task<ApiResult<GetUserQuotaResponse>> GetUserQuota()
+        public async Task<ApiResult<GetQuotaResponse>> GetQuota()
         {
             try
             {
                 if (!IsAuthenticated())
-                    return ApiResult<GetUserQuotaResponse>.Failed("Not authenticated");
+                    return ApiResult<GetQuotaResponse>.Failed("Not authenticated");
 
-                var result = await ApiClient.Ai.GetUserQuota();
+                var result = await ApiClient.Ai.GetQuota();
 
                 return result;
             }
             catch (Exception exception)
             {
                 MonaDebug.LogException(exception);
-                return ApiResult<GetUserQuotaResponse>.Failed(exception.Message);
+                return ApiResult<GetQuotaResponse>.Failed(exception.Message);
             }
         }
 

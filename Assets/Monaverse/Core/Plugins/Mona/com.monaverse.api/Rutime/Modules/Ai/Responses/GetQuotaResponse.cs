@@ -6,7 +6,7 @@ using Monaverse.Api.Modules.Ai.Responses.Common;
 
 namespace Monaverse.Api.Modules.Ai.Responses
 {
-    public record GetUserQuotaResponse
+    public record GetQuotaResponse
     {
         [JsonExtensionData]
         public Dictionary<string, object> QuotasRaw { get; set; } = new Dictionary<string, object>();

@@ -58,7 +58,7 @@ namespace Monaverse.Api.Tests.Editor
         public void GetUserQuotaResponse_DeserializationTest()
         {
             var json = LoadJsonFromFile("user_quota_response.json");
-            var response = JsonConvert.DeserializeObject<GetUserQuotaResponse>(json);
+            var response = JsonConvert.DeserializeObject<GetQuotaResponse>(json);
             
             Assert.NotNull(response);
             Assert.NotNull(response.QuotasRaw);
@@ -93,7 +93,7 @@ namespace Monaverse.Api.Tests.Editor
         public void GetAssetByIdResponse_DeserializationTest()
         {
             var json = LoadJsonFromFile("get_asset_by_id_response.json");
-            var response = JsonConvert.DeserializeObject<GetAssetByIdResponse>(json);
+            var response = JsonConvert.DeserializeObject<GetAssetResponse>(json);
             
             Assert.NotNull(response);
             Assert.NotNull(response.Creator);
@@ -106,7 +106,7 @@ namespace Monaverse.Api.Tests.Editor
         public void GetAssetsByUserResponse_DeserializationTest()
         {
             var json = LoadJsonFromFile("get_assets_by_user_response.json");
-            var response = JsonConvert.DeserializeObject<GetAssetsByUserResponse>(json);
+            var response = JsonConvert.DeserializeObject<GetAssetsResponse>(json);
             
             Assert.NotNull(response);
             Assert.NotNull(response.Items);
@@ -118,7 +118,7 @@ namespace Monaverse.Api.Tests.Editor
         public void GetRequestsByUserResponse_DeserializationTest()
         {
             var json = LoadJsonFromFile("get_requests_by_user_response.json");
-            var response = JsonConvert.DeserializeObject<GetRequestsByUserResponse>(json);
+            var response = JsonConvert.DeserializeObject<GetGenerationRequestsResponse>(json);
             
             Assert.NotNull(response);
             Assert.NotNull(response.Items);

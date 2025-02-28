@@ -1,15 +1,12 @@
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using Monaverse.Api.Modules.Ai.Responses.Common;
 
 namespace Monaverse.Api.Modules.Ai.Responses
 {
-    public record GetRequestsByUserResponse
+    public record GetGenerationRequestsResponse
     {
-        [JsonProperty("items")]
         public List<GenerationRequest> Items { get; set; } = new();
-
-        [JsonProperty("count")]
+        
         public int Count { get; set; }
     }
 

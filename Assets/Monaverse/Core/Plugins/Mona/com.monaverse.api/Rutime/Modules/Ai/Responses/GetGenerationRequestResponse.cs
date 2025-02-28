@@ -1,6 +1,3 @@
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using Monaverse.Api.Modules.Ai.Responses.Common;
 
 namespace Monaverse.Api.Modules.Ai.Responses

@@ -28,18 +28,18 @@ namespace Monaverse.Api.Modules.Ai
             return response.ConvertTo<GetGenerationRequestResponse>();
         }
 
-        public async Task<ApiResult<GetAssetByIdResponse>> GetAssetById(string assetId)
+        public async Task<ApiResult<GetAssetResponse>> GetAsset(string assetId)
         {
             var monaHttpRequest = new MonaHttpRequest(
-                url: _monaApiClient.GetUrlWithPath(Constants.Endpoints.Ai.GetAssetById(assetId)),
+                url: _monaApiClient.GetUrlWithPath(Constants.Endpoints.Ai.GetAsset(assetId)),
                 method: RequestMethod.Get
             );
 
             var response = await _monaApiClient.SendAuthenticated(monaHttpRequest);
-            return response.ConvertTo<GetAssetByIdResponse>();
+            return response.ConvertTo<GetAssetResponse>();
         }
 
-        public async Task<ApiResult<GetRequestsByUserResponse>> GetRequestsByUser(
+        public async Task<ApiResult<GetGenerationRequestsResponse>> GetGenerationRequests(
             StatusFilter? status = null,
             StepTypeFilter? stepType = null,
             AssetTypeFilter? desiredOutputType = null,
@@ -48,7 +48,7 @@ namespace Monaverse.Api.Modules.Ai
         )
         {
             var monaHttpRequest = new MonaHttpRequest(
-                url: _monaApiClient.GetUrlWithPath(Constants.Endpoints.Ai.GetRequestsByUser),
+                url: _monaApiClient.GetUrlWithPath(Constants.Endpoints.Ai.GetGenerationRequests),
                 method: RequestMethod.Get);
 
             if (status.HasValue)
@@ -71,17 +71,17 @@ namespace Monaverse.Api.Modules.Ai
                 .WithQueryParam("offset", offset);
             
             var response = await _monaApiClient.SendAuthenticated(monaHttpRequest);
-            return response.ConvertTo<GetRequestsByUserResponse>();
+            return response.ConvertTo<GetGenerationRequestsResponse>();
         }
 
-        public async Task<ApiResult<GetAssetsByUserResponse>> GetAssetsByUser(
+        public async Task<ApiResult<GetAssetsResponse>> GetAssets(
             AssetTypeFilter? assetType = null,
             int limit = 100,
             int offset = 0
         )
         {
             var monaHttpRequest = new MonaHttpRequest(
-                url: _monaApiClient.GetUrlWithPath(Constants.Endpoints.Ai.GetAssetsByUser),
+                url: _monaApiClient.GetUrlWithPath(Constants.Endpoints.Ai.GetAssets),
                 method: RequestMethod.Get);
                 
             if (assetType.HasValue)
@@ -94,7 +94,7 @@ namespace Monaverse.Api.Modules.Ai
                 .WithQueryParam("offset", offset);
 
             var response = await _monaApiClient.SendAuthenticated(monaHttpRequest);
-            return response.ConvertTo<GetAssetsByUserResponse>();
+            return response.ConvertTo<GetAssetsResponse>();
         }
 
         public async Task<ApiResult<CreateTextToImageRequestResponse>> CreateTextToImageRequest(CreateTextToImageRequestRequest request)
@@ -119,15 +119,15 @@ namespace Monaverse.Api.Modules.Ai
             return response.ConvertTo<CreateImageTo3dRequestResponse>();
         }
 
-        public async Task<ApiResult<GetUserQuotaResponse>> GetUserQuota()
+        public async Task<ApiResult<GetQuotaResponse>> GetQuota()
         {
             var monaHttpRequest = new MonaHttpRequest(
-                url: _monaApiClient.GetUrlWithPath(Constants.Endpoints.Ai.GetUserQuota),
+                url: _monaApiClient.GetUrlWithPath(Constants.Endpoints.Ai.GetQuota),
                 method: RequestMethod.Get
             );
 
             var response = await _monaApiClient.SendAuthenticated(monaHttpRequest);
-            return response.ConvertTo<GetUserQuotaResponse>();
+            return response.ConvertTo<GetQuotaResponse>();
         }
     }
 }
