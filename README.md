@@ -401,14 +401,14 @@ Retrieves detailed information about a specific asset.
 
 ```csharp
 var result = await MonaverseManager.Instance.SDK
-    .GetAssetById("asset-id");
+    .GetAsset("asset-id");
 ```
 
 #### Parameters:
 - **assetId**: The unique identifier of the asset
 
 #### Returns:
-A `GetAssetByIdResponse` containing:
+A `GetAssetResponse` containing:
 - Creator information
 - Source generation details
 - Asset metadata (type, URL, creation time)
@@ -419,7 +419,7 @@ Retrieves a list of generation requests made by the authenticated user.
 
 ```csharp
 var result = await MonaverseManager.Instance.SDK
-    .GetRequestsByUser(
+    .GetGenerationRequests(
         status: StatusFilter.Completed,
         stepType: StepTypeFilter.TextToImage,
         limit: 20,
@@ -435,7 +435,7 @@ var result = await MonaverseManager.Instance.SDK
 - **offset**: Number of requests to skip (default: 0)
 
 #### Returns:
-A paginated `GetRequestsByUserResponse` containing:
+A paginated `GetGenerationRequestsResponse` containing:
 - Items: List of generation requests
 - Count: Total number of requests matching the filters
 
@@ -445,7 +445,7 @@ Retrieves a list of assets owned by the authenticated user.
 
 ```csharp
 var result = await MonaverseManager.Instance.SDK
-    .GetAssetsByUser(
+    .GetAssets(
         assetType: AssetTypeFilter.Image,
         limit: 20,
         offset: 0
@@ -458,7 +458,7 @@ var result = await MonaverseManager.Instance.SDK
 - **offset**: Number of assets to skip (default: 0)
 
 #### Returns:
-A paginated `GetAssetsByUserResponse` containing:
+A paginated `GetAssetsResponse` containing:
 - Items: List of assets
 - Count: Total number of assets matching the filters
 
@@ -468,11 +468,11 @@ Retrieves the current user's quota information for various generation types.
 
 ```csharp
 var result = await MonaverseManager.Instance.SDK
-    .GetUserQuota();
+    .GetQuota();
 ```
 
 #### Returns:
-A `GetUserQuotaResponse` containing quota information for each generation type:
+A `GetQuotaResponse` containing quota information for each generation type:
 - Generation type and period
 - Usage limits
 - Current usage and remaining quota
