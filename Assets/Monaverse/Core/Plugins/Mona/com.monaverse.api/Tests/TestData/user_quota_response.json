@@ -1,0 +1,18 @@
+{
+  "text-to-image": {
+    "generationType": "text-to-image",
+    "period": "monthly",
+    "limit": 100,
+    "used": 7,
+    "remaining": 93,
+    "isCustom": false
+  },
+  "image-to-3d": {
+    "generationType": "image-to-3d",
+    "period": "monthly",
+    "limit": 100,
+    "used": 7,
+    "remaining": 93,
+    "isCustom": false
+  }
+}

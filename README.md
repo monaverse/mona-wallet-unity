@@ -326,10 +326,165 @@ A **topic** is a label you can associate with each score submission. Topics allo
 
 By leveraging topics, you can create as many dynamic leaderboards as your game requires.
 
-For instance, if your game has thousands of levels, you can track high scores for each level individually by using topics like `"Level 1"`, `"Level 2"`, and so on. There’s no need to manually configure a new leaderboard for each level—topics provide the flexibility to create as many leaderboards as needed, on the fly.
+For instance, if your game has thousands of levels, you can track high scores for each level individually by using topics like `"Level 1"`, `"Level 2"`, and so on. There's no need to manually configure a new leaderboard for each level—topics provide the flexibility to create as many leaderboards as needed, on the fly.
 
 #### Important Notes:
 - **Topics are case-sensitive**, so `"level 1"` and `"Level 1"` will be treated as two different topics. Ensure consistency in how you define and reference topics throughout your game.
 - If no topic is provided when posting a score, the score will not be grouped under any specific topic and will be considered part of the general leaderboard.
 
 By utilizing topics, you gain full control over how scores are organized, allowing your game to scale seamlessly without added complexity.
+
+## AI Generation
+
+Our SDK now supports AI-powered generation features, allowing developers to create images and 3D models directly through the Monaverse platform. Below is a guide on how to use these features.
+
+### AI Generation APIs
+
+### CreateTextToImageRequest
+
+Generates an image from a text description (prompt). The generation is processed asynchronously, and you can monitor its status using GetGenerationRequest.
+
+```csharp
+var result = await MonaverseManager.Instance.SDK
+    .CreateTextToImageRequest("a bright pink stuffed bunny rabbit");
+```
+
+#### Parameters:
+- **prompt**: Text description of the image you want to generate
+
+#### Returns:
+A `CreateTextToImageRequestResponse` containing:
+- Uuid: Unique identifier for tracking the generation
+- Status: Current status of the generation
+- InputAsset & OutputAsset: Asset information once generation is complete
+
+### CreateImageTo3dRequest
+
+Converts a 2D image into a 3D model. Like text-to-image, this is processed asynchronously and can be monitored using GetGenerationRequest.
+
+```csharp
+var result = await MonaverseManager.Instance.SDK
+    .CreateImageTo3dRequest("your-image-id");
+```
+
+#### Parameters:
+- **imageId**: ID of the source image to convert to 3D
+
+#### Returns:
+A `CreateImageTo3dRequestResponse` containing:
+- Uuid: Unique identifier for tracking the generation
+- Status: Current status of the generation
+- InputAsset & OutputAsset: Asset information once generation is complete
+
+### GetGenerationRequest
+
+Retrieves the status and details of a specific generation request.
+
+```csharp
+var result = await MonaverseManager.Instance.SDK
+    .GetGenerationRequest("generation-request-id");
+```
+
+#### Parameters:
+- **requestId**: The unique identifier of the generation request
+
+#### Returns:
+A `GetGenerationRequestResponse` containing complete details about the generation request, including:
+- Status: Current status (pending, in_progress, completed, failed)
+- Input/Output assets
+- Creation and completion timestamps
+- Error messages if applicable
+
+### GetAssetById
+
+Retrieves detailed information about a specific asset.
+
+```csharp
+var result = await MonaverseManager.Instance.SDK
+    .GetAsset("asset-id");
+```
+
+#### Parameters:
+- **assetId**: The unique identifier of the asset
+
+#### Returns:
+A `GetAssetResponse` containing:
+- Creator information
+- Source generation details
+- Asset metadata (type, URL, creation time)
+
+### GetRequestsByUser
+
+Retrieves a list of generation requests made by the authenticated user.
+
+```csharp
+var result = await MonaverseManager.Instance.SDK
+    .GetGenerationRequests(
+        status: StatusFilter.Completed,
+        stepType: StepTypeFilter.TextToImage,
+        limit: 20,
+        offset: 0
+    );
+```
+
+#### Parameters:
+- **status**: Filter by request status (optional)
+- **stepType**: Filter by generation type (optional)
+- **desiredOutputType**: Filter by output type (optional)
+- **limit**: Maximum number of requests to return (default: 100)
+- **offset**: Number of requests to skip (default: 0)
+
+#### Returns:
+A paginated `GetGenerationRequestsResponse` containing:
+- Items: List of generation requests
+- Count: Total number of requests matching the filters
+
+### GetAssetsByUser
+
+Retrieves a list of assets owned by the authenticated user.
+
+```csharp
+var result = await MonaverseManager.Instance.SDK
+    .GetAssets(
+        assetType: AssetTypeFilter.Image,
+        limit: 20,
+        offset: 0
+    );
+```
+
+#### Parameters:
+- **assetType**: Filter by asset type (optional)
+- **limit**: Maximum number of assets to return (default: 100)
+- **offset**: Number of assets to skip (default: 0)
+
+#### Returns:
+A paginated `GetAssetsResponse` containing:
+- Items: List of assets
+- Count: Total number of assets matching the filters
+
+### GetUserQuota
+
+Retrieves the current user's quota information for various generation types.
+
+```csharp
+var result = await MonaverseManager.Instance.SDK
+    .GetQuota();
+```
+
+#### Returns:
+A `GetQuotaResponse` containing quota information for each generation type:
+- Generation type and period
+- Usage limits
+- Current usage and remaining quota
+- Custom quota status
+
+### Understanding Generation Status
+
+When using the AI generation features, requests go through several states:
+- **pending**: Request is queued for processing
+- **in_progress**: Generation is actively being processed
+- **completed**: Generation has finished successfully
+- **failed**: Generation encountered an error
+- **awaiting_retry**: Generation failed but will be retried automatically
+
+You can monitor the status of any generation request using the `GetGenerationRequest` API.

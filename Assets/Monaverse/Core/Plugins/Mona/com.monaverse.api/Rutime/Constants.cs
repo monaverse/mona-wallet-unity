@@ -46,6 +46,19 @@ namespace Monaverse.Api
                 public const string GetUserRank = "public/leaderboards/rank";
                 public const string GetAroundMeScores = "public/leaderboards/around-me";
             }
+
+            public static class Ai
+            {
+                public static string GetGenerationRequest(string requestId)
+                    => $"public/ai/requests/{requestId}";
+                public static string GetAsset(string assetId)
+                    => $"public/ai/assets/{assetId}";
+                public const string GetGenerationRequests = "public/ai/requests";
+                public const string GetAssets = "public/ai/assets";
+                public const string CreateTextToImageRequest = "public/ai/text-to-image";
+                public const string CreateImageTo3dRequest = "public/ai/image-to-3d";
+                public const string GetQuota = "public/ai/quota";
+            }
         }
     }
 }
